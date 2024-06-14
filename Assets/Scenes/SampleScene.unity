@@ -220,6 +220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cellPrefab: {fileID: 3869021828577780324, guid: ab5441bb0e5db7f4b91fb3cc70b09e4d, type: 3}
   cellContainerPrefab: {fileID: 7031501898914153013, guid: 4484d8ccb9d44ad44ba3729d86055d82, type: 3}
+  cellContainerHolderPrefab: {fileID: 0}
 --- !u!114 &419188299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,10 +297,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85ef4f4d06e3db74894ec92d921a4260, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layers:
+  groundLayerMask:
     serializedVersion: 2
     m_Bits: 8
-  cellContainerSelectionBarsTransforms:
+  selectionBarCellContainerTransformList:
   - {fileID: 371120509}
   - {fileID: 1926214680}
   - {fileID: 1522481080}
