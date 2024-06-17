@@ -1,3 +1,5 @@
+using Scrips.Objects.Block;
+
 namespace Scrips.Objects.Cell
 {
     public interface IBlockFactory

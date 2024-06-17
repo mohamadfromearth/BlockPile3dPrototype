@@ -1,8 +1,8 @@
 using Scrips.Core;
-using Scrips.Objects.Cell;
+using Scrips.Objects.Block;
 using UnityEngine;
 
-namespace Scrips.Objects.CellsContainer
+namespace Scrips.Objects.BlocksContainer
 {
     public interface IBlockContainer : IPosition, IGameObject
     {

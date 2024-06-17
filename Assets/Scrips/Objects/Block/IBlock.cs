@@ -1,7 +1,7 @@
 using Scrips.Core;
 using UnityEngine;
 
-namespace Scrips.Objects.Cell
+namespace Scrips.Objects.Block
 {
     public interface IBlock : IPosition, IGameObject
     {

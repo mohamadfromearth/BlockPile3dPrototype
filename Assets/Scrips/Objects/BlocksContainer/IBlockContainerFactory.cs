@@ -1,3 +1,5 @@
+using Scrips.Objects.BlocksContainer;
+
 namespace Scrips.Objects.CellsContainer
 {
     public interface IBlockContainerFactory

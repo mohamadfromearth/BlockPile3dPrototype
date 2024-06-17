@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Event;
 using Scrips.Event;
+using Scrips.Objects.Block;
+using Scrips.Objects.BlocksContainer;
 using Scrips.Objects.Cell;
 using UnityEngine;
 using UnityEngine.EventSystems;

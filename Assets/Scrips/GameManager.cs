@@ -3,7 +3,7 @@ using System.Linq;
 using Event;
 using Scrips.Data;
 using Scrips.Event;
-using Scrips.Objects.CellsContainer;
+using Scrips.Objects.BlocksContainer;
 using Scrips.Utils;
 using UnityEngine;
 using Zenject;
@@ -28,6 +28,18 @@ namespace Scrips
 
         private int _selectionBarSelectedIndex;
         private IBlockContainer _selectedBlockContainer;
+
+        private readonly Vector3Int[] _gridOffsets = new[]
+        {
+            new Vector3Int(1, 0, 1),
+            new Vector3Int(1, 0, 0),
+            new Vector3Int(1, 0, -1),
+            new Vector3Int(0, 0, -1),
+            new Vector3Int(-1, 0, -1),
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(-1, 0, 1),
+            new Vector3Int(0, 0, 1)
+        };
 
 
         private void Awake()
@@ -100,6 +112,25 @@ namespace Scrips
                 {
                     _selectedBlockContainer.SetPosition(_selectionBarCellContainerPosList[_selectionBarSelectedIndex]);
                     _selectedBlockContainer = null;
+                }
+            }
+        }
+
+
+        private void Check(Vector3Int boardPosition)
+        {
+            var container = _board.GetBlockContainerHolder(boardPosition);
+            
+            
+
+
+            foreach (var gridOffset in _gridOffsets)
+            {
+                var containerToCheck = _board.GetBlockContainerHolder(boardPosition + gridOffset);
+
+
+                if (containerToCheck != container)
+                {
                 }
             }
         }

@@ -18,21 +18,43 @@ MonoBehaviour:
     blockContainerDataList:
     - position: {x: 3, y: 0, z: 3}
       color: {r: 0, g: 0, b: 0, a: 0}
-      count: 4
+      blockGroupDataList:
+      - color: {r: 0, g: 0, b: 0, a: 0}
+        count: 2
+      - color: {r: 1, g: 1, b: 1, a: 0}
+        count: 2
     - position: {x: 2, y: 0, z: 2}
       color: {r: 1, g: 1, b: 1, a: 0}
-      count: 7
+      blockGroupDataList:
+      - color: {r: 1, g: 0, b: 0, a: 0}
+        count: 3
+      - color: {r: 1, g: 1, b: 1, a: 0}
+        count: 2
     - position: {x: 1, y: 0, z: 1}
       color: {r: 1, g: 0, b: 0, a: 0}
-      count: 10
+      blockGroupDataList:
+      - color: {r: 1, g: 0, b: 0, a: 0}
+        count: 4
+      - color: {r: 0, g: 0, b: 0, a: 0}
+        count: 2
     emptyHoldersPosList: []
     selectionBarBlockContainerDataList:
     - position: {x: 0, y: 0, z: 0}
       color: {r: 0, g: 0, b: 0, a: 1}
-      count: 3
+      blockGroupDataList:
+      - color: {r: 0, g: 0, b: 0, a: 0}
+        count: 3
+      - color: {r: 1, g: 1, b: 1, a: 0}
+        count: 1
     - position: {x: 0, y: 0, z: 0}
       color: {r: 1, g: 1, b: 1, a: 1}
-      count: 4
+      blockGroupDataList:
+      - color: {r: 1, g: 1, b: 1, a: 0}
+        count: 2
+      - color: {r: 1, g: 0, b: 0, a: 0}
+        count: 2
     - position: {x: 0, y: 0, z: 0}
       color: {r: 1, g: 0, b: 0, a: 1}
-      count: 5
+      blockGroupDataList:
+      - color: {r: 0, g: 0, b: 0, a: 0}
+        count: 4

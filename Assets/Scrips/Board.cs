@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Scrips.Objects.BlockContainerHolder;
+using Scrips.Objects.BlocksContainer;
 using Scrips.Objects.CellsContainer;
 using UnityEngine;
 using Zenject;
@@ -43,6 +44,16 @@ namespace Scrips
             return null;
         }
 
+        public IBlockContainerHolder GetBlockContainerHolder(Vector3Int boardPosition)
+        {
+            if (_blockContainerHoldersDic.TryGetValue(boardPosition, out var holder))
+            {
+                return holder;
+            }
+
+            return null;
+        }
+
         public void AddBlockContainer(IBlockContainer blockContainer, Vector3 worldPosition)
         {
             var gridPos = _grid.WorldToCell(worldPosition);
@@ -61,6 +72,9 @@ namespace Scrips
                 blockContainer.SetPosition(holder.GetPosition());
             }
         }
+
+
+        public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
 
 
         private void SpawnHolders()
