@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Scrips.Objects.CellsContainer
 {
-    public interface ICellContainer : IPosition, IGameObject
+    public interface IBlockContainer : IPosition, IGameObject
     {
-        public void Push(ICell cell);
+        public void Push(IBlock block);
 
-        public ICell Pop();
+        public IBlock Pop();
 
         public Color Color { get; set; }
     }

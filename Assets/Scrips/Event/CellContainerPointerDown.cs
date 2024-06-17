@@ -5,11 +5,11 @@ namespace Scrips.Event
 {
     public struct CellContainerPointerDown : IEventData
     {
-        public ICellContainer CellContainer { get; }
+        public IBlockContainer BlockContainer { get; }
 
-        public CellContainerPointerDown(ICellContainer cellContainer)
+        public CellContainerPointerDown(IBlockContainer blockContainer)
         {
-            CellContainer = cellContainer;
+            BlockContainer = blockContainer;
         }
     }
 }

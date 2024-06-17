@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 349890455}
   m_Layer: 0
-  m_Name: CellSelectionBar
+  m_Name: BlockSelectionBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -218,9 +218,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e44741d51029204e8f03ae2e0ef5b14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellPrefab: {fileID: 3869021828577780324, guid: ab5441bb0e5db7f4b91fb3cc70b09e4d, type: 3}
-  cellContainerPrefab: {fileID: 7031501898914153013, guid: 4484d8ccb9d44ad44ba3729d86055d82, type: 3}
-  cellContainerHolderPrefab: {fileID: 0}
+  blockPrefab: {fileID: 3869021828577780324, guid: ab5441bb0e5db7f4b91fb3cc70b09e4d, type: 3}
+  blockContainerPrefab: {fileID: 7031501898914153013, guid: 4484d8ccb9d44ad44ba3729d86055d82, type: 3}
+  blockContainerHolderPrefab: {fileID: 7998414728364303778, guid: f7716b26ad3a7f94f87c9053f1311564, type: 3}
+  levelRepository: {fileID: 11400000, guid: 906d165bdd9d1a04395a18a20cd3bf3b, type: 2}
+  grid: {fileID: 1654743540}
 --- !u!114 &419188299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -834,7 +836,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1654743541}
   - component: {fileID: 1654743540}
-  - component: {fileID: 1654743542}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -869,22 +870,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1654743542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1654743539}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 875ced7a21db4cc4da8ad5983117102c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cellPrefab: {fileID: 3443244722900992813, guid: ab5441bb0e5db7f4b91fb3cc70b09e4d, type: 3}
-  grid: {fileID: 1654743540}
-  width: 4
-  height: 4
 --- !u!1 &1926214679
 GameObject:
   m_ObjectHideFlags: 0

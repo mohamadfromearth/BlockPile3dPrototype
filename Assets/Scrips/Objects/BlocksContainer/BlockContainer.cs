@@ -7,9 +7,9 @@ using UnityEngine.EventSystems;
 
 namespace Scrips.Objects.CellsContainer
 {
-    public class CellContainer : MonoBehaviour, ICellContainer, IPointerDownHandler, IPointerUpHandler
+    public class BlockContainer : MonoBehaviour, IBlockContainer, IPointerDownHandler, IPointerUpHandler
     {
-        private Stack<ICell> _cells = new Stack<ICell>();
+        private Stack<IBlock> _cells = new Stack<IBlock>();
 
         public Color Color { get; set; }
 
@@ -27,13 +27,13 @@ namespace Scrips.Objects.CellsContainer
 
         public Vector3 GetPosition() => transform.position;
 
-        public void Push(ICell cell)
+        public void Push(IBlock block)
         {
-            _cells.Push(cell);
+            _cells.Push(block);
         }
 
 
-        public ICell Pop() => _cells.Pop();
+        public IBlock Pop() => _cells.Pop();
 
         public void OnPointerDown(PointerEventData eventData)
         {
