@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Scrips.Data
+namespace Scripts.Data
 {
     [Serializable]
     public struct LevelData
@@ -19,15 +18,7 @@ namespace Scrips.Data
     public struct BlockContainerData
     {
         public Vector3Int position;
-        public Color color;
-        public List<BlockGroupData> blockGroupDataList;
-    }
-
-    [Serializable]
-    public struct BlockGroupData
-    {
-        public Color color;
-        public int count;
+        public List<Color> color;
     }
 
 

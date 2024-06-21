@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Scrips.Core;
 using Scrips.Objects.Block;
 using UnityEngine;
@@ -10,6 +11,10 @@ namespace Scrips.Objects.BlocksContainer
 
         public IBlock Pop();
 
-        public Color Color { get; set; }
+        public IBlock Peek();
+
+        public bool HasSingleColor { get; }
+
+        public Stack<Color> Colors { get; }
     }
 }

@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Event;
-using Scrips.Data;
+using Scrips;
 using Scrips.Event;
 using Scrips.Objects.BlocksContainer;
 using Scrips.Utils;
+using Scripts.Data;
 using UnityEngine;
 using Zenject;
 
-namespace Scrips
+namespace Scripts
 {
     public class GameManager : MonoBehaviour
     {
@@ -29,16 +30,20 @@ namespace Scrips
         private int _selectionBarSelectedIndex;
         private IBlockContainer _selectedBlockContainer;
 
-        private readonly Vector3Int[] _gridOffsets = new[]
+        private readonly Vector3Int[] _gridHorizontalVerticalOffsets = new[]
+        {
+            new Vector3Int(1, 0, 0),
+            new Vector3Int(0, 0, -1),
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(0, 0, 1)
+        };
+
+        private readonly Vector3Int[] _griDiagonalOffsets = new[]
         {
             new Vector3Int(1, 0, 1),
-            new Vector3Int(1, 0, 0),
             new Vector3Int(1, 0, -1),
-            new Vector3Int(0, 0, -1),
             new Vector3Int(-1, 0, -1),
-            new Vector3Int(-1, 0, 0),
-            new Vector3Int(-1, 0, 1),
-            new Vector3Int(0, 0, 1)
+            new Vector3Int(-1, 0, 1)
         };
 
 
@@ -105,6 +110,8 @@ namespace Scrips
 
                     _board.AddBlockContainer(_selectedBlockContainer, pos);
 
+                    Check(_board.WorldToCell(holder.GetPosition()));
+
 
                     _selectedBlockContainer = null;
                 }
@@ -119,19 +126,61 @@ namespace Scrips
 
         private void Check(Vector3Int boardPosition)
         {
-            var container = _board.GetBlockContainerHolder(boardPosition);
-            
-            
+            var container = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
 
 
-            foreach (var gridOffset in _gridOffsets)
+            List<IBlockContainer> matchedContainers = new();
+
+            foreach (var gridOffset in _gridHorizontalVerticalOffsets)
             {
-                var containerToCheck = _board.GetBlockContainerHolder(boardPosition + gridOffset);
+                var neighbourPosition = boardPosition + gridOffset;
+                var neighbour = _board.GetBlockContainerHolder(neighbourPosition)?.BlockContainer;
 
 
-                if (containerToCheck != container)
+                if (neighbour != null)
                 {
+                    Debug.Log("neighbour colors count: " + neighbour.Colors.Count);
+                    if (neighbour.Colors.Peek() == container.Colors.Peek())
+                    {
+                        matchedContainers.Add(neighbour);
+                    }
                 }
+            }
+
+            if (container.HasSingleColor)
+            {
+                foreach (var matchedContainer in matchedContainers)
+                {
+                    var color = container.Colors.Peek();
+                    Debug.Log("Color is " + color);
+
+
+                    var block = matchedContainer.Pop();
+
+                    while (true)
+                    {
+                        container.Push(block);
+
+                        block = matchedContainer.Peek();
+
+                        if (block == null)
+                        {
+                            _board.AddBlockContainer(null, matchedContainer.GetPosition());
+                            break;
+                        }
+
+                        if (block.Color != color)
+                        {
+                            break;
+                        }
+
+                        matchedContainer.Pop();
+                    }
+                }
+            }
+            else
+            {
+                
             }
         }
 

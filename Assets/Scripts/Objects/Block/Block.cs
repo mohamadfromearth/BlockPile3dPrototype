@@ -14,6 +14,8 @@ namespace Scrips.Objects.Block
         public Vector3 GetPosition() => transform.position;
 
 
+        private Color color;
+
         public Color Color
         {
             set
@@ -22,8 +24,10 @@ namespace Scrips.Objects.Block
                 {
                     material.color = value;
                 }
+
+                color = value;
             }
-            get { return Color; }
+            get { return color; }
         }
 
         public GameObject GameObj
