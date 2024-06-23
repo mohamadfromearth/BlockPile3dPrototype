@@ -1,141 +1,154 @@
 using System.Collections.Generic;
+using System.Linq;
 using Scrips;
+using Scrips.Objects.BlocksContainer;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
 using Scripts.Data;
 using UnityEngine;
 using Zenject;
 
-namespace Scripts
+public class GameManagerHelpers
 {
-    public class GameManagerHelpers
+    [Inject] private IBlockContainerFactory _blockContainerFactory;
+    [Inject] private IBlockFactory _blockFactory;
+    [Inject] private ILevelRepository _levelRepository;
+    [Inject] private Board _board;
+
+
+    private readonly Vector3Int[] _gridHorizontalVerticalOffsets = new[]
     {
-        [Inject] private IBlockContainerFactory _blockContainerFactory;
-        [Inject] private IBlockFactory _blockFactory;
-        [Inject] private ILevelRepository _levelRepository;
-        [Inject] private Board _board;
+        new Vector3Int(1, 0, 0),
+        new Vector3Int(0, 0, -1),
+        new Vector3Int(-1, 0, 0),
+        new Vector3Int(0, 0, 1)
+    };
 
+    public void SpawnSelectionBarBlockContainers(List<Vector3> blockContainersPositionList)
+    {
+        var containerDataList = _levelRepository.GetLevelData().selectionBarBlockContainerDataList;
 
-        public void SpawnSelectionBarBlockContainers(List<Vector3> blockContainersPositionList)
+        for (int i = 0; i < containerDataList.Count; i++)
         {
-            var containerDataList = _levelRepository.GetLevelData().selectionBarBlockContainerDataList;
+            var containerData = containerDataList[i];
+            var container = _blockContainerFactory.Create();
+            container.SetPosition(blockContainersPositionList[i]);
 
-            for (int i = 0; i < containerDataList.Count; i++)
+            foreach (var color in containerData.color)
             {
-                var containerData = containerDataList[i];
-                var container = _blockContainerFactory.Create();
-                container.SetPosition(blockContainersPositionList[i]);
-
-                foreach (var color in containerData.color)
-                {
-                    var block = _blockFactory.Create();
-                    block.Color = color;
-                    container.Push(block);
-                }
+                var block = _blockFactory.Create();
+                block.Color = color;
+                container.Push(block);
             }
+        }
+    }
+
+    public void SpawnBoardBlockContainers()
+    {
+        var levelData = _levelRepository.GetLevelData();
+        var containerDataList = levelData.blockContainerDataList;
+
+        foreach (var containerData in containerDataList)
+        {
+            var holder = _board.GetBlockContainerHolder(containerData.position);
+
+            var container = _blockContainerFactory.Create();
+
+            holder.BlockContainer = container;
+
+            container.SetPosition(holder.GetPosition());
+
+            foreach (var color in containerData.color)
+            {
+                var block = _blockFactory.Create();
+                block.Color = color;
+
+                container.Push(block);
+            }
+        }
+    }
 
 
-            // var selectionBarBlockContainersData = _levelRepository.GetLevelData().selectionBarBlockContainerDataList;
-            //
-            //
-            // for (int i = 0; i < selectionBarBlockContainersData.Count; i++)
-            // {
-            //     var containerData = selectionBarBlockContainersData[i];
-            //     var container = _blockContainerFactory.Create();
-            //     container.SetPosition(blockContainersPositionList[i]);
-            //
-            //
-            //     var previousCount = 0;
-            //
-            //
-            //     for (int blockGroupIndex = 0;
-            //          blockGroupIndex < containerData.blockGroupDataList.Count;
-            //          blockGroupIndex++)
-            //     {
-            //         var blockGroupData = containerData.blockGroupDataList[blockGroupIndex];
-            //
-            //         for (int blockGroupHeight = previousCount;
-            //              blockGroupHeight < previousCount + blockGroupData.count;
-            //              blockGroupHeight++)
-            //         {
-            //             var block = _blockFactory.Create();
-            //             var blockPosition = container.GetPosition();
-            //             blockPosition.y = blockGroupHeight * 0.2f;
-            //             block.SetPosition(blockPosition);
-            //             block.Color = blockGroupData.color;
-            //             block.GameObj.transform.SetParent(container.GameObj.transform);
-            //
-            //             container.Push(block);
-            //         }
-            //
-            //         previousCount += blockGroupData.count;
-            //     }
-            // }
+    public void UpdateBoard(Vector3Int boardPosition)
+    {
+        var containers = GetMatchedContainers(boardPosition);
+        ReArrangeBoard(containers);
+    }
+
+    private void ReArrangeBoard(List<KeyValuePair<int, IBlockContainer>> containers)
+    {
+        var targetContainer = containers[^1].Value;
+
+        foreach (var containerValuePair in containers)
+        {
+            var container = containerValuePair.Value;
+
+            if (container.GameObj.GetInstanceID() == targetContainer.GameObj.GetInstanceID()) continue;
+
+            var block = container.Pop();
+
+            var color = targetContainer.Colors.Peek();
+
+            while (true)
+            {
+                targetContainer.Push(block);
+
+                block = container.Peek();
+
+                if (block == null)
+                {
+                    _board.AddBlockContainer(null, container.GetPosition());
+                    break;
+                }
+
+                if (block.Color != color)
+                {
+                    break;
+                }
+
+                block = container.Pop();
+            }
+        }
+    }
+
+    private List<KeyValuePair<int, IBlockContainer>> GetMatchedContainers(Vector3Int boardPosition)
+    {
+        var recentPlacedContainer = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
+
+        List<KeyValuePair<int, IBlockContainer>> containers = new();
+
+        int containerScore = 1;
+
+        if (recentPlacedContainer.HasSingleColor)
+        {
+            containerScore += 10;
         }
 
-        public void SpawnBoardBlockContainers()
+        containers.Add(new KeyValuePair<int, IBlockContainer>(containerScore, recentPlacedContainer));
+
+
+        foreach (var gridOffset in _gridHorizontalVerticalOffsets)
         {
-            var levelData = _levelRepository.GetLevelData();
-            var containerDataList = levelData.blockContainerDataList;
+            var neighbourPosition = boardPosition + gridOffset;
+            var neighbour = _board.GetBlockContainerHolder(neighbourPosition)?.BlockContainer;
 
-            foreach (var containerData in containerDataList)
+            if (neighbour != null)
             {
-                var holder = _board.GetBlockContainerHolder(containerData.position);
-
-                var container = _blockContainerFactory.Create();
-
-                holder.BlockContainer = container;
-
-                container.SetPosition(holder.GetPosition());
-
-                foreach (var color in containerData.color)
+                if (neighbour.Colors.Peek() == recentPlacedContainer.Colors.Peek())
                 {
-                    var block = _blockFactory.Create();
-                    block.Color = color;
+                    int neighbourScore = 0;
 
-                    container.Push(block);
+                    if (neighbour.HasSingleColor)
+                    {
+                        neighbourScore = 10;
+                    }
+
+                    containers.Add(new KeyValuePair<int, IBlockContainer>(neighbourScore, neighbour));
                 }
             }
-
-
-            // var levelData = _levelRepository.GetLevelData();
-            //
-            // var containerDataList = levelData.blockContainerDataList;
-            //
-            //
-            // foreach (var containerData in containerDataList)
-            // {
-            //     var blockContainer = _blockContainerFactory.Create();
-            //     blockContainer.SetPosition(containerData.position);
-            //
-            //     var previousCount = 0;
-            //
-            //     for (int blockGroupIndex = 0;
-            //          blockGroupIndex < containerData.blockGroupDataList.Count;
-            //          blockGroupIndex++)
-            //     {
-            //         var blockGroup = containerData.blockGroupDataList[blockGroupIndex];
-            //
-            //         for (int blockGroupHeight = previousCount;
-            //              blockGroupHeight < previousCount + blockGroup.count;
-            //              blockGroupHeight++)
-            //         {
-            //             var block = _blockFactory.Create();
-            //             var blockPosition = blockContainer.GetPosition();
-            //             blockPosition.y = blockGroupHeight * 0.2f + 0.2f;
-            //             block.SetPosition(blockPosition);
-            //             block.Color = blockGroup.color;
-            //             block.GameObj.transform.SetParent(blockContainer.GameObj.transform);
-            //
-            //             blockContainer.Push(block);
-            //         }
-            //
-            //         previousCount += blockGroup.count;
-            //     }
-            //
-            //
-            //     _board.AddBlockContainer(blockContainer, containerData.position);
-            // }
         }
+
+        containers = containers.OrderBy(pair => pair.Key).ToList();
+        return containers;
     }
 }
