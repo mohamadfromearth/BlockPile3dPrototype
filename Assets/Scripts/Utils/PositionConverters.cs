@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scrips.Utils
+namespace Utils
 {
     public class PositionConverters
     {

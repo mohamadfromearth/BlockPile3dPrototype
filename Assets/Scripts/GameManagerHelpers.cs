@@ -94,6 +94,9 @@ public class GameManagerHelpers
 
     private void ReArrangeBoard(List<KeyValuePair<int, IBlockContainer>> containers)
     {
+        // a+(b-a)/2
+
+
         var targetContainer = containers[^1].Value;
 
         foreach (var containerValuePair in containers)
