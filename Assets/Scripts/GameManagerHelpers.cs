@@ -72,7 +72,24 @@ public class GameManagerHelpers
     public void UpdateBoard(Vector3Int boardPosition)
     {
         var containers = GetMatchedContainers(boardPosition);
+        if (containers.Count <= 1) return;
+
         ReArrangeBoard(containers);
+
+        var singleColorsContainers = new List<IBlockContainer>();
+
+        foreach (var keyValuePair in containers)
+        {
+            if (keyValuePair.Value.HasSingleColor)
+            {
+                singleColorsContainers.Add(keyValuePair.Value);
+            }
+        }
+
+        foreach (var singleColorsContainer in singleColorsContainers)
+        {
+            UpdateBoard(_board.WorldToCell(singleColorsContainer.GetPosition()));
+        }
     }
 
     private void ReArrangeBoard(List<KeyValuePair<int, IBlockContainer>> containers)
