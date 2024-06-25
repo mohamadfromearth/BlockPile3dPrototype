@@ -280,6 +280,7 @@ GameObject:
   m_Component:
   - component: {fileID: 453200290}
   - component: {fileID: 453200289}
+  - component: {fileID: 453200291}
   m_Layer: 0
   m_Name: Services
   m_TagString: Untagged
@@ -306,6 +307,7 @@ MonoBehaviour:
   - {fileID: 371120509}
   - {fileID: 1926214680}
   - {fileID: 1522481080}
+  helpers: {fileID: 453200291}
 --- !u!4 &453200290
 Transform:
   m_ObjectHideFlags: 0
@@ -321,6 +323,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &453200291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453200288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42bf199392d4b5949a414b259e22cbde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &488818944
 GameObject:
   m_ObjectHideFlags: 0

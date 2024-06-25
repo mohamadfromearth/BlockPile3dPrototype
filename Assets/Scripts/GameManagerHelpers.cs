@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Scrips;
@@ -8,7 +10,7 @@ using Scripts.Data;
 using UnityEngine;
 using Zenject;
 
-public class GameManagerHelpers
+public class GameManagerHelpers : MonoBehaviour
 {
     [Inject] private IBlockContainerFactory _blockContainerFactory;
     [Inject] private IBlockFactory _blockFactory;
@@ -23,6 +25,9 @@ public class GameManagerHelpers
         new Vector3Int(-1, 0, 0),
         new Vector3Int(0, 0, 1)
     };
+
+
+    private float _blockPlacementDuration = 0.5f;
 
     public void SpawnSelectionBarBlockContainers(List<Vector3> blockContainersPositionList)
     {
@@ -74,7 +79,70 @@ public class GameManagerHelpers
         var containers = GetMatchedContainers(boardPosition);
         if (containers.Count <= 1) return;
 
-        ReArrangeBoard(containers);
+        StartCoroutine(ReArrangeBoard(containers, (() =>
+        {
+            var singleColorsContainers = new List<IBlockContainer>();
+
+            foreach (var keyValuePair in containers)
+            {
+                if (keyValuePair.Value.HasSingleColor)
+                {
+                    singleColorsContainers.Add(keyValuePair.Value);
+                }
+            }
+
+            foreach (var singleColorsContainer in singleColorsContainers)
+            {
+                UpdateBoard(_board.WorldToCell(singleColorsContainer.GetPosition()));
+            }
+        })));
+    }
+
+
+    public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition)
+    {
+        var containers = GetMatchedContainers(boardPosition);
+        if (containers.Count <= 1) yield break;
+
+        var targetContainer = containers[^1].Value;
+
+        // REARRANGE
+
+        foreach (var containerValuePair in containers)
+        {
+            var container = containerValuePair.Value;
+
+            if (container.GameObj.GetInstanceID() == targetContainer.GameObj.GetInstanceID()) continue;
+
+            var block = container.Pop();
+
+            var color = targetContainer.Colors.Peek();
+
+            while (true)
+            {
+                targetContainer.Push(block, _blockPlacementDuration);
+
+                yield return new WaitForSeconds(_blockPlacementDuration);
+
+
+                block = container.Peek();
+
+                if (block == null)
+                {
+                    _board.AddBlockContainer(null, container.GetPosition());
+                    break;
+                }
+
+                if (block.Color != color)
+                {
+                    break;
+                }
+
+                block = container.Pop();
+            }
+        }
+
+        // REARANGE
 
         var singleColorsContainers = new List<IBlockContainer>();
 
@@ -86,13 +154,14 @@ public class GameManagerHelpers
             }
         }
 
+
         foreach (var singleColorsContainer in singleColorsContainers)
         {
-            UpdateBoard(_board.WorldToCell(singleColorsContainer.GetPosition()));
+            yield return UpdateBoardRoutine(_board.WorldToCell(singleColorsContainer.GetPosition()));
         }
     }
 
-    private void ReArrangeBoard(List<KeyValuePair<int, IBlockContainer>> containers)
+    private IEnumerator ReArrangeBoard(List<KeyValuePair<int, IBlockContainer>> containers, Action onComplete)
     {
         // a+(b-a)/2
 
@@ -111,19 +180,24 @@ public class GameManagerHelpers
 
             while (true)
             {
-                targetContainer.Push(block);
+                targetContainer.Push(block, _blockPlacementDuration);
+
+                yield return new WaitForSeconds(_blockPlacementDuration);
+
 
                 block = container.Peek();
 
                 if (block == null)
                 {
                     _board.AddBlockContainer(null, container.GetPosition());
-                    break;
+                    onComplete.Invoke();
+                    yield break;
                 }
 
                 if (block.Color != color)
                 {
-                    break;
+                    onComplete.Invoke();
+                    yield break;
                 }
 
                 block = container.Pop();

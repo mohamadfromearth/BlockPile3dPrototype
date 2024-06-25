@@ -1,17 +1,16 @@
 using Event;
+using Objects.BlocksContainer;
+using Scrips;
 using Scrips.Data;
 using Scrips.Objects.Block;
 using Scrips.Objects.BlockContainerHolder;
-using Scrips.Objects.BlocksContainer;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
-using Scripts;
 using Scripts.Data;
-using Scripts.Objects.BlocksContainer;
 using UnityEngine;
 using Zenject;
 
-namespace Scrips.Di
+namespace Di
 {
     public class GameInstaller : MonoInstaller
     {
@@ -37,7 +36,6 @@ namespace Scrips.Di
             Container.Bind<IBlockContainerFactory>().To<BlockContainerFactory>().AsSingle()
                 .WithArguments(blockContainerPrefab);
 
-            Container.Bind<GameManagerHelpers>().AsSingle();
 
             Container.Bind<ILevelRepository>().FromInstance(levelRepository).AsSingle();
 

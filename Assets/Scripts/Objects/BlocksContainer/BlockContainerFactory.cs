@@ -1,6 +1,6 @@
 using Event;
+using Objects.BlocksContainer;
 using Scrips.Objects.BlocksContainer;
-using Scripts.Objects.BlocksContainer;
 using UnityEngine;
 using Zenject;
 

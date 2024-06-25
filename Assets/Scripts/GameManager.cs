@@ -18,9 +18,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private List<Transform> selectionBarCellContainerTransformList;
     private List<Vector3> _selectionBarCellContainerPosList = new();
+    [SerializeField] private GameManagerHelpers helpers;
 
-
-    [Inject] private GameManagerHelpers _helpers;
     [Inject] private Board _board;
     [Inject] private EventChannel _channel;
     [Inject] private ILevelRepository _levelRepository;
@@ -39,8 +38,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _selectionBarCellContainerPosList = selectionBarCellContainerTransformList.Select(t => t.position).ToList();
-        _helpers.SpawnSelectionBarBlockContainers(_selectionBarCellContainerPosList);
-        _helpers.SpawnBoardBlockContainers();
+        helpers.SpawnSelectionBarBlockContainers(_selectionBarCellContainerPosList);
+        helpers.SpawnBoardBlockContainers();
     }
 
     private void OnEnable()
@@ -93,7 +92,7 @@ public class GameManager : MonoBehaviour
 
                 _board.AddBlockContainer(_selectedBlockContainer, pos);
 
-                _helpers.UpdateBoard(_board.WorldToCell(holder.GetPosition()));
+                StartCoroutine(helpers.UpdateBoardRoutine(_board.WorldToCell(holder.GetPosition())));
 
                 _selectedBlockContainer = null;
             }
