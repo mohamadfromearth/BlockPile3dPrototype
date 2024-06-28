@@ -19,5 +19,7 @@ namespace Scrips.Objects.BlocksContainer
         public bool HasSingleColor { get; }
 
         public Stack<Color> Colors { get; }
+
+        public bool IsPlaced { set; }
     }
 }

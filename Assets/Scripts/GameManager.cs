@@ -88,6 +88,7 @@ public class GameManager : MonoBehaviour
 
             if (holder != null && holder.BlockContainer == null)
             {
+                _selectedBlockContainer.IsPlaced = true;
                 _selectedBlockContainer.SetPosition(holder.GetPosition());
 
                 _board.AddBlockContainer(_selectedBlockContainer, pos);

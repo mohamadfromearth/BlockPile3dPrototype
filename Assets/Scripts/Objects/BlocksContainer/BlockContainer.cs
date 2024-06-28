@@ -17,6 +17,8 @@ namespace Objects.BlocksContainer
 
         public Stack<Color> Colors { get; set; }
 
+        public bool IsPlaced { get; set; }
+
         public IBlock Peek()
         {
             if (blocks.Count == 0) return null;
@@ -90,25 +92,13 @@ namespace Objects.BlocksContainer
 
         public void Push(IBlock block, float duration)
         {
-            Vector3 blockPosition;
-            // a+(b-a)/2
-            if (blocks.Count == 0)
-            {
-                blockPosition = GetPosition();
-                blockPosition.y += 0.2f;
-
-                block.GameObj.transform.DOMove(blockPosition, duration);
-
-                Colors.Push(block.Color);
-                block.GameObj.transform.SetParent(transform);
-                blocks.Push(block);
-                return;
-            }
+            Vector3 targetBlockPosition = blocks.Count == 0 ? GetPosition() : blocks.Peek().GetPosition();
+            var currentBlockPosition = block.GetPosition();
+            Vector3[] points = new Vector3[3];
+            Vector3 mid;
 
 
-            blockPosition = blocks.Peek().GetPosition();
-            blockPosition.y += 0.2f;
-
+            targetBlockPosition.y += 0.2f;
 
             if (blocks.Peek().Color != block.Color)
             {
@@ -117,12 +107,53 @@ namespace Objects.BlocksContainer
 
             blocks.Push(block);
 
+            mid = currentBlockPosition + (targetBlockPosition - currentBlockPosition) / 2f;
+            mid.y = targetBlockPosition.y + 1f;
 
-            block.GameObj.transform.DOMove(blockPosition, duration);
+
+            points[0] = currentBlockPosition;
+            points[1] = mid;
+            points[2] = targetBlockPosition;
+
+            var rotation = block.GameObj.transform.rotation.eulerAngles;
+            rotation = rotation + GetTargetRotation(currentBlockPosition, targetBlockPosition);
+            block.GameObj.transform.DOPath(points, duration, PathType.CatmullRom);
+            block.GameObj.transform.DOLocalRotate(rotation, duration).onComplete += () =>
+            {
+                block.GameObj.transform.rotation = Quaternion.identity;
+            };
             block.GameObj.transform.SetParent(transform);
         }
 
-       
+        private Vector3 GetTargetRotation(Vector3 currentPosition, Vector3 targetPosition)
+        {
+            var dif = targetPosition - currentPosition;
+
+
+            if (Mathf.RoundToInt(dif.x) > 0)
+            {
+                return new Vector3(0f, 0f, -180f);
+            }
+
+            if (Mathf.RoundToInt(dif.x) < 0)
+            {
+                return new Vector3(0f, 0f, 180f);
+            }
+
+            if (dif.z > 0)
+            {
+                return new Vector3(180f, 0f, 0f);
+            }
+
+            if (dif.z < 0)
+            {
+                return new Vector3(-180f, 0f, 0f);
+            }
+
+            return Vector3.zero;
+        }
+
+
         public IBlock Pop()
         {
             if (blocks.Count == 0) return null;
@@ -148,11 +179,13 @@ namespace Objects.BlocksContainer
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            if (IsPlaced == true) return;
             Channel.Rise<CellContainerPointerDown>(new CellContainerPointerDown(this));
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (IsPlaced == true) return;
             Channel.Rise<CellContainerPointerUp>(new CellContainerPointerUp(this));
         }
     }

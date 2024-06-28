@@ -58,6 +58,7 @@ public class GameManagerHelpers : MonoBehaviour
             var holder = _board.GetBlockContainerHolder(containerData.position);
 
             var container = _blockContainerFactory.Create();
+            container.IsPlaced = true;
 
             holder.BlockContainer = container;
 
