@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Objects.BlocksContainer;
 using Scrips;
-using Scrips.Objects.BlocksContainer;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
 using Scripts.Data;
@@ -107,58 +107,81 @@ public class GameManagerHelpers : MonoBehaviour
 
         var targetContainer = containers[^1].Value;
 
-        // REARRANGE
+        var recentContainer = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
 
-        foreach (var containerValuePair in containers)
+        if (recentContainer.GameObj.GetInstanceID() != targetContainer.GameObj.GetInstanceID())
         {
-            var container = containerValuePair.Value;
+            var adjacentContainer =
+                recentContainer.GameObj.GetInstanceID() == containers[0].Value.GameObj.GetInstanceID()
+                    ? containers[1]
+                    : containers[0];
+            
+            
+            
+        }
+        else
+        {
+            // REARRANGE
 
-            if (container.GameObj.GetInstanceID() == targetContainer.GameObj.GetInstanceID()) continue;
 
-            var block = container.Pop();
-
-            var color = targetContainer.Colors.Peek();
-
-            while (true)
+            foreach (var containerValuePair in containers)
             {
-                targetContainer.Push(block, _blockPlacementDuration);
+                var container = containerValuePair.Value;
 
-                yield return new WaitForSeconds(_blockPlacementDuration);
+                if (container.GameObj.GetInstanceID() == targetContainer.GameObj.GetInstanceID()) continue;
 
+                var block = container.Pop();
 
-                block = container.Peek();
+                var color = targetContainer.Colors.Peek();
 
-                if (block == null)
+                while (true)
                 {
-                    _board.AddBlockContainer(null, container.GetPosition());
-                    break;
+                    targetContainer.Push(block, _blockPlacementDuration);
+
+                    yield return new WaitForSeconds(_blockPlacementDuration);
+
+
+                    block = container.Peek();
+
+                    if (block == null)
+                    {
+                        _board.AddBlockContainer(null, container.GetPosition());
+                        break;
+                    }
+
+                    if (block.Color != color)
+                    {
+                        break;
+                    }
+
+                    block = container.Pop();
+                }
+            }
+
+            // REARRANGE
+
+            var singleColorsContainers = new List<IBlockContainer>();
+
+            foreach (var keyValuePair in containers)
+            {
+                if (keyValuePair.Value.GameObj.GetInstanceID() == targetContainer.GameObj.GetInstanceID())
+                {
+                    continue;
                 }
 
-                if (block.Color != color)
+                if (keyValuePair.Value.HasSingleColor)
                 {
-                    break;
+                    singleColorsContainers.Add(keyValuePair.Value);
                 }
-
-                block = container.Pop();
             }
-        }
 
-        // REARANGE
+            _board.AddBlockContainer(null, targetContainer.GetPosition());
+            targetContainer.Destroy();
 
-        var singleColorsContainers = new List<IBlockContainer>();
-
-        foreach (var keyValuePair in containers)
-        {
-            if (keyValuePair.Value.HasSingleColor)
+            foreach (var singleColorsContainer in singleColorsContainers)
             {
-                singleColorsContainers.Add(keyValuePair.Value);
+                yield return UpdateBoardRoutine(_board.WorldToCell(singleColorsContainer.GetPosition()));
             }
-        }
-
-
-        foreach (var singleColorsContainer in singleColorsContainers)
-        {
-            yield return UpdateBoardRoutine(_board.WorldToCell(singleColorsContainer.GetPosition()));
         }
     }
 

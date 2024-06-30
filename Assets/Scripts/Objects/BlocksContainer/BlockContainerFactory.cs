@@ -1,6 +1,5 @@
 using Event;
 using Objects.BlocksContainer;
-using Scrips.Objects.BlocksContainer;
 using UnityEngine;
 using Zenject;
 

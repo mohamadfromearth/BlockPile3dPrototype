@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Event;
+using Objects.BlocksContainer;
 using Scrips;
 using Scrips.Event;
-using Scrips.Objects.BlocksContainer;
 using Scrips.Utils;
 using Scripts.Data;
 using UnityEngine;
@@ -114,12 +114,6 @@ public class GameManager : MonoBehaviour
             if (cellPos != null)
             {
                 _selectedBlockContainer.SetPosition(cellPos.Value);
-
-                var holder = _board.GetBlockContainerHolder(cellPos.Value);
-
-                if (holder != null)
-                {
-                }
             }
         }
     }

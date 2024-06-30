@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Event;
+using Objects.Block;
 using Scrips.Event;
-using Scrips.Objects.Block;
-using Scrips.Objects.BlocksContainer;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Utils;
 
 namespace Objects.BlocksContainer
 {
@@ -18,6 +15,29 @@ namespace Objects.BlocksContainer
         public Stack<Color> Colors { get; set; }
 
         public bool IsPlaced { get; set; }
+
+        public void Destroy()
+        {
+            if (Colors.Count > 1)
+            {
+                var color = Colors.Peek();
+
+                while (blocks.Count > 0)
+                {
+                    blocks.Pop().Destroy();
+
+                    if (blocks.Peek().Color != color)
+                    {
+                        Colors.Pop();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
 
         public IBlock Peek()
         {

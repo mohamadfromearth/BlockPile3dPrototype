@@ -11,6 +11,8 @@ namespace Scripts.Data
         public List<BlockContainerData> blockContainerDataList;
         public List<Vector3Int> emptyHoldersPosList;
         public List<BlockContainerData> selectionBarBlockContainerDataList;
+        public int targetColorCount;
+        public int targetScore;
     }
 
 

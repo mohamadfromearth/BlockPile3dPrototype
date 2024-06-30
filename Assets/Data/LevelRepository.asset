@@ -28,6 +28,9 @@ MonoBehaviour:
       - {r: 1, g: 0, b: 0, a: 1}
       - {r: 1, g: 0, b: 0, a: 1}
       - {r: 1, g: 0, b: 0, a: 1}
+      - {r: 0, g: 0, b: 0, a: 1}
+      - {r: 0, g: 0, b: 0, a: 1}
+      - {r: 0, g: 0, b: 0, a: 1}
     - position: {x: 1, y: 0, z: 1}
       color:
       - {r: 0, g: 0, b: 0, a: 1}
@@ -66,3 +69,5 @@ MonoBehaviour:
       - {r: 1, g: 0, b: 0, a: 1}
       - {r: 1, g: 0, b: 0, a: 1}
       - {r: 1, g: 0, b: 0, a: 1}
+    targetColorCount: 5
+    targetScore: 50

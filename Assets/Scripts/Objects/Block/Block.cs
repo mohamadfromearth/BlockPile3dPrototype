@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scrips.Objects.Block
+namespace Objects.Block
 {
     public class Block : MonoBehaviour, IBlock
     {
@@ -28,6 +28,11 @@ namespace Scrips.Objects.Block
                 color = value;
             }
             get { return color; }
+        }
+
+        public void Destroy()
+        {
+            Destroy(gameObject);
         }
 
         public GameObject GameObj

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Core;
+using Objects.Block;
 using Scrips.Core;
-using Scrips.Objects.Block;
 using UnityEngine;
 
-namespace Scrips.Objects.BlocksContainer
+namespace Objects.BlocksContainer
 {
     public interface IBlockContainer : IPosition, IGameObject
     {
@@ -21,5 +20,7 @@ namespace Scrips.Objects.BlocksContainer
         public Stack<Color> Colors { get; }
 
         public bool IsPlaced { set; }
+
+        public void Destroy();
     }
 }

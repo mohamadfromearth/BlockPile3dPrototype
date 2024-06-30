@@ -1,4 +1,4 @@
-using Scrips.Objects.BlocksContainer;
+using Objects.BlocksContainer;
 using UnityEngine;
 
 namespace Scrips.Objects.BlockContainerHolder
