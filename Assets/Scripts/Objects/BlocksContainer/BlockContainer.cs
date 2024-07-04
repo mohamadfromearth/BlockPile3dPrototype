@@ -12,6 +12,10 @@ namespace Objects.BlocksContainer
     {
         private Stack<IBlock> blocks = new();
 
+        private int _countIndex = -1;
+
+        private List<int> _countList = new List<int>();
+
         public Stack<Color> Colors { get; set; }
 
         public bool IsPlaced { get; set; }
@@ -52,7 +56,15 @@ namespace Objects.BlocksContainer
 
         public int Count
         {
-            get => Colors.Count;
+            get
+            {
+                if (_countIndex >= 0)
+                {
+                    return _countList[_countIndex];
+                }
+
+                return 0;
+            }
         }
 
         private void Awake()
@@ -90,6 +102,9 @@ namespace Objects.BlocksContainer
                 block.GameObj.transform.SetParent(transform);
                 blocks.Push(block);
 
+                _countList.Add(1);
+                _countIndex++;
+
                 return;
             }
 
@@ -101,6 +116,13 @@ namespace Objects.BlocksContainer
             if (blocks.Peek().Color != block.Color)
             {
                 Colors.Push(block.Color);
+
+                _countList.Add(1);
+                _countIndex++;
+            }
+            else
+            {
+                _countList[_countIndex] += 1;
             }
 
             blocks.Push(block);
@@ -112,17 +134,32 @@ namespace Objects.BlocksContainer
 
         public void Push(IBlock block, float duration)
         {
-            Vector3 targetBlockPosition = blocks.Count == 0 ? GetPosition() : blocks.Peek().GetPosition();
+            Vector3 targetBlockPosition = GetPosition();
             var currentBlockPosition = block.GetPosition();
             Vector3[] points = new Vector3[3];
             Vector3 mid;
 
 
-            targetBlockPosition.y += 0.2f;
+            targetBlockPosition.y += 0.2f * blocks.Count;
 
             if (blocks.Peek().Color != block.Color)
             {
                 Colors.Push(block.Color);
+
+                _countList.Add(1);
+                _countIndex++;
+            }
+            else
+            {
+                if (blocks.Count == 0)
+                {
+                    _countList.Add(1);
+                    _countIndex++;
+                }
+                else
+                {
+                    _countList[_countIndex] += 1;
+                }
             }
 
             blocks.Push(block);
@@ -182,15 +219,23 @@ namespace Objects.BlocksContainer
 
             if (blocks.Count == 0)
             {
-                Debug.Log("Color is Over " + Colors.Count + Colors.Peek());
                 Colors.Pop();
+
+                _countList.RemoveAt(_countIndex);
+                _countIndex = -1;
+
                 return block;
             }
 
             if (blocks.Peek().Color != block.Color)
             {
                 Colors.Pop();
-                Debug.Log("Color is changed " + Colors.Count);
+                _countList.RemoveAt(_countList.Count - 1);
+                _countIndex--;
+            }
+            else
+            {
+                _countList[_countIndex] -= 1;
             }
 
             return block;

@@ -9,6 +9,9 @@ namespace Objects.BlocksContainer
     {
         public void Push(IBlock block);
 
+
+        public int Count { get; }
+
         public void Push(IBlock block, float duration);
 
         public IBlock Pop();
