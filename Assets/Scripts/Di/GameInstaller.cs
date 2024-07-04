@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Event;
 using Objects.Block;
 using Objects.BlocksContainer;
@@ -24,6 +26,10 @@ namespace Di
 
         [SerializeField] private Grid grid;
 
+        // selectionBar
+        [SerializeField] private List<Color> colors;
+        [SerializeField] private List<Transform> selectionBarPositionList;
+
         public override void InstallBindings()
         {
             Container.Bind<EventChannel>().AsSingle().NonLazy();
@@ -42,6 +48,9 @@ namespace Di
 
             var levelData = levelRepository.GetLevelData();
             Container.Bind<Board>().AsSingle().WithArguments(levelData.width, levelData.height, grid);
+
+            Container.Bind<BlockContainerSelectionBar>().AsCached()
+                .WithArguments(colors, selectionBarPositionList.Select(t => t.position).ToList());
         }
     }
 }

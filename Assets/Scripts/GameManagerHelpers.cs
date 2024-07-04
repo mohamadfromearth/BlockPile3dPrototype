@@ -119,8 +119,12 @@ public class GameManagerHelpers : MonoBehaviour
 
             if (targetContainer.Count >= MaxBlock)
             {
-                _board.AddBlockContainer(null, targetContainer.GetPosition());
                 targetContainer.Destroy();
+
+                if (targetContainer.Colors.Count == 0)
+                {
+                    _board.AddBlockContainer(null, targetContainer.GetPosition());
+                }
             }
 
 
@@ -143,7 +147,10 @@ public class GameManagerHelpers : MonoBehaviour
             if (recentContainer.Count >= MaxBlock)
             {
                 recentContainer.Destroy();
-                _board.AddBlockContainer(null, recentContainer.GetPosition());
+                if (recentContainer.Colors.Count == 0)
+                {
+                    _board.AddBlockContainer(null, recentContainer.GetPosition());
+                }
             }
 
             List<KeyValuePair<int, IBlockContainer>> remainedSingleColors = new();
@@ -187,8 +194,12 @@ public class GameManagerHelpers : MonoBehaviour
 
             if (targetContainer.Count >= MaxBlock)
             {
-                _board.AddBlockContainer(null, targetContainer.GetPosition());
                 targetContainer.Destroy();
+
+                if (targetContainer.Colors.Count == 0)
+                {
+                    _board.AddBlockContainer(null, targetContainer.GetPosition());
+                }
             }
 
             foreach (var singleColorsContainer in singleColorsContainers)

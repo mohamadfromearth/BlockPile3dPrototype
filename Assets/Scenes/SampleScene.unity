@@ -223,6 +223,14 @@ MonoBehaviour:
   blockContainerHolderPrefab: {fileID: 7998414728364303778, guid: f7716b26ad3a7f94f87c9053f1311564, type: 3}
   levelRepository: {fileID: 11400000, guid: 906d165bdd9d1a04395a18a20cd3bf3b, type: 2}
   grid: {fileID: 1654743540}
+  colors:
+  - {r: 0, g: 0, b: 0, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  selectionBarPositionList:
+  - {fileID: 371120509}
+  - {fileID: 1926214680}
+  - {fileID: 1522481080}
 --- !u!114 &419188299
 MonoBehaviour:
   m_ObjectHideFlags: 0

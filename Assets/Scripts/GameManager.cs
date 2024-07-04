@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     [Inject] private Board _board;
     [Inject] private EventChannel _channel;
     [Inject] private ILevelRepository _levelRepository;
+    [Inject] private BlockContainerSelectionBar _selectionBar;
 
 
     private int _selectionBarSelectedIndex;
@@ -38,7 +39,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _selectionBarCellContainerPosList = selectionBarCellContainerTransformList.Select(t => t.position).ToList();
-        helpers.SpawnSelectionBarBlockContainers(_selectionBarCellContainerPosList);
+        //helpers.SpawnSelectionBarBlockContainers(_selectionBarCellContainerPosList);
+        _selectionBar.Spawn();
         helpers.SpawnBoardBlockContainers();
     }
 
@@ -96,6 +98,10 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(helpers.UpdateBoardRoutine(_board.WorldToCell(holder.GetPosition())));
 
                 _selectedBlockContainer = null;
+
+                _selectionBar.Decrease();
+
+                if (_selectionBar.Count == 0) _selectionBar.Spawn();
             }
             else
             {

@@ -39,6 +39,7 @@ namespace Objects.BlocksContainer
             }
             else
             {
+                Colors.Clear();
                 Destroy(gameObject);
             }
         }
