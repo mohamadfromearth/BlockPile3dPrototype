@@ -88,6 +88,65 @@ public class GameManagerHelpers : MonoBehaviour
     }
 
 
+    private IEnumerator MatchBlock(Vector3Int boardPosition, Vector3Int exceptOffset)
+    {
+        var container = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
+
+        foreach (var gridOffset in _gridHorizontalVerticalOffsets)
+        {
+            var position = boardPosition + gridOffset;
+
+            var holder = _board.GetBlockContainerHolder(position);
+
+            if (holder == null) continue;
+
+            var matchedContainer = holder.BlockContainer;
+
+            if (gridOffset == exceptOffset) continue;
+
+            if (matchedContainer != null)
+            {
+                if (matchedContainer.Colors.Peek() == container.Colors.Peek())
+                {
+                    yield return MatchBlock(position, gridOffset * -1);
+
+                    var block = matchedContainer.Pop();
+
+                    var color = container.Colors.Peek();
+
+
+                    while (true)
+                    {
+                        container.Push(block, BlockPlacementDuration);
+
+                        yield return _blockPlacementRateWaitForSeconds;
+
+
+                        block = matchedContainer.Peek();
+
+                        if (block == null)
+                        {
+                            _board.AddBlockContainer(null, matchedContainer.GetPosition());
+                            break;
+                        }
+
+                        if (block.Color != color)
+                        {
+                            break;
+                        }
+
+                        block = matchedContainer.Pop();
+
+                        yield return null;
+                    }
+
+                    yield return _blockPlacementDelayWaitForSeconds;
+                }
+            }
+        }
+    }
+
+
     public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition)
     {
         var containers = GetMatchedContainers(boardPosition);
@@ -95,177 +154,32 @@ public class GameManagerHelpers : MonoBehaviour
 
         var targetContainer = containers[^1].Value;
 
-        var recentContainer = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
+        yield return MatchBlock(_board.WorldToCell(targetContainer.GetPosition()), Vector3Int.zero);
 
-        if (recentContainer.GameObj.GetInstanceID() != targetContainer.GameObj.GetInstanceID()
-            && containers.Count != 2
-           )
+        if (targetContainer.Count >= MaxBlock)
         {
-            var firstList = new List<KeyValuePair<int, IBlockContainer>>(containers);
+            var targetPosition = targetContainer.GetPosition();
+            targetContainer.Destroy();
 
-            firstList.RemoveAt(firstList.Count - 1);
-
-            yield return ReArrangeRoutine(firstList, recentContainer);
-
-
-            var secondList = new List<KeyValuePair<int, IBlockContainer>>()
+            if (targetContainer.Colors.Count == 0)
             {
-                new KeyValuePair<int, IBlockContainer>(0, recentContainer),
-                containers[^1]
-            };
-
-            yield return ReArrangeRoutine(secondList, targetContainer);
-
-
-            if (targetContainer.Count >= MaxBlock)
-            {
-                targetContainer.Destroy();
-
-                if (targetContainer.Colors.Count == 0)
-                {
-                    _board.AddBlockContainer(null, targetContainer.GetPosition());
-                }
-            }
-
-
-            var adjacentMatchedContainers = GetMatchedContainers(_board.WorldToCell(containers[0].Value.GetPosition()));
-
-            if (adjacentMatchedContainers.Count > 2)
-            {
-                RemoveContainer(adjacentMatchedContainers, recentContainer);
-
-                yield return ReArrangeRoutine(adjacentMatchedContainers, adjacentMatchedContainers[^1].Value);
-            }
-
-            var singleRecentMatchedContainers = GetMatchedContainers(_board.WorldToCell(recentContainer.GetPosition()));
-
-            if (singleRecentMatchedContainers.Count > 1)
-            {
-                yield return ReArrangeRoutine(singleRecentMatchedContainers, recentContainer);
-            }
-
-            if (recentContainer.Count >= MaxBlock)
-            {
-                recentContainer.Destroy();
-                if (recentContainer.Colors.Count == 0)
-                {
-                    _board.AddBlockContainer(null, recentContainer.GetPosition());
-                }
-            }
-
-            List<KeyValuePair<int, IBlockContainer>> remainedSingleColors = new();
-
-            foreach (var adjacentMatchedContainer in adjacentMatchedContainers)
-            {
-                if (adjacentMatchedContainer.Value.HasSingleColor)
-                {
-                    remainedSingleColors.Add(adjacentMatchedContainer);
-                }
-            }
-
-            foreach (var remainedSingleColor in remainedSingleColors)
-            {
-                yield return UpdateBoardRoutine(_board.WorldToCell(remainedSingleColor.Value.GetPosition()));
+                _board.GetBlockContainerHolder(targetPosition).BlockContainer = null;
+                containers.RemoveAt(containers.Count - 1);
             }
         }
-        else
+
+        foreach (var keyValuePair in containers)
         {
-            // REARRANGE
-
-            yield return ReArrangeRoutine(containers, targetContainer);
-
-            // REARRANGE
-
-
-            var singleColorsContainers = new List<IBlockContainer>();
-
-            foreach (var keyValuePair in containers)
+            if (keyValuePair.Value.WasUpperColorChanged)
             {
-                if (keyValuePair.Value.GameObj.GetInstanceID() == targetContainer.GameObj.GetInstanceID())
-                {
-                    continue;
-                }
-
-                if (keyValuePair.Value.HasSingleColor)
-                {
-                    singleColorsContainers.Add(keyValuePair.Value);
-                }
-            }
-
-            if (targetContainer.Count >= MaxBlock)
-            {
-                targetContainer.Destroy();
-
-                if (targetContainer.Colors.Count == 0)
-                {
-                    _board.AddBlockContainer(null, targetContainer.GetPosition());
-                }
-            }
-
-            foreach (var singleColorsContainer in singleColorsContainers)
-            {
-                yield return UpdateBoardRoutine(_board.WorldToCell(singleColorsContainer.GetPosition()));
+                keyValuePair.Value.WasUpperColorChanged = false;
+                yield return UpdateBoardRoutine(_board.WorldToCell(keyValuePair.Value.GetPosition()));
             }
         }
     }
 
-    private static void RemoveContainer(List<KeyValuePair<int, IBlockContainer>> adjacentMatchedContainers,
-        IBlockContainer recentContainer)
-    {
-        var removeIndex = 0;
-        for (int i = 0; i < adjacentMatchedContainers.Count; i++)
-        {
-            var adjacentMatchedContainer = adjacentMatchedContainers[i];
-            if (adjacentMatchedContainer.Value.GameObj.GetInstanceID() ==
-                recentContainer.GameObj.GetInstanceID())
-            {
-                removeIndex = i;
-                break;
-            }
-        }
-
-        adjacentMatchedContainers.RemoveAt(removeIndex);
-    }
-
-    private IEnumerator ReArrangeRoutine(List<KeyValuePair<int, IBlockContainer>> containers,
-        IBlockContainer targetContainer)
-    {
-        foreach (var containerValuePair in containers)
-        {
-            var container = containerValuePair.Value;
-
-            if (container.GameObj.GetInstanceID() == targetContainer.GameObj.GetInstanceID()) continue;
-
-            var block = container.Pop();
-
-            var color = targetContainer.Colors.Peek();
-
-            while (true)
-            {
-                targetContainer.Push(block, BlockPlacementDuration);
-
-                yield return _blockPlacementRateWaitForSeconds;
-
-
-                block = container.Peek();
-
-                if (block == null)
-                {
-                    _board.AddBlockContainer(null, container.GetPosition());
-                    break;
-                }
-
-                if (block.Color != color)
-                {
-                    break;
-                }
-
-                block = container.Pop();
-            }
-
-            yield return _blockPlacementDelayWaitForSeconds;
-        }
-    }
+ 
+    
 
 
     private List<KeyValuePair<int, IBlockContainer>> GetMatchedContainers(Vector3Int boardPosition)
@@ -273,6 +187,8 @@ public class GameManagerHelpers : MonoBehaviour
         var recentPlacedContainer = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
 
         List<KeyValuePair<int, IBlockContainer>> containers = new();
+
+        if (recentPlacedContainer == null) return containers;
 
         int containerScore = 1;
 
@@ -308,4 +224,6 @@ public class GameManagerHelpers : MonoBehaviour
         containers = containers.OrderBy(pair => pair.Key).ToList();
         return containers;
     }
+
+
 }

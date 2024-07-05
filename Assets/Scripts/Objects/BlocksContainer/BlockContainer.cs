@@ -68,9 +68,12 @@ namespace Objects.BlocksContainer
             }
         }
 
+        public bool WasUpperColorChanged { get; set; }
+
         private void Awake()
         {
             Colors = new();
+            WasUpperColorChanged = false;
         }
 
 
@@ -225,6 +228,8 @@ namespace Objects.BlocksContainer
                 _countList.RemoveAt(_countIndex);
                 _countIndex = -1;
 
+                WasUpperColorChanged = false;
+
                 return block;
             }
 
@@ -233,6 +238,7 @@ namespace Objects.BlocksContainer
                 Colors.Pop();
                 _countList.RemoveAt(_countList.Count - 1);
                 _countIndex--;
+                WasUpperColorChanged = true;
             }
             else
             {

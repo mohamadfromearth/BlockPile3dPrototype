@@ -12,6 +12,8 @@ namespace Objects.BlocksContainer
 
         public int Count { get; }
 
+        public bool WasUpperColorChanged { get; set; }
+
         public void Push(IBlock block, float duration);
 
         public IBlock Pop();
