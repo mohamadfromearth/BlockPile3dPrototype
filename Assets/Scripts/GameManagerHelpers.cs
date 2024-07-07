@@ -6,6 +6,7 @@ using Scrips;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
 using Scripts.Data;
+using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
@@ -26,15 +27,18 @@ public class GameManagerHelpers : MonoBehaviour
     };
 
 
-    private const float BlockPlacementDuration = 0.60f;
-    private const float BlockPlacementRate = 0.3f;
-    private const float BlockPlacementDelay = 0.3f;
+    private const float BlockPlacementDuration = 0.35f;
+    private const float BlockPlacementRate = 0.175f;
+    private const float BlockPlacementDelay = 0.175f;
 
 
     private readonly WaitForSeconds _blockPlacementRateWaitForSeconds;
     private readonly WaitForSeconds _blockPlacementDelayWaitForSeconds;
 
     private const int MaxBlock = 7;
+
+
+    private HashSet<Vector3Int> _checkedList = new();
 
     public GameManagerHelpers()
     {
@@ -99,6 +103,8 @@ public class GameManagerHelpers : MonoBehaviour
             var holder = _board.GetBlockContainerHolder(position);
 
             if (holder == null) continue;
+            if (_checkedList.Contains(position)) continue;
+            _checkedList.Add(position);
 
             var matchedContainer = holder.BlockContainer;
 
@@ -150,36 +156,39 @@ public class GameManagerHelpers : MonoBehaviour
     public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition)
     {
         var containers = GetMatchedContainers(boardPosition);
-        if (containers.Count <= 1) yield break;
-
-        var targetContainer = containers[^1].Value;
-
-        yield return MatchBlock(_board.WorldToCell(targetContainer.GetPosition()), Vector3Int.zero);
-
-        if (targetContainer.Count >= MaxBlock)
+        if (containers.Count > 1)
         {
-            var targetPosition = targetContainer.GetPosition();
-            targetContainer.Destroy();
+            var targetContainer = containers[^1].Value;
 
-            if (targetContainer.Colors.Count == 0)
+            yield return MatchBlock(_board.WorldToCell(targetContainer.GetPosition()), Vector3Int.zero);
+
+
+            if (targetContainer.Count >= MaxBlock)
             {
-                _board.GetBlockContainerHolder(targetPosition).BlockContainer = null;
-                containers.RemoveAt(containers.Count - 1);
+                var targetPosition = targetContainer.GetPosition();
+                targetContainer.Destroy();
+
+                if (targetContainer.Colors.Count == 0)
+                {
+                    _board.GetBlockContainerHolder(targetPosition).BlockContainer = null;
+                    containers.RemoveAt(containers.Count - 1);
+                }
             }
-        }
 
-        foreach (var keyValuePair in containers)
-        {
-            if (keyValuePair.Value.WasUpperColorChanged)
+            _checkedList.Clear();
+
+
+            foreach (var keyValuePair in containers)
             {
-                keyValuePair.Value.WasUpperColorChanged = false;
-                yield return UpdateBoardRoutine(_board.WorldToCell(keyValuePair.Value.GetPosition()));
+                if (keyValuePair.Value.WasUpperColorChanged)
+                {
+                    keyValuePair.Value.WasUpperColorChanged = false;
+                    if (keyValuePair.Value.GameObj == null) continue;
+                    yield return UpdateBoardRoutine(_board.WorldToCell(keyValuePair.Value.GetPosition()));
+                }
             }
         }
     }
-
- 
-    
 
 
     private List<KeyValuePair<int, IBlockContainer>> GetMatchedContainers(Vector3Int boardPosition)
@@ -224,6 +233,4 @@ public class GameManagerHelpers : MonoBehaviour
         containers = containers.OrderBy(pair => pair.Key).ToList();
         return containers;
     }
-
-
 }

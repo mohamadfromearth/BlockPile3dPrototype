@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _camera = Camera.main;
+
+        Application.targetFrameRate = 60;
     }
 
 

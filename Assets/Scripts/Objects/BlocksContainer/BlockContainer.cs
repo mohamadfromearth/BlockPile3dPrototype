@@ -40,9 +40,12 @@ namespace Objects.BlocksContainer
             else
             {
                 Colors.Clear();
+                _hasBeenDestroyed = true;
                 Destroy(gameObject);
             }
         }
+
+        private bool _hasBeenDestroyed = false;
 
         public IBlock Peek()
         {
@@ -81,7 +84,11 @@ namespace Objects.BlocksContainer
 
         public GameObject GameObj
         {
-            get => gameObject;
+            get
+            {
+                if (_hasBeenDestroyed) return null;
+                return gameObject;
+            }
         }
 
 
@@ -169,7 +176,15 @@ namespace Objects.BlocksContainer
             blocks.Push(block);
 
             mid = currentBlockPosition + (targetBlockPosition - currentBlockPosition) / 2f;
-            mid.y = targetBlockPosition.y + 1f;
+
+            if (targetBlockPosition.y < currentBlockPosition.y)
+            {
+                mid.y = currentBlockPosition.y + 1;
+            }
+            else
+            {
+                mid.y = targetBlockPosition.y + 1f;
+            }
 
 
             points[0] = currentBlockPosition;

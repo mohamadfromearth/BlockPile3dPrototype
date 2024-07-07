@@ -33,13 +33,13 @@ public class BlockContainerSelectionBar
             container.SetPosition(position);
 
 
-            var colorsCount = Random.Range(1, 4);
+            var colorsCount = Random.Range(2, 4);
 
             for (int i = 0; i < colorsCount; i++)
             {
                 var blockCount = Random.Range(1, 8);
 
-                var colorIndex = Random.Range(0, _colors.Count);
+                var colorIndex = Random.Range(0, _colors.Count - 1);
 
 
                 for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
