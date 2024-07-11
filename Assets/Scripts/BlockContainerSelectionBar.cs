@@ -26,23 +26,57 @@ public class BlockContainerSelectionBar
     public void Spawn()
     {
         Count = _containersPositionList.Count;
-        //
+        
+        foreach (var position in _containersPositionList)
+        {
+            var container = _blockContainerFactory.Create();
+            container.SetPosition(position);
+        
+        
+            var colorsCount = 2;
+        
+            var isRedInt = Random.Range(0, 2);
+            bool isRed = isRedInt != 0;
+        
+            for (int i = 0; i < colorsCount; i++)
+            {
+                var blockCount = Random.Range(1, 8);
+        
+                var colorIndex = Random.Range(0, _colors.Count - 1);
+        
+        
+                for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
+                {
+                    var block = _blockFactory.Create();
+        
+        
+                    if (i == 0)
+                    {
+                        block.Color = isRed ? Color.black : Color.red;
+                    }
+                    else
+                    {
+                        block.Color = isRed ? Color.red : Color.black;
+                    }
+        
+                    container.Push(block);
+                }
+            }
+        }  
+
         // foreach (var position in _containersPositionList)
         // {
         //     var container = _blockContainerFactory.Create();
         //     container.SetPosition(position);
         //
         //
-        //     var colorsCount = 2;
-        //
-        //     var isRedInt = Random.Range(0, 2);
-        //     bool isRed = isRedInt != 0;
+        //     var colorsCount = Random.Range(2, 4);
         //
         //     for (int i = 0; i < colorsCount; i++)
         //     {
         //         var blockCount = Random.Range(1, 8);
         //
-        //         var colorIndex = Random.Range(0, _colors.Count - 1);
+        //         var colorIndex = Random.Range(0, _colors.Count);
         //
         //
         //         for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
@@ -50,46 +84,12 @@ public class BlockContainerSelectionBar
         //             var block = _blockFactory.Create();
         //
         //
-        //             if (i == 0)
-        //             {
-        //                 block.Color = isRed ? Color.black : Color.red;
-        //             }
-        //             else
-        //             {
-        //                 block.Color = isRed ? Color.red : Color.black;
-        //             }
+        //             block.Color = _colors[colorIndex];
         //
         //             container.Push(block);
         //         }
         //     }
-        // }  
-
-        foreach (var position in _containersPositionList)
-        {
-            var container = _blockContainerFactory.Create();
-            container.SetPosition(position);
-
-
-            var colorsCount = Random.Range(2, 4);
-
-            for (int i = 0; i < colorsCount; i++)
-            {
-                var blockCount = Random.Range(1, 8);
-
-                var colorIndex = Random.Range(0, _colors.Count);
-
-
-                for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
-                {
-                    var block = _blockFactory.Create();
-
-
-                    block.Color = _colors[colorIndex];
-
-                    container.Push(block);
-                }
-            }
-        }
+        // }
     }
 
     public void Decrease() => Count--;

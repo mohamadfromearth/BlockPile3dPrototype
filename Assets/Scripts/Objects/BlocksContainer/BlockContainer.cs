@@ -1,4 +1,7 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Event;
 using Objects.Block;
@@ -20,15 +23,31 @@ namespace Objects.BlocksContainer
 
         public bool IsPlaced { get; set; }
 
-        public void Destroy()
+        [SerializeField] private float height = 0.21f;
+        [SerializeField] private float destroyRate = 0.08f;
+
+        private WaitForSeconds _destroyRateWaitForSeconds;
+
+
+        private void Start()
         {
+            _destroyRateWaitForSeconds = new WaitForSeconds(destroyRate);
+        }
+
+        public float Destroy()
+        {
+            var blocksBuffers = new List<IBlock>();
+
+            bool destroyContainer;
+
             if (Colors.Count > 1)
             {
+                destroyContainer = false;
                 var color = Colors.Peek();
 
                 while (blocks.Count > 0)
                 {
-                    blocks.Pop().Destroy();
+                    blocksBuffers.Add(blocks.Pop());
 
                     if (blocks.Peek().Color != color)
                     {
@@ -39,10 +58,27 @@ namespace Objects.BlocksContainer
             }
             else
             {
+                destroyContainer = true;
+                blocksBuffers = blocks.ToList();
                 Colors.Clear();
                 _hasBeenDestroyed = true;
-                Destroy(gameObject);
             }
+
+            StartCoroutine(DestroyAnimationRoutine(blocksBuffers, destroyContainer));
+
+            return blocksBuffers.Count * destroyRate + 0.5f;
+        }
+
+        private IEnumerator DestroyAnimationRoutine(List<IBlock> blocksBuffer,
+            bool destroyContainer)
+        {
+            foreach (var block in blocksBuffer)
+            {
+                block.Destroy();
+                yield return _destroyRateWaitForSeconds;
+            }
+
+            if (destroyContainer) Destroy(gameObject);
         }
 
         private bool _hasBeenDestroyed = false;
@@ -105,7 +141,7 @@ namespace Objects.BlocksContainer
             if (blocks.Count == 0)
             {
                 blockPosition = GetPosition();
-                blockPosition.y += 0.2f;
+                blockPosition.y += height;
 
                 midPoint = block.GetPosition() + (blockPosition - block.GetPosition()) / 2;
                 block.SetPosition(blockPosition);
@@ -121,7 +157,7 @@ namespace Objects.BlocksContainer
 
 
             blockPosition = blocks.Peek().GetPosition();
-            blockPosition.y += 0.2f;
+            blockPosition.y += height;
 
 
             if (blocks.Peek().Color != block.Color)
@@ -151,7 +187,7 @@ namespace Objects.BlocksContainer
             Vector3 mid;
 
 
-            targetBlockPosition.y += 0.2f * blocks.Count;
+            targetBlockPosition.y += height * blocks.Count;
 
             if (blocks.Peek().Color != block.Color)
             {

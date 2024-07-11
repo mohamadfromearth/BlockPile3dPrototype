@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 namespace Objects.Block
@@ -32,7 +33,7 @@ namespace Objects.Block
 
         public void Destroy()
         {
-            Destroy(gameObject);
+            transform.DOScale(Vector3.zero, 0.5f).onComplete = () => { Destroy(gameObject); };
         }
 
         public GameObject GameObj

@@ -138,6 +138,7 @@ public class GameManagerHelpers : MonoBehaviour
 
                         if (block.Color != color)
                         {
+                            Debug.Log("Adding " + _board.WorldToCell(matchedContainer.GetPosition()));
                             _checkedList.Add(_board.WorldToCell(matchedContainer.GetPosition()));
                             _blocksToMatch.Add(position);
                             break;
@@ -158,6 +159,8 @@ public class GameManagerHelpers : MonoBehaviour
     public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition, bool isStaringPoint = false)
     {
         var containers = GetMatchedContainers(boardPosition);
+        Debug.Log("its bigger than one! " + containers.Count + " " + boardPosition);
+
         if (containers.Count > 1)
         {
             var targetContainer = containers[^1].Value;
@@ -167,7 +170,7 @@ public class GameManagerHelpers : MonoBehaviour
             if (targetContainer.Count >= MaxBlock)
             {
                 var targetPosition = targetContainer.GetPosition();
-                targetContainer.Destroy();
+                yield return new WaitForSeconds(targetContainer.Destroy());
 
                 if (targetContainer.Colors.Count == 0)
                 {
@@ -176,10 +179,7 @@ public class GameManagerHelpers : MonoBehaviour
                 else
                 {
                     var position = _board.WorldToCell(targetContainer.GetPosition());
-                    if (_blocksToMatch.Contains(position) == false)
-                    {
-                        _blocksToMatch.Add(position);
-                    }
+                    _blocksToMatch.Add(position);
                 }
             }
 
@@ -210,8 +210,9 @@ public class GameManagerHelpers : MonoBehaviour
 
                     var isLastIndex = i == _blocksToMatch.Count - 1;
 
-                    yield return UpdateBoardRoutine(_board.WorldToCell(position), isLastIndex);
-                    
+
+                    yield return UpdateBoardRoutine(position, isLastIndex);
+
                     if (isLastIndex)
                     {
                         Debug.Log("Clearing " + _blocksToMatch.Count);
