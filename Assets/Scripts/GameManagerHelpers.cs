@@ -42,6 +42,9 @@ public class GameManagerHelpers : MonoBehaviour
 
     private List<Vector3Int> _blocksToMatch = new();
 
+    public Vector3Int StartMatchingPosition { get; set; }
+
+
     public void SpawnSelectionBarBlockContainers(List<Vector3> blockContainersPositionList)
     {
         var containerDataList = _levelRepository.GetLevelData().selectionBarBlockContainerDataList;
@@ -129,12 +132,14 @@ public class GameManagerHelpers : MonoBehaviour
                         if (block == null)
                         {
                             _board.AddBlockContainer(null, matchedContainer.GetPosition());
+                            matchedContainer.Destroy();
                             break;
                         }
 
                         if (block.Color != color)
                         {
                             _checkedList.Add(_board.WorldToCell(matchedContainer.GetPosition()));
+                            _blocksToMatch.Add(position);
                             break;
                         }
 
@@ -150,7 +155,7 @@ public class GameManagerHelpers : MonoBehaviour
     }
 
 
-    public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition)
+    public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition, bool isStaringPoint = false)
     {
         var containers = GetMatchedContainers(boardPosition);
         if (containers.Count > 1)
@@ -159,8 +164,6 @@ public class GameManagerHelpers : MonoBehaviour
 
             yield return MatchBlock(_board.WorldToCell(targetContainer.GetPosition()), Vector3Int.zero);
 
-
-            Debug.Log("Target container position is " + _board.WorldToCell(targetContainer.GetPosition()));
             if (targetContainer.Count >= MaxBlock)
             {
                 var targetPosition = targetContainer.GetPosition();
@@ -193,15 +196,29 @@ public class GameManagerHelpers : MonoBehaviour
                 }
             }
 
-            for (int i = 0; i < _blocksToMatch.Count; i++)
+            if (isStaringPoint)
             {
-                var position = _blocksToMatch[i];
-                if (_board.GetBlockContainerHolder(position) == null) continue;
-                if (_board.GetBlockContainerHolder(position).BlockContainer == null) continue;
-                yield return UpdateBoardRoutine(_board.WorldToCell(position));
-            }
+                Debug.Log("Ending");
 
-            _blocksToMatch.Clear();
+                for (int i = 0; i < _blocksToMatch.Count; i++)
+                {
+                    var position = _blocksToMatch[i];
+                    var holder = _board.GetBlockContainerHolder(position);
+                    if (holder.BlockContainer == null) continue;
+
+                    holder.BlockContainer.WasUpperColorChanged = false;
+
+                    var isLastIndex = i == _blocksToMatch.Count - 1;
+
+                    yield return UpdateBoardRoutine(_board.WorldToCell(position), isLastIndex);
+                    
+                    if (isLastIndex)
+                    {
+                        Debug.Log("Clearing " + _blocksToMatch.Count);
+                        _blocksToMatch.Clear();
+                    }
+                }
+            }
         }
     }
 

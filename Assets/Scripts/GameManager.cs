@@ -97,7 +97,9 @@ public class GameManager : MonoBehaviour
 
                 _board.AddBlockContainer(_selectedBlockContainer, pos);
 
-                StartCoroutine(helpers.UpdateBoardRoutine(_board.WorldToCell(holder.GetPosition())));
+                var boardPosition = _board.WorldToCell(holder.GetPosition());
+                helpers.StartMatchingPosition = boardPosition;
+                StartCoroutine(helpers.UpdateBoardRoutine(boardPosition, true));
 
                 _selectedBlockContainer = null;
 
