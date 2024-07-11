@@ -6,7 +6,6 @@ using Scrips;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
 using Scripts.Data;
-using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
@@ -32,19 +31,16 @@ public class GameManagerHelpers : MonoBehaviour
     private const float BlockPlacementDelay = 0.175f;
 
 
-    private readonly WaitForSeconds _blockPlacementRateWaitForSeconds;
-    private readonly WaitForSeconds _blockPlacementDelayWaitForSeconds;
+    private readonly WaitForSeconds _blockPlacementRateWaitForSeconds = new(BlockPlacementRate);
+    private readonly WaitForSeconds _blockPlacementDelayWaitForSeconds = new(BlockPlacementDelay);
 
     private const int MaxBlock = 7;
 
 
     private HashSet<Vector3Int> _checkedList = new();
 
-    public GameManagerHelpers()
-    {
-        _blockPlacementRateWaitForSeconds = new WaitForSeconds(BlockPlacementRate);
-        _blockPlacementDelayWaitForSeconds = new WaitForSeconds(BlockPlacementDelay);
-    }
+
+    private List<Vector3Int> _blocksToMatch = new();
 
     public void SpawnSelectionBarBlockContainers(List<Vector3> blockContainersPositionList)
     {
@@ -96,6 +92,8 @@ public class GameManagerHelpers : MonoBehaviour
     {
         var container = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
 
+        _checkedList.Add(boardPosition);
+
         foreach (var gridOffset in _gridHorizontalVerticalOffsets)
         {
             var position = boardPosition + gridOffset;
@@ -117,9 +115,7 @@ public class GameManagerHelpers : MonoBehaviour
                     yield return MatchBlock(position, gridOffset * -1);
 
                     var block = matchedContainer.Pop();
-
                     var color = container.Colors.Peek();
-
 
                     while (true)
                     {
@@ -138,6 +134,7 @@ public class GameManagerHelpers : MonoBehaviour
 
                         if (block.Color != color)
                         {
+                            _checkedList.Add(_board.WorldToCell(matchedContainer.GetPosition()));
                             break;
                         }
 
@@ -163,6 +160,7 @@ public class GameManagerHelpers : MonoBehaviour
             yield return MatchBlock(_board.WorldToCell(targetContainer.GetPosition()), Vector3Int.zero);
 
 
+            Debug.Log("Target container position is " + _board.WorldToCell(targetContainer.GetPosition()));
             if (targetContainer.Count >= MaxBlock)
             {
                 var targetPosition = targetContainer.GetPosition();
@@ -171,7 +169,14 @@ public class GameManagerHelpers : MonoBehaviour
                 if (targetContainer.Colors.Count == 0)
                 {
                     _board.GetBlockContainerHolder(targetPosition).BlockContainer = null;
-                    containers.RemoveAt(containers.Count - 1);
+                }
+                else
+                {
+                    var position = _board.WorldToCell(targetContainer.GetPosition());
+                    if (_blocksToMatch.Contains(position) == false)
+                    {
+                        _blocksToMatch.Add(position);
+                    }
                 }
             }
 
@@ -187,6 +192,16 @@ public class GameManagerHelpers : MonoBehaviour
                     yield return UpdateBoardRoutine(_board.WorldToCell(keyValuePair.Value.GetPosition()));
                 }
             }
+
+            for (int i = 0; i < _blocksToMatch.Count; i++)
+            {
+                var position = _blocksToMatch[i];
+                if (_board.GetBlockContainerHolder(position) == null) continue;
+                if (_board.GetBlockContainerHolder(position).BlockContainer == null) continue;
+                yield return UpdateBoardRoutine(_board.WorldToCell(position));
+            }
+
+            _blocksToMatch.Clear();
         }
     }
 
