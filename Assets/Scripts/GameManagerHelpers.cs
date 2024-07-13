@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Event;
 using Objects.BlocksContainer;
 using Scrips;
 using Scrips.Objects.Cell;
@@ -15,6 +16,7 @@ public class GameManagerHelpers : MonoBehaviour
     [Inject] private IBlockFactory _blockFactory;
     [Inject] private ILevelRepository _levelRepository;
     [Inject] private Board _board;
+    [Inject] private EventChannel _channel;
 
 
     private readonly Vector3Int[] _gridHorizontalVerticalOffsets = new[]
@@ -88,6 +90,13 @@ public class GameManagerHelpers : MonoBehaviour
                 container.Push(block);
             }
         }
+    }
+
+    public string GetTargetScoreString(float currentScore)
+    {
+        var levelData = _levelRepository.GetLevelData();
+
+        return currentScore + "/" + levelData.targetScore;
     }
 
 

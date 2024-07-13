@@ -6,6 +6,7 @@ using Scrips;
 using Scrips.Event;
 using Scrips.Utils;
 using Scripts.Data;
+using UI;
 using UnityEngine;
 using Utils;
 using Zenject;
@@ -13,6 +14,8 @@ using Zenject;
 public class GameManager : MonoBehaviour
 {
     private Camera _camera;
+
+    [SerializeField] private GameUI gameUI;
 
     [SerializeField] private LayerMask groundLayerMask;
 
@@ -29,6 +32,8 @@ public class GameManager : MonoBehaviour
     private int _selectionBarSelectedIndex;
     private IBlockContainer _selectedBlockContainer;
 
+    private float _currentScore = 0f;
+
 
     private void Awake()
     {
@@ -41,9 +46,12 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _selectionBarCellContainerPosList = selectionBarCellContainerTransformList.Select(t => t.position).ToList();
-        //helpers.SpawnSelectionBarBlockContainers(_selectionBarCellContainerPosList);
         _selectionBar.Spawn();
+
         helpers.SpawnBoardBlockContainers();
+
+        gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
+        gameUI.SetProgress(0);
     }
 
     private void OnEnable()
@@ -61,12 +69,14 @@ public class GameManager : MonoBehaviour
     {
         _channel.Subscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
         _channel.Subscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
+        _channel.Subscribe<BlockDestroy>(OnBlocksDestroyed);
     }
 
     private void UnSubscribeToEvents()
     {
         _channel.UnSubscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
         _channel.UnSubscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
+        _channel.UnSubscribe<BlockDestroy>(OnBlocksDestroyed);
     }
 
 
@@ -113,6 +123,16 @@ public class GameManager : MonoBehaviour
                 _selectedBlockContainer = null;
             }
         }
+    }
+
+    private void OnBlocksDestroyed()
+    {
+        var data = _channel.GetData<BlockDestroy>();
+
+        _currentScore += data.Count;
+
+        gameUI.SetProgress(_currentScore / _levelRepository.GetLevelData().targetScore);
+        gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
     }
 
 

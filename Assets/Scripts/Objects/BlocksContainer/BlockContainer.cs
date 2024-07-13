@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +21,7 @@ namespace Objects.BlocksContainer
         public Stack<Color> Colors { get; set; }
 
         public bool IsPlaced { get; set; }
+
 
         [SerializeField] private float height = 0.21f;
         [SerializeField] private float destroyRate = 0.08f;
@@ -72,13 +72,18 @@ namespace Objects.BlocksContainer
         private IEnumerator DestroyAnimationRoutine(List<IBlock> blocksBuffer,
             bool destroyContainer)
         {
+            int count = 0;
+
             foreach (var block in blocksBuffer)
             {
                 block.Destroy();
                 yield return _destroyRateWaitForSeconds;
+                count++;
             }
 
             if (destroyContainer) Destroy(gameObject);
+
+            Channel.Rise<BlockDestroy>(new BlockDestroy(count));
         }
 
         private bool _hasBeenDestroyed = false;
@@ -116,7 +121,7 @@ namespace Objects.BlocksContainer
         }
 
 
-        public EventChannel Channel { get; set; }
+        public EventChannel Channel { private get; set; }
 
         public GameObject GameObj
         {

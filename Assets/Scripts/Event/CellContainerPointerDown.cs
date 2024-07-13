@@ -1,8 +1,6 @@
-using Event;
 using Objects.BlocksContainer;
-using Scrips.Objects.CellsContainer;
 
-namespace Scrips.Event
+namespace Event
 {
     public struct CellContainerPointerDown : IEventData
     {
