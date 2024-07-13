@@ -47,25 +47,6 @@ public class GameManagerHelpers : MonoBehaviour
     public Vector3Int StartMatchingPosition { get; set; }
 
 
-    public void SpawnSelectionBarBlockContainers(List<Vector3> blockContainersPositionList)
-    {
-        var containerDataList = _levelRepository.GetLevelData().selectionBarBlockContainerDataList;
-
-        for (int i = 0; i < containerDataList.Count; i++)
-        {
-            var containerData = containerDataList[i];
-            var container = _blockContainerFactory.Create();
-            container.SetPosition(blockContainersPositionList[i]);
-
-            foreach (var color in containerData.color)
-            {
-                var block = _blockFactory.Create();
-                block.Color = color;
-                container.Push(block);
-            }
-        }
-    }
-
     public void SpawnBoardBlockContainers()
     {
         var levelData = _levelRepository.GetLevelData();

@@ -27,5 +27,7 @@ namespace Scripts.Data
     public interface ILevelRepository
     {
         public LevelData GetLevelData();
+
+        public void NextLevel();
     }
 }

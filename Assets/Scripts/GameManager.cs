@@ -133,8 +133,13 @@ public class GameManager : MonoBehaviour
 
         gameUI.SetProgress(_currentScore / _levelRepository.GetLevelData().targetScore);
         gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
+
+        CheckWin();
     }
 
+    private void OnNextLevel()
+    {
+    }
 
     public void OnPointerMove(Vector2 position)
     {
@@ -149,4 +154,12 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
+
+    private void CheckWin()
+    {
+        if (_currentScore >= _levelRepository.GetLevelData().targetScore)
+        {
+        }
+    }
 }

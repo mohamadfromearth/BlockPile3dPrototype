@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Scripts.Data;
 using UnityEngine;
 
-namespace Scrips.Data
+namespace Data
 {
     [CreateAssetMenu(menuName = "so/LevelRepository", fileName = "LevelRepository")]
     public class LevelRepository : ScriptableObject, ILevelRepository
@@ -10,8 +10,13 @@ namespace Scrips.Data
         [SerializeField] private List<LevelData> levelDataList;
 
 
-        private int levelIndex = 0;
+        private int _levelIndex;
 
-        public LevelData GetLevelData() => levelDataList[levelIndex];
+        public LevelData GetLevelData() => levelDataList[_levelIndex];
+
+        public void NextLevel()
+        {
+            if (_levelIndex < levelDataList.Count - 1) _levelIndex++;
+        }
     }
 }
