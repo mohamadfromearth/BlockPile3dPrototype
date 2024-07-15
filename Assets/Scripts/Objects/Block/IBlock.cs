@@ -1,4 +1,4 @@
-using Scrips.Core;
+using Core;
 using UnityEngine;
 
 namespace Objects.Block

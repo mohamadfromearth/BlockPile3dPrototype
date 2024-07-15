@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Core;
 using Objects.Block;
-using Scrips.Core;
 using UnityEngine;
 
 namespace Objects.BlocksContainer
@@ -26,6 +26,6 @@ namespace Objects.BlocksContainer
 
         public bool IsPlaced { set; }
 
-        public float Destroy();
+        public float Destroy(bool destroyImmediately = false);
     }
 }

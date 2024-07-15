@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public interface IGameObject
+namespace Core
 {
-    public GameObject GameObj { get; }
+    public interface IGameObject
+    {
+        public GameObject GameObj { get; }
+    }
 }

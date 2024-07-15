@@ -49,8 +49,10 @@ namespace Di
             var levelData = levelRepository.GetLevelData();
             Container.Bind<Board>().AsSingle().WithArguments(levelData.width, levelData.height, grid);
 
-            Container.Bind<BlockContainerSelectionBar>().AsCached()
+            Container.Bind<BlockContainerSelectionBar>().AsTransient()
                 .WithArguments(colors, selectionBarPositionList.Select(t => t.position).ToList());
+
+            Container.Bind<BlockContainersPlacer>().AsTransient();
         }
     }
 }

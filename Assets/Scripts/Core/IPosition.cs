@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Scrips.Core
+namespace Core
 {
     public interface IPosition
     {

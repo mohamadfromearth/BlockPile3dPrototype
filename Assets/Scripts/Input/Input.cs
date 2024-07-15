@@ -1,33 +1,36 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Input : MonoBehaviour
+namespace Input
 {
-    private PlayerControls _playerControls;
-
-    [SerializeField] private UnityEvent<Vector2> PointerMoveEvent;
-
-    private void Awake()
+    public class Input : MonoBehaviour
     {
-        _playerControls = new PlayerControls();
-    }
+        private PlayerControls _playerControls;
 
-    private void OnEnable()
-    {
-        _playerControls.Enable();
-    }
+        [SerializeField] private UnityEvent<Vector2> PointerMoveEvent;
 
-    private void OnDisable()
-    {
-        _playerControls.Disable();
-    }
-
-    private void Update()
-    {
-        if (_playerControls.Game.PointerDown.IsInProgress())
+        private void Awake()
         {
-            var position = _playerControls.Game.PointerMove.ReadValue<Vector2>();
-            PointerMoveEvent?.Invoke(position);
+            _playerControls = new PlayerControls();
+        }
+
+        private void OnEnable()
+        {
+            _playerControls.Enable();
+        }
+
+        private void OnDisable()
+        {
+            _playerControls.Disable();
+        }
+
+        private void Update()
+        {
+            if (_playerControls.Game.PointerDown.IsInProgress())
+            {
+                var position = _playerControls.Game.PointerMove.ReadValue<Vector2>();
+                PointerMoveEvent?.Invoke(position);
+            }
         }
     }
 }

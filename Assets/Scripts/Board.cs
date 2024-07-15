@@ -1,98 +1,115 @@
 using System.Collections.Generic;
 using Objects.BlocksContainer;
 using Scrips.Objects.BlockContainerHolder;
-using Scrips.Objects.CellsContainer;
 using UnityEngine;
 using Zenject;
 
-namespace Scrips
+public class Board
 {
-    public class Board
+    private readonly Grid _grid;
+
+    private readonly int _width;
+    private readonly int _height;
+
+    private IBlockContainerHolderFactory _blockContainerHolderFactory;
+
+
+    private Dictionary<Vector3Int, IBlockContainerHolder> _blockContainerHoldersDic = new();
+
+    public Board(int width, int height, Grid grid)
     {
-        private Grid _grid;
+        _width = width;
+        _height = height;
+        _grid = grid;
+    }
 
-        private int _width, _height;
+    [Inject]
+    private void Construct(IBlockContainerHolderFactory blockContainerHolderFactory)
+    {
+        _blockContainerHolderFactory = blockContainerHolderFactory;
+    }
 
-        private IBlockContainerHolderFactory _blockContainerHolderFactory;
 
-
-        private Dictionary<Vector3Int, IBlockContainerHolder> _blockContainerHoldersDic = new();
-
-        public Board(int width, int height, Grid grid)
+    public IBlockContainerHolder GetBlockContainerHolder(Vector3 worldPosition)
+    {
+        var gridPos = _grid.WorldToCell(worldPosition);
+        if (_blockContainerHoldersDic.TryGetValue(gridPos, out var holder))
         {
-            _width = width;
-            _height = height;
-            _grid = grid;
+            return holder;
         }
 
-        [Inject]
-        private void Construct(IBlockContainerHolderFactory blockContainerHolderFactory)
+        return null;
+    }
+
+
+    public IBlockContainerHolder GetBlockContainerHolder(Vector3Int boardPosition)
+    {
+        if (_blockContainerHoldersDic.TryGetValue(boardPosition, out var holder))
         {
-            _blockContainerHolderFactory = blockContainerHolderFactory;
-            SpawnHolders();
+            return holder;
         }
 
+        return null;
+    }
 
-        public IBlockContainerHolder GetBlockContainerHolder(Vector3 worldPosition)
+    public void AddBlockContainer(IBlockContainer blockContainer, Vector3 worldPosition)
+    {
+        var gridPos = _grid.WorldToCell(worldPosition);
+
+        if (_blockContainerHoldersDic.TryGetValue(gridPos, out var holder))
         {
-            var gridPos = _grid.WorldToCell(worldPosition);
-            if (_blockContainerHoldersDic.TryGetValue(gridPos, out var holder))
+            holder.BlockContainer = blockContainer;
+        }
+    }
+
+    public void AddBlockContainer(IBlockContainer blockContainer, Vector3Int gridPosition)
+    {
+        if (_blockContainerHoldersDic.TryGetValue(gridPosition, out var holder))
+        {
+            holder.BlockContainer = blockContainer;
+            blockContainer.SetPosition(holder.GetPosition());
+        }
+    }
+
+
+    public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
+
+
+    public void Clear()
+    {
+        for (int x = 0; x < _width; x++)
+        {
+            for (int z = 0; z < _height; z++)
             {
-                return holder;
-            }
+                var position = new Vector3Int(x, 0, z);
+                var holder = GetBlockContainerHolder(position);
 
-            return null;
-        }
-
-
-        public IBlockContainerHolder GetBlockContainerHolder(Vector3Int boardPosition)
-        {
-            if (_blockContainerHoldersDic.TryGetValue(boardPosition, out var holder))
-            {
-                return holder;
-            }
-
-            return null;
-        }
-
-        public void AddBlockContainer(IBlockContainer blockContainer, Vector3 worldPosition)
-        {
-            var gridPos = _grid.WorldToCell(worldPosition);
-
-            if (_blockContainerHoldersDic.TryGetValue(gridPos, out var holder))
-            {
-                holder.BlockContainer = blockContainer;
-            }
-        }
-
-        public void AddBlockContainer(IBlockContainer blockContainer, Vector3Int gridPosition)
-        {
-            if (_blockContainerHoldersDic.TryGetValue(gridPosition, out var holder))
-            {
-                holder.BlockContainer = blockContainer;
-                blockContainer.SetPosition(holder.GetPosition());
-            }
-        }
-
-
-        public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
-
-
-        private void SpawnHolders()
-        {
-            for (int y = 0; y < _height; y++)
-            {
-                for (int x = 0; x < _width; x++)
+                if (holder != null && holder.BlockContainer != null)
                 {
-                    var gridPos = new Vector3Int(x, 0, y);
-                    var pos = _grid.CellToWorld(gridPos);
-
-
-                    var holder = _blockContainerHolderFactory.Create();
-                    holder.SetPosition(pos);
-
-                    _blockContainerHoldersDic[gridPos] = holder;
+                    holder.BlockContainer.Destroy(true);
+                    holder.BlockContainer = null;
                 }
+            }
+        }
+    }
+
+
+    public void SpawnHolders(List<Vector3Int> emptyHolders)
+    {
+        for (int y = 0; y < _height; y++)
+        {
+            for (int x = 0; x < _width; x++)
+            {
+                var gridPos = new Vector3Int(x, 0, y);
+
+                if (emptyHolders.Contains(gridPos)) continue;
+
+                var pos = _grid.CellToWorld(gridPos);
+
+                var holder = _blockContainerHolderFactory.Create();
+                holder.SetPosition(pos);
+
+                _blockContainerHoldersDic[gridPos] = holder;
             }
         }
     }

@@ -34,8 +34,14 @@ namespace Objects.BlocksContainer
             _destroyRateWaitForSeconds = new WaitForSeconds(destroyRate);
         }
 
-        public float Destroy()
+        public float Destroy(bool destroyImmediately)
         {
+            if (destroyImmediately)
+            {
+                Object.Destroy(gameObject);
+                return 0;
+            }
+
             var blocksBuffers = new List<IBlock>();
 
             bool destroyContainer;
@@ -81,7 +87,7 @@ namespace Objects.BlocksContainer
                 count++;
             }
 
-            if (destroyContainer) Destroy(gameObject);
+            if (destroyContainer) Object.Destroy(gameObject);
 
             Channel.Rise<BlockDestroy>(new BlockDestroy(count));
         }

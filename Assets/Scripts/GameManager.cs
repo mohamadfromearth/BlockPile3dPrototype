@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Event;
 using Objects.BlocksContainer;
-using Scrips;
 using Scrips.Event;
 using Scrips.Utils;
 using Scripts.Data;
@@ -15,24 +14,27 @@ public class GameManager : MonoBehaviour
 {
     private Camera _camera;
 
-    [SerializeField] private GameUI gameUI;
+    [Header("UI")] [SerializeField] private GameUI gameUI;
+    [SerializeField] private WinUI winUI;
 
     [SerializeField] private LayerMask groundLayerMask;
 
     [SerializeField] private List<Transform> selectionBarCellContainerTransformList;
     private List<Vector3> _selectionBarCellContainerPosList = new();
     [SerializeField] private GameManagerHelpers helpers;
+    [SerializeField] private BlocksMatcher blocksMatcher;
 
     [Inject] private Board _board;
     [Inject] private EventChannel _channel;
     [Inject] private ILevelRepository _levelRepository;
     [Inject] private BlockContainerSelectionBar _selectionBar;
+    [Inject] private BlockContainersPlacer _blockContainersPlacer;
 
 
     private int _selectionBarSelectedIndex;
     private IBlockContainer _selectedBlockContainer;
 
-    private float _currentScore = 0f;
+    private float _currentScore;
 
 
     private void Awake()
@@ -48,7 +50,9 @@ public class GameManager : MonoBehaviour
         _selectionBarCellContainerPosList = selectionBarCellContainerTransformList.Select(t => t.position).ToList();
         _selectionBar.Spawn();
 
-        helpers.SpawnBoardBlockContainers();
+        _board.SpawnHolders(_levelRepository.GetLevelData().emptyHoldersPosList);
+
+        _blockContainersPlacer.Place();
 
         gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
         gameUI.SetProgress(0);
@@ -70,6 +74,8 @@ public class GameManager : MonoBehaviour
         _channel.Subscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
         _channel.Subscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
         _channel.Subscribe<BlockDestroy>(OnBlocksDestroyed);
+
+        winUI.AddNextLevelClickListener(OnNextLevel);
     }
 
     private void UnSubscribeToEvents()
@@ -77,6 +83,8 @@ public class GameManager : MonoBehaviour
         _channel.UnSubscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
         _channel.UnSubscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
         _channel.UnSubscribe<BlockDestroy>(OnBlocksDestroyed);
+
+        winUI.RemoveNextLevelClickListener(OnNextLevel);
     }
 
 
@@ -108,8 +116,8 @@ public class GameManager : MonoBehaviour
                 _board.AddBlockContainer(_selectedBlockContainer, pos);
 
                 var boardPosition = _board.WorldToCell(holder.GetPosition());
-                helpers.StartMatchingPosition = boardPosition;
-                StartCoroutine(helpers.UpdateBoardRoutine(boardPosition, true));
+                blocksMatcher.StartMatchingPosition = boardPosition;
+                StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition, true));
 
                 _selectedBlockContainer = null;
 
@@ -139,6 +147,12 @@ public class GameManager : MonoBehaviour
 
     private void OnNextLevel()
     {
+        _board.Clear();
+        _levelRepository.NextLevel();
+        _blockContainersPlacer.Place();
+        winUI.Hide();
+        gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
+        gameUI.SetProgress(0);
     }
 
     public void OnPointerMove(Vector2 position)
@@ -160,6 +174,8 @@ public class GameManager : MonoBehaviour
     {
         if (_currentScore >= _levelRepository.GetLevelData().targetScore)
         {
+            _currentScore = 0;
+            winUI.Show();
         }
     }
 }
