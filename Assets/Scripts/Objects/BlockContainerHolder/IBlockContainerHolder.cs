@@ -1,8 +1,7 @@
 using Core;
 using Objects.BlocksContainer;
-using Scrips.Objects.CellsContainer;
 
-namespace Scrips.Objects.BlockContainerHolder
+namespace Objects.BlockContainerHolder
 {
     public interface IBlockContainerHolder : IPosition, IGameObject, IToScale
     {

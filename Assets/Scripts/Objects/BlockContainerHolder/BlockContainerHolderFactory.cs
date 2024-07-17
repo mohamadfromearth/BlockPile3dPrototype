@@ -1,13 +1,14 @@
+using Objects.BlockContainerHolder;
 using UnityEngine;
 
 namespace Scrips.Objects.BlockContainerHolder
 {
     public class BlockContainerHolderFactory : IBlockContainerHolderFactory
     {
-        private BlockContainerHolder _blockContainerHolderPrefab;
+        private global::Objects.BlockContainerHolder.BlockContainerHolder _blockContainerHolderPrefab;
 
 
-        public BlockContainerHolderFactory(BlockContainerHolder blockContainerHolderPrefab)
+        public BlockContainerHolderFactory(global::Objects.BlockContainerHolder.BlockContainerHolder blockContainerHolderPrefab)
         {
             _blockContainerHolderPrefab = blockContainerHolderPrefab;
         }

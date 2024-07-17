@@ -1,12 +1,16 @@
+using Event;
 using Objects.BlocksContainer;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-namespace Scrips.Objects.BlockContainerHolder
+namespace Objects.BlockContainerHolder
 {
-    public class BlockContainerHolder : MonoBehaviour, IBlockContainerHolder
+    public class BlockContainerHolder : MonoBehaviour, IBlockContainerHolder, IPointerClickHandler
     {
-        [SerializeField] private MeshRenderer renderer;
+        [SerializeField] private new MeshRenderer renderer;
         [SerializeField] private Color color;
+
+        public EventChannel Channel { private get; set; }
 
         private void Start()
         {
@@ -28,6 +32,10 @@ namespace Scrips.Objects.BlockContainerHolder
         }
 
         public void ToScale(float duration, Vector3 scale)
+        {
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
         {
         }
     }
