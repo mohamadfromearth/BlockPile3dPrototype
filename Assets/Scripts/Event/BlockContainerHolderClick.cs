@@ -1,14 +1,14 @@
-using Objects.BlockContainerHolder;
+using Objects.Cell;
 
 namespace Event
 {
     public struct BlockContainerHolderClick : IEventData
     {
-        public IBlockContainerHolder BlockContainerHolder;
+        public ICell Cell;
 
-        public BlockContainerHolderClick(IBlockContainerHolder blockContainerHolder)
+        public BlockContainerHolderClick(ICell cell)
         {
-            BlockContainerHolder = blockContainerHolder;
+            Cell = cell;
         }
     }
 }

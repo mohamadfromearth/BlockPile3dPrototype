@@ -3,14 +3,14 @@ using System.Linq;
 using Data;
 using Event;
 using Objects.Block;
-using Objects.BlockContainerHolder;
 using Objects.BlocksContainer;
+using Objects.Cell;
 using Scrips;
-using Scrips.Objects.BlockContainerHolder;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
 using Scripts.Data;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Di
@@ -20,7 +20,7 @@ namespace Di
         // prefabs
         [SerializeField] private Block blockPrefab;
         [SerializeField] private BlockContainer blockContainerPrefab;
-        [SerializeField] private BlockContainerHolder blockContainerHolderPrefab;
+        [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField] private DefaultCell defaultCellPrefab;
 
         // so
         [SerializeField] private LevelRepository levelRepository;
@@ -37,8 +37,8 @@ namespace Di
 
             Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefab);
 
-            Container.Bind<IBlockContainerHolderFactory>().To<BlockContainerHolderFactory>().AsSingle()
-                .WithArguments(blockContainerHolderPrefab).NonLazy();
+            Container.Bind<ICellFactory>().To<CellFactory>().AsSingle()
+                .WithArguments(defaultCellPrefab).NonLazy();
 
             Container.Bind<IBlockContainerFactory>().To<BlockContainerFactory>().AsSingle()
                 .WithArguments(blockContainerPrefab);

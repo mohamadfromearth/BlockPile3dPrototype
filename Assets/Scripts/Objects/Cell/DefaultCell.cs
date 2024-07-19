@@ -3,9 +3,9 @@ using Objects.BlocksContainer;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Objects.BlockContainerHolder
+namespace Objects.Cell
 {
-    public class BlockContainerHolder : MonoBehaviour, IBlockContainerHolder, IPointerClickHandler
+    public class DefaultCell : MonoBehaviour, ICell, IPointerClickHandler
     {
         [SerializeField] private new MeshRenderer renderer;
         [SerializeField] private Color color;

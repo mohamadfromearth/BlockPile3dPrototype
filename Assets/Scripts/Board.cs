@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Objects.BlockContainerHolder;
 using Objects.BlocksContainer;
-using Scrips.Objects.BlockContainerHolder;
+using Objects.Cell;
 using UnityEngine;
 using Zenject;
 
@@ -12,10 +11,10 @@ public class Board
     private readonly int _width;
     private readonly int _height;
 
-    private IBlockContainerHolderFactory _blockContainerHolderFactory;
+    private ICellFactory _cellFactory;
 
 
-    private Dictionary<Vector3Int, IBlockContainerHolder> _blockContainerHoldersDic = new();
+    private Dictionary<Vector3Int, ICell> _blockContainerHoldersDic = new();
 
     public Board(int width, int height, Grid grid)
     {
@@ -25,13 +24,13 @@ public class Board
     }
 
     [Inject]
-    private void Construct(IBlockContainerHolderFactory blockContainerHolderFactory)
+    private void Construct(ICellFactory cellFactory)
     {
-        _blockContainerHolderFactory = blockContainerHolderFactory;
+        _cellFactory = cellFactory;
     }
 
 
-    public IBlockContainerHolder GetBlockContainerHolder(Vector3 worldPosition)
+    public ICell GetBlockContainerHolder(Vector3 worldPosition)
     {
         var gridPos = _grid.WorldToCell(worldPosition);
         if (_blockContainerHoldersDic.TryGetValue(gridPos, out var holder))
@@ -43,7 +42,7 @@ public class Board
     }
 
 
-    public IBlockContainerHolder GetBlockContainerHolder(Vector3Int boardPosition)
+    public ICell GetBlockContainerHolder(Vector3Int boardPosition)
     {
         if (_blockContainerHoldersDic.TryGetValue(boardPosition, out var holder))
         {
@@ -107,7 +106,7 @@ public class Board
 
                 var pos = _grid.CellToWorld(gridPos);
 
-                var holder = _blockContainerHolderFactory.Create();
+                var holder = _cellFactory.Create();
                 holder.SetPosition(pos);
 
                 _blockContainerHoldersDic[gridPos] = holder;

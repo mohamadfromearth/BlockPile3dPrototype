@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using Objects.Block;
-using Objects.BlockContainerHolder;
 using Objects.BlocksContainer;
-using Scrips.Objects.BlockContainerHolder;
+using Objects.Cell;
 using Scrips.Objects.Cell;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Designer.DI
@@ -14,7 +14,7 @@ namespace Designer.DI
         // prefabs
         [SerializeField] private Block blockPrefab;
         [SerializeField] private BlockContainer blockContainerPrefab;
-        [SerializeField] private BlockContainerHolder blockContainerHolderPrefab;
+        [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField] private DefaultCell defaultCellPrefab;
 
         [SerializeField] private Grid grid;
 
@@ -24,8 +24,8 @@ namespace Designer.DI
         {
             Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefab);
 
-            Container.Bind<IBlockContainerHolderFactory>().To<BlockContainerHolderFactory>().AsSingle()
-                .WithArguments(blockContainerHolderPrefab).NonLazy();
+            Container.Bind<ICellFactory>().To<CellFactory>().AsSingle()
+                .WithArguments(defaultCellPrefab).NonLazy();
 
             Container.Bind<Board>().AsSingle().WithArguments(width, height, grid);
         }

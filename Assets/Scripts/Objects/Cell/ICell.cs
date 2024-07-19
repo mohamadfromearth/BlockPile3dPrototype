@@ -1,9 +1,9 @@
 using Core;
 using Objects.BlocksContainer;
 
-namespace Objects.BlockContainerHolder
+namespace Objects.Cell
 {
-    public interface IBlockContainerHolder : IPosition, IGameObject, IToScale
+    public interface ICell : IPosition, IGameObject, IToScale
     {
         public IBlockContainer BlockContainer { get; set; }
     }
