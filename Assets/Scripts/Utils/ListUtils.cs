@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Scrips.Utils
@@ -16,6 +17,19 @@ namespace Scrips.Utils
             }
 
             return -1;
+        }
+
+
+        public static List<int> GetUniqueRandomIntList(int count, int min, int max)
+        {
+            HashSet<int> uniqueInts = new HashSet<int>();
+            while (uniqueInts.Count < count)
+            {
+                int newInt = Random.Range(min, max);
+                uniqueInts.Add(newInt);
+            }
+
+            return uniqueInts.ToList();
         }
     }
 }

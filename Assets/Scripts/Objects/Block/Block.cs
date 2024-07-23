@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace Objects.Block
     public class Block : MonoBehaviour, IBlock
     {
         [SerializeField] private MeshRenderer renderer;
+
+        private Tween scaleTween;
 
         public void SetPosition(Vector3 position)
         {
@@ -33,7 +36,13 @@ namespace Objects.Block
 
         public void Destroy()
         {
-            transform.DOScale(Vector3.zero, 0.5f).onComplete = () => { Destroy(gameObject); };
+            scaleTween = transform.DOScale(Vector3.zero, 0.5f);
+            scaleTween.onComplete = () => { Destroy(gameObject); };
+        }
+
+        private void OnDestroy()
+        {
+            scaleTween?.Kill();
         }
 
         public GameObject GameObj

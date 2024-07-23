@@ -13,6 +13,15 @@ MonoBehaviour:
   m_Name: LevelRepository
   m_EditorClassIdentifier: 
   levelDataList:
+  - width: 4
+    height: 4
+    blockContainerDataList: []
+    emptyHoldersPosList:
+    - {x: 0, y: 0, z: 0}
+    - {x: 3, y: 0, z: 0}
+    - {x: 0, y: 0, z: 3}
+    - {x: 3, y: 0, z: 3}
+    targetScore: 100
   - width: 5
     height: 5
     blockContainerDataList:
@@ -68,24 +77,4 @@ MonoBehaviour:
     emptyHoldersPosList:
     - {x: 0, y: 0, z: 0}
     - {x: 4, y: 0, z: 4}
-    selectionBarBlockContainerDataList:
-    - position: {x: 0, y: 0, z: 0}
-      color:
-      - {r: 1, g: 0, b: 0, a: 1}
-      - {r: 0, g: 0, b: 0, a: 1}
-      - {r: 0, g: 0, b: 0, a: 1}
-      - {r: 0, g: 0, b: 0, a: 1}
-    - position: {x: 0, y: 0, z: 0}
-      color:
-      - {r: 0, g: 0, b: 0, a: 1}
-      - {r: 0, g: 0, b: 0, a: 1}
-      - {r: 0, g: 0, b: 0, a: 1}
-      - {r: 0, g: 0, b: 0, a: 1}
-    - position: {x: 0, y: 0, z: 0}
-      color:
-      - {r: 1, g: 0, b: 0, a: 1}
-      - {r: 1, g: 0, b: 0, a: 1}
-      - {r: 1, g: 0, b: 0, a: 1}
-      - {r: 1, g: 0, b: 0, a: 1}
-    targetColorCount: 5
     targetScore: 50

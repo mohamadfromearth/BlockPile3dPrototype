@@ -6,7 +6,6 @@ using Zenject;
 
 public class BlockContainerSelectionBar
 {
-    private readonly List<Color> _colors;
     [Inject] private IBlockContainerFactory _blockContainerFactory;
     [Inject] private IBlockFactory _blockFactory;
     private readonly List<Vector3> _containersPositionList;
@@ -14,19 +13,17 @@ public class BlockContainerSelectionBar
 
     public int Count { get; private set; }
 
-    public BlockContainerSelectionBar(List<Color> colors,
-        List<Vector3> containersPositionList)
+    public BlockContainerSelectionBar(List<Vector3> containersPositionList)
     {
-        _colors = colors;
         _containersPositionList = containersPositionList;
         Count = 3;
     }
 
 
-    public void Spawn()
+    public void Spawn(List<Color> colors)
     {
         Count = _containersPositionList.Count;
-        
+
         // foreach (var position in _containersPositionList)
         // {
         //     var container = _blockContainerFactory.Create();
@@ -68,24 +65,23 @@ public class BlockContainerSelectionBar
         {
             var container = _blockContainerFactory.Create();
             container.SetPosition(position);
-        
-        
+
+
             var colorsCount = Random.Range(2, 4);
-        
+
             for (int i = 0; i < colorsCount; i++)
             {
                 var blockCount = Random.Range(1, 8);
-        
-                var colorIndex = Random.Range(0, _colors.Count);
-        
-        
+
+                var colorIndex = Random.Range(0, colors.Count);
+
+
                 for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
                 {
                     var block = _blockFactory.Create();
-        
-        
-                    block.Color = _colors[colorIndex];
-        
+
+                    block.Color = colors[colorIndex];
+
                     container.Push(block);
                 }
             }

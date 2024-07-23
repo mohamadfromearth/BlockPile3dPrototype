@@ -1,4 +1,4 @@
-using Scripts.Data;
+using Data;
 using UnityEngine;
 using Zenject;
 

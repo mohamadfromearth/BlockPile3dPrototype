@@ -5,10 +5,8 @@ using Event;
 using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
-using Scrips;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
-using Scripts.Data;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
@@ -20,16 +18,22 @@ namespace Di
         // prefabs
         [SerializeField] private Block blockPrefab;
         [SerializeField] private BlockContainer blockContainerPrefab;
-        [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField] private DefaultCell defaultCellPrefab;
+
+        [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField]
+        private DefaultCell defaultCellPrefab;
 
         // so
         [SerializeField] private LevelRepository levelRepository;
+        [SerializeField] private BoardDataList boardData;
+        [SerializeField] private List<Color> levelColors;
 
         [SerializeField] private Grid grid;
 
         // selectionBar
         [SerializeField] private List<Color> colors;
         [SerializeField] private List<Transform> selectionBarPositionList;
+
+        [SerializeField] private Camera camera;
 
         public override void InstallBindings()
         {
@@ -43,17 +47,21 @@ namespace Di
             Container.Bind<IBlockContainerFactory>().To<BlockContainerFactory>().AsSingle()
                 .WithArguments(blockContainerPrefab);
 
+            Container.Bind<LevelGenerator>().AsSingle().WithArguments(boardData, levelColors);
 
-            Container.Bind<ILevelRepository>().FromInstance(levelRepository).AsSingle();
+
+            Container.Bind<ILevelRepository>().To<GenerativeLevelRepository>().AsSingle();
 
 
             var levelData = levelRepository.GetLevelData();
             Container.Bind<Board>().AsSingle().WithArguments(levelData.width, levelData.height, grid);
 
             Container.Bind<BlockContainerSelectionBar>().AsTransient()
-                .WithArguments(colors, selectionBarPositionList.Select(t => t.position).ToList());
+                .WithArguments(selectionBarPositionList.Select(t => t.position).ToList());
 
             Container.Bind<BlockContainersPlacer>().AsTransient();
+
+            Container.Bind<CameraSizeSetter>().AsTransient().WithArguments(camera);
         }
     }
 }

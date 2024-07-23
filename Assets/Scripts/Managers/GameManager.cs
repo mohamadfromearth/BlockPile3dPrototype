@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Data;
 using Event;
 using Objects.BlocksContainer;
 using Scrips.Event;
 using Scrips.Utils;
-using Scripts.Data;
 using UI;
 using UnityEngine;
 using Utils;
@@ -31,6 +31,7 @@ namespace Managers
         [Inject] private ILevelRepository _levelRepository;
         [Inject] private BlockContainerSelectionBar _selectionBar;
         [Inject] private BlockContainersPlacer _blockContainersPlacer;
+        [Inject] private CameraSizeSetter _cameraSizeSetter;
 
 
         private int _selectionBarSelectedIndex;
@@ -50,14 +51,17 @@ namespace Managers
         private void Start()
         {
             _selectionBarCellContainerPosList = selectionBarCellContainerTransformList.Select(t => t.position).ToList();
-            _selectionBar.Spawn();
+            _selectionBar.Spawn(_levelRepository.GetLevelData().colors);
 
-            _board.SpawnHolders(_levelRepository.GetLevelData().emptyHoldersPosList);
+            var levelData = _levelRepository.GetLevelData();
+            _board.SpawnCells(levelData.emptyHoldersPosList, levelData.width, levelData.height);
 
             _blockContainersPlacer.Place();
 
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
+
+            _cameraSizeSetter.RefreshSize();
         }
 
         private void OnEnable()
@@ -108,9 +112,9 @@ namespace Managers
                 pos.x += 0.4f;
                 pos.z += 0.4f;
 
-                var holder = _board.GetBlockContainerHolder(pos);
+                var holder = _board.GetCell(pos);
 
-                if (holder != null && holder.BlockContainer == null)
+                if (holder != null && holder.CanPlaceItem)
                 {
                     _selectedBlockContainer.IsPlaced = true;
                     _selectedBlockContainer.SetPosition(holder.GetPosition());
@@ -125,7 +129,7 @@ namespace Managers
 
                     _selectionBar.Decrease();
 
-                    if (_selectionBar.Count == 0) _selectionBar.Spawn();
+                    if (_selectionBar.Count == 0) _selectionBar.Spawn(_levelRepository.GetLevelData().colors);
                 }
                 else
                 {
@@ -151,10 +155,13 @@ namespace Managers
         {
             _board.Clear();
             _levelRepository.NextLevel();
+            var levelData = _levelRepository.GetLevelData();
+            _board.SpawnCells(levelData.emptyHoldersPosList, levelData.width, levelData.height);
             _blockContainersPlacer.Place();
             winUI.Hide();
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
+            _cameraSizeSetter.RefreshSize();
         }
 
         public void OnPointerMove(Vector2 position)

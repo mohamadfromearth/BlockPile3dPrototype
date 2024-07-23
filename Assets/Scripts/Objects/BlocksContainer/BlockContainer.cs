@@ -28,6 +28,9 @@ namespace Objects.BlocksContainer
 
         private WaitForSeconds _destroyRateWaitForSeconds;
 
+        private Tween _pathTween;
+        private Tween _rotateTween;
+
 
         private void Start()
         {
@@ -38,7 +41,9 @@ namespace Objects.BlocksContainer
         {
             if (destroyImmediately)
             {
+                KillTweens();
                 Object.Destroy(gameObject);
+                _hasBeenDestroyed = true;
                 return 0;
             }
 
@@ -75,6 +80,12 @@ namespace Objects.BlocksContainer
             return blocksBuffers.Count * destroyRate + 0.5f;
         }
 
+        private void KillTweens()
+        {
+            _rotateTween?.Kill();
+            _pathTween?.Kill();
+        }
+
         private IEnumerator DestroyAnimationRoutine(List<IBlock> blocksBuffer,
             bool destroyContainer)
         {
@@ -87,7 +98,11 @@ namespace Objects.BlocksContainer
                 count++;
             }
 
-            if (destroyContainer) Object.Destroy(gameObject);
+            if (destroyContainer)
+            {
+                KillTweens();
+                Object.Destroy(gameObject);
+            }
 
             Channel.Rise<BlockDestroy>(new BlockDestroy(count));
         }
@@ -142,7 +157,10 @@ namespace Objects.BlocksContainer
         public void SetPosition(Vector3 position) => transform.position = position;
 
 
-        public Vector3 GetPosition() => transform.position;
+        public Vector3 GetPosition()
+        {
+            return transform.position;
+        }
 
         public void Push(IBlock block)
         {
@@ -240,11 +258,9 @@ namespace Objects.BlocksContainer
 
             var rotation = block.GameObj.transform.rotation.eulerAngles;
             rotation = rotation + GetTargetRotation(currentBlockPosition, targetBlockPosition);
-            block.GameObj.transform.DOPath(points, duration, PathType.CatmullRom);
-            block.GameObj.transform.DOLocalRotate(rotation, duration).onComplete += () =>
-            {
-                block.GameObj.transform.rotation = Quaternion.identity;
-            };
+            _pathTween = block.GameObj.transform.DOPath(points, duration, PathType.CatmullRom);
+            _rotateTween = block.GameObj.transform.DOLocalRotate(rotation, duration);
+            _rotateTween.onComplete += () => { block.GameObj.transform.rotation = Quaternion.identity; };
             block.GameObj.transform.SetParent(transform);
         }
 
@@ -280,6 +296,7 @@ namespace Objects.BlocksContainer
         public IBlock Pop()
         {
             if (blocks.Count == 0) return null;
+
 
             var block = blocks.Pop();
 

@@ -2,16 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Scripts.Data
+namespace Data
 {
     [Serializable]
     public struct LevelData
     {
         public int width, height;
+        public List<Color> colors;
         public List<BlockContainerData> blockContainerDataList;
         public List<Vector3Int> emptyHoldersPosList;
-        public List<BlockContainerData> selectionBarBlockContainerDataList;
-        public int targetColorCount;
         public int targetScore;
     }
 

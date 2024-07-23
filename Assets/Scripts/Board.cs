@@ -8,18 +8,18 @@ public class Board
 {
     private readonly Grid _grid;
 
-    private readonly int _width;
-    private readonly int _height;
+    public int Width { get; private set; }
+    public int Height { get; private set; }
+
 
     private ICellFactory _cellFactory;
 
 
-    private Dictionary<Vector3Int, ICell> _blockContainerHoldersDic = new();
+    private Dictionary<Vector3Int, ICell> _cellsDic = new();
+
 
     public Board(int width, int height, Grid grid)
     {
-        _width = width;
-        _height = height;
         _grid = grid;
     }
 
@@ -30,10 +30,10 @@ public class Board
     }
 
 
-    public ICell GetBlockContainerHolder(Vector3 worldPosition)
+    public ICell GetCell(Vector3 worldPosition)
     {
         var gridPos = _grid.WorldToCell(worldPosition);
-        if (_blockContainerHoldersDic.TryGetValue(gridPos, out var holder))
+        if (_cellsDic.TryGetValue(gridPos, out var holder))
         {
             return holder;
         }
@@ -42,9 +42,9 @@ public class Board
     }
 
 
-    public ICell GetBlockContainerHolder(Vector3Int boardPosition)
+    public ICell GetCell(Vector3Int boardPosition)
     {
-        if (_blockContainerHoldersDic.TryGetValue(boardPosition, out var holder))
+        if (_cellsDic.TryGetValue(boardPosition, out var holder))
         {
             return holder;
         }
@@ -56,49 +56,66 @@ public class Board
     {
         var gridPos = _grid.WorldToCell(worldPosition);
 
-        if (_blockContainerHoldersDic.TryGetValue(gridPos, out var holder))
+        if (_cellsDic.TryGetValue(gridPos, out var cell))
         {
-            holder.BlockContainer = blockContainer;
+            if (blockContainer == null)
+                cell.CanPlaceItem = true;
+            else
+                cell.CanPlaceItem = false;
+
+
+            cell.BlockContainer = blockContainer;
         }
     }
 
     public void AddBlockContainer(IBlockContainer blockContainer, Vector3Int gridPosition)
     {
-        if (_blockContainerHoldersDic.TryGetValue(gridPosition, out var holder))
+        if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
-            holder.BlockContainer = blockContainer;
-            blockContainer.SetPosition(holder.GetPosition());
+            cell.BlockContainer = blockContainer;
+            blockContainer.SetPosition(cell.GetPosition());
         }
     }
 
 
     public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
 
+    public Vector3 CellToWorld(Vector3Int cellPosition) => _grid.CellToWorld(cellPosition);
+
 
     public void Clear()
     {
-        for (int x = 0; x < _width; x++)
+        for (int x = 0; x < Width; x++)
         {
-            for (int z = 0; z < _height; z++)
+            for (int z = 0; z < Height; z++)
             {
                 var position = new Vector3Int(x, 0, z);
-                var holder = GetBlockContainerHolder(position);
+                var cell = GetCell(position);
 
-                if (holder != null && holder.BlockContainer != null)
+                if (cell != null && cell.BlockContainer != null)
                 {
-                    holder.BlockContainer.Destroy(true);
-                    holder.BlockContainer = null;
+                    cell.CanPlaceItem = true;
+                    cell.BlockContainer.Destroy(true);
+                    cell.BlockContainer = null;
                 }
+
+                if (cell != null) cell.Destroy();
             }
         }
+
+        _cellsDic.Clear();
     }
 
 
-    public void SpawnHolders(List<Vector3Int> emptyHolders)
+    public void SpawnCells(List<Vector3Int> emptyHolders, int width, int height)
     {
-        for (int y = 0; y < _height; y++)
+        Width = width;
+        Height = height;
+
+
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < _width; x++)
+            for (int x = 0; x < width; x++)
             {
                 var gridPos = new Vector3Int(x, 0, y);
 
@@ -106,10 +123,10 @@ public class Board
 
                 var pos = _grid.CellToWorld(gridPos);
 
-                var holder = _cellFactory.Create();
-                holder.SetPosition(pos);
+                var cell = _cellFactory.Create();
+                cell.SetPosition(pos);
 
-                _blockContainerHoldersDic[gridPos] = holder;
+                _cellsDic[gridPos] = cell;
             }
         }
     }

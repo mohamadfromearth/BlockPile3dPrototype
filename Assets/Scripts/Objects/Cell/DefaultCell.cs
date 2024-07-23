@@ -10,6 +10,14 @@ namespace Objects.Cell
         [SerializeField] private new MeshRenderer renderer;
         [SerializeField] private Color color;
 
+        public bool canPlaceItem = true;
+
+        public bool CanPlaceItem
+        {
+            get => canPlaceItem;
+            set => canPlaceItem = value;
+        }
+
         public EventChannel Channel { private get; set; }
 
         private void Start()
@@ -21,6 +29,7 @@ namespace Objects.Cell
         }
 
         public IBlockContainer BlockContainer { get; set; }
+        public void Destroy() => Destroy(gameObject);
 
         public void SetPosition(Vector3 position) => transform.position = position;
 

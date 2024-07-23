@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Scripts.Data;
 using UnityEngine;
 
 namespace Data
@@ -11,6 +10,7 @@ namespace Data
 
 
         private int _levelIndex;
+
 
         public LevelData GetLevelData() => levelDataList[_levelIndex];
 

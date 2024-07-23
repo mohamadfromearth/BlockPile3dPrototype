@@ -1,38 +1,42 @@
-﻿using Scrips.Objects.Cell;
+﻿using Data;
+using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
-using Scripts.Data;
 using Zenject;
 
-public class BlockContainersPlacer
+namespace Objects.BlocksContainer
 {
-    [Inject] private ILevelRepository _levelRepository;
-    [Inject] private Board _board;
-    [Inject] private IBlockContainerFactory _blockContainerFactory;
-    [Inject] private IBlockFactory _blockFactory;
-
-
-    public void Place()
+    public class BlockContainersPlacer
     {
-        var levelData = _levelRepository.GetLevelData();
-        var containerDataList = levelData.blockContainerDataList;
+        [Inject] private ILevelRepository _levelRepository;
+        [Inject] private Board _board;
+        [Inject] private IBlockContainerFactory _blockContainerFactory;
+        [Inject] private IBlockFactory _blockFactory;
 
-        foreach (var containerData in containerDataList)
+
+        public void Place()
         {
-            var holder = _board.GetBlockContainerHolder(containerData.position);
+            var levelData = _levelRepository.GetLevelData();
+            var containerDataList = levelData.blockContainerDataList;
 
-            var container = _blockContainerFactory.Create();
-            container.IsPlaced = true;
-
-            holder.BlockContainer = container;
-
-            container.SetPosition(holder.GetPosition());
-
-            foreach (var color in containerData.color)
+            foreach (var containerData in containerDataList)
             {
-                var block = _blockFactory.Create();
-                block.Color = color;
+                var holder = _board.GetCell(containerData.position);
 
-                container.Push(block);
+                var container = _blockContainerFactory.Create();
+                container.IsPlaced = true;
+
+                holder.BlockContainer = container;
+                holder.CanPlaceItem = false;
+
+                container.SetPosition(holder.GetPosition());
+
+                foreach (var color in containerData.color)
+                {
+                    var block = _blockFactory.Create();
+                    block.Color = color;
+
+                    container.Push(block);
+                }
             }
         }
     }

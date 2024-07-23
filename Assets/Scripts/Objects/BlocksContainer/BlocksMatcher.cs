@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
 using Event;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
-using Scripts.Data;
 using UnityEngine;
 using Zenject;
 
@@ -49,7 +49,7 @@ namespace Objects.BlocksContainer
 
         private IEnumerator MatchBlock(Vector3Int boardPosition, Vector3Int exceptOffset)
         {
-            var container = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
+            var container = _board.GetCell(boardPosition).BlockContainer;
 
             _checkedList.Add(boardPosition);
 
@@ -57,7 +57,7 @@ namespace Objects.BlocksContainer
             {
                 var position = boardPosition + gridOffset;
 
-                var holder = _board.GetBlockContainerHolder(position);
+                var holder = _board.GetCell(position);
 
                 if (holder == null) continue;
                 if (_checkedList.Contains(position)) continue;
@@ -94,7 +94,6 @@ namespace Objects.BlocksContainer
 
                             if (block.Color != color)
                             {
-                                Debug.Log("Adding " + _board.WorldToCell(matchedContainer.GetPosition()));
                                 _checkedList.Add(_board.WorldToCell(matchedContainer.GetPosition()));
                                 _blocksToMatch.Add(position);
                                 break;
@@ -129,7 +128,8 @@ namespace Objects.BlocksContainer
 
                     if (targetContainer.Colors.Count == 0)
                     {
-                        _board.GetBlockContainerHolder(targetPosition).BlockContainer = null;
+                        _board.AddBlockContainer(null, targetPosition);
+                        // _board.GetCell(targetPosition).BlockContainer = null;
                     }
                     else
                     {
@@ -158,10 +158,10 @@ namespace Objects.BlocksContainer
                     for (int i = 0; i < _blocksToMatch.Count; i++)
                     {
                         var position = _blocksToMatch[i];
-                        var holder = _board.GetBlockContainerHolder(position);
-                        if (holder.BlockContainer == null) continue;
+                        var cell = _board.GetCell(position);
+                        if (cell.BlockContainer == null) continue;
 
-                        holder.BlockContainer.WasUpperColorChanged = false;
+                        cell.BlockContainer.WasUpperColorChanged = false;
 
                         var isLastIndex = i == _blocksToMatch.Count - 1;
 
@@ -181,7 +181,7 @@ namespace Objects.BlocksContainer
 
         private List<KeyValuePair<int, IBlockContainer>> GetMatchedContainers(Vector3Int boardPosition)
         {
-            var recentPlacedContainer = _board.GetBlockContainerHolder(boardPosition).BlockContainer;
+            var recentPlacedContainer = _board.GetCell(boardPosition).BlockContainer;
 
             List<KeyValuePair<int, IBlockContainer>> containers = new();
 
@@ -200,7 +200,7 @@ namespace Objects.BlocksContainer
             foreach (var gridOffset in _gridHorizontalVerticalOffsets)
             {
                 var neighbourPosition = boardPosition + gridOffset;
-                var neighbour = _board.GetBlockContainerHolder(neighbourPosition)?.BlockContainer;
+                var neighbour = _board.GetCell(neighbourPosition)?.BlockContainer;
 
                 if (neighbour != null)
                 {

@@ -11,7 +11,7 @@ namespace Designer
 
         private void Start()
         {
-            _board.SpawnHolders(new List<Vector3Int>());
+            //_board.SpawnCells(new List<Vector3Int>());
         }
     }
 }
