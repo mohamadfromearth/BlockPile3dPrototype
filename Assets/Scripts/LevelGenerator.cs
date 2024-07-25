@@ -20,6 +20,19 @@ public class LevelGenerator
 
     private List<Color> _colors;
 
+    private List<int> _targetScoreList = new List<int>()
+    {
+        100,
+        200,
+        300,
+        340,
+        360,
+        370,
+        400
+    };
+
+    private int _index;
+
 
     public LevelGenerator(BoardDataList boardDataList, List<Color> colors)
     {
@@ -49,6 +62,10 @@ public class LevelGenerator
         levelData.emptyHoldersPosList = boardData.emptyPosArray;
         levelData.targetScore = 100;
 
+        levelData.targetScore = _targetScoreList[_index];
+
+        if (_index < _targetScoreList.Count - 1) _index++;
+
 
         return levelData;
     }
@@ -57,7 +74,7 @@ public class LevelGenerator
     private BoardData GetBoardData()
     {
         var index = Random.Range(0, _boardDataList.boardDataArray.Length);
-        return _boardDataList.boardDataArray[1];
+        return _boardDataList.boardDataArray[index];
     }
 
     private List<BlockContainerData> GetContainers(BoardData boardData, List<int> colorIndices)

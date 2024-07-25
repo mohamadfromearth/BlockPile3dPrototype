@@ -38,6 +38,8 @@ namespace Objects.BlocksContainer
 
         private const int MaxBlock = 7;
 
+        private bool _areBlocksMatching = false;
+
 
         private HashSet<Vector3Int> _checkedList = new();
 
@@ -45,6 +47,10 @@ namespace Objects.BlocksContainer
         private List<Vector3Int> _blocksToMatch = new();
 
         public Vector3Int StartMatchingPosition { get; set; }
+
+        public bool AreBlocksMatching() => _areBlocksMatching;
+
+        private Queue<Vector3Int> _blocksToMatchQueue = new();
 
 
         private IEnumerator MatchBlock(Vector3Int boardPosition, Vector3Int exceptOffset)
@@ -111,8 +117,18 @@ namespace Objects.BlocksContainer
         }
 
 
-        public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition, bool isStaringPoint = false)
+        public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition, bool isStaringPoint = false,
+            bool isLastIndex = false)
         {
+            if (_areBlocksMatching)
+            {
+                _blocksToMatchQueue.Enqueue(boardPosition);
+
+                yield break;
+            }
+
+            _areBlocksMatching = true;
+
             var containers = GetMatchedContainers(boardPosition);
 
             if (containers.Count > 1)
@@ -129,7 +145,6 @@ namespace Objects.BlocksContainer
                     if (targetContainer.Colors.Count == 0)
                     {
                         _board.AddBlockContainer(null, targetPosition);
-                        // _board.GetCell(targetPosition).BlockContainer = null;
                     }
                     else
                     {
@@ -151,10 +166,8 @@ namespace Objects.BlocksContainer
                     }
                 }
 
-                if (isStaringPoint)
+                if (isStaringPoint || isLastIndex)
                 {
-                    Debug.Log("Ending");
-
                     for (int i = 0; i < _blocksToMatch.Count; i++)
                     {
                         var position = _blocksToMatch[i];
@@ -163,18 +176,31 @@ namespace Objects.BlocksContainer
 
                         cell.BlockContainer.WasUpperColorChanged = false;
 
-                        var isLastIndex = i == _blocksToMatch.Count - 1;
+                        isLastIndex = i == _blocksToMatch.Count - 1;
 
 
-                        yield return UpdateBoardRoutine(position, isLastIndex);
+                        yield return UpdateBoardRoutine(position, false, isLastIndex);
 
                         if (isLastIndex)
                         {
-                            Debug.Log("Clearing " + _blocksToMatch.Count);
                             _blocksToMatch.Clear();
                         }
                     }
                 }
+
+                if (isStaringPoint)
+                {
+                    _areBlocksMatching = false;
+
+                    while (_blocksToMatchQueue.Count > 0)
+                    {
+                        yield return UpdateBoardRoutine(_blocksToMatchQueue.Dequeue(), true, false);
+                    }
+                }
+            }
+            else
+            {
+                _areBlocksMatching = false;
             }
         }
 
