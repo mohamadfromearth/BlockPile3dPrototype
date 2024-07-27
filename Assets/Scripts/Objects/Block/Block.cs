@@ -1,4 +1,3 @@
-using System;
 using DG.Tweening;
 using UnityEngine;
 
@@ -6,16 +5,23 @@ namespace Objects.Block
 {
     public class Block : MonoBehaviour, IBlock
     {
-        [SerializeField] private MeshRenderer renderer;
+        [SerializeField] private new MeshRenderer renderer;
 
-        private Tween scaleTween;
+        private Tween _scaleTween;
+
+        private bool _hasBeenDestroyed = false;
 
         public void SetPosition(Vector3 position)
         {
+            if (_hasBeenDestroyed) return;
             transform.position = position;
         }
 
-        public Vector3 GetPosition() => transform.position;
+        public Vector3 GetPosition()
+        {
+            if (_hasBeenDestroyed) return Vector3.zero;
+            return transform.position;
+        }
 
 
         private Color color;
@@ -36,18 +42,23 @@ namespace Objects.Block
 
         public void Destroy()
         {
-            scaleTween = transform.DOScale(Vector3.zero, 0.5f);
-            scaleTween.onComplete = () => { Destroy(gameObject); };
+            _scaleTween = transform.DOScale(Vector3.zero, 0.5f);
+            _scaleTween.onComplete = () => { Destroy(gameObject); };
         }
 
         private void OnDestroy()
         {
-            scaleTween?.Kill();
+            _hasBeenDestroyed = true;
+            _scaleTween?.Kill();
         }
 
         public GameObject GameObj
         {
-            get => gameObject;
+            get
+            {
+                if (_hasBeenDestroyed) return null;
+                return gameObject;
+            }
         }
     }
 }

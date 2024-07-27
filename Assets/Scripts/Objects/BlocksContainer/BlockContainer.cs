@@ -159,6 +159,7 @@ namespace Objects.BlocksContainer
 
         public Vector3 GetPosition()
         {
+            if (_hasBeenDestroyed) return Vector3.zero;
             return transform.position;
         }
 
@@ -210,6 +211,8 @@ namespace Objects.BlocksContainer
 
         public void Push(IBlock block, float duration)
         {
+            if (_hasBeenDestroyed) return;
+
             Vector3 targetBlockPosition = GetPosition();
             var currentBlockPosition = block.GetPosition();
             Vector3[] points = new Vector3[3];

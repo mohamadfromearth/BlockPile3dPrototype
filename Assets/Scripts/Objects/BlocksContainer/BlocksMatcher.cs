@@ -36,7 +36,7 @@ namespace Objects.BlocksContainer
         private readonly WaitForSeconds _blockPlacementRateWaitForSeconds = new(BlockPlacementRate);
         private readonly WaitForSeconds _blockPlacementDelayWaitForSeconds = new(BlockPlacementDelay);
 
-        private const int MaxBlock = 7;
+        private const int MaxBlock = 10;
 
         private bool _areBlocksMatching = false;
 
@@ -196,6 +196,8 @@ namespace Objects.BlocksContainer
                     {
                         yield return UpdateBoardRoutine(_blocksToMatchQueue.Dequeue(), true, false);
                     }
+
+                    _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
                 }
             }
             else

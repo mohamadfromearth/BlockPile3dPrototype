@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Event;
 using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
@@ -14,7 +15,9 @@ namespace Designer.DI
         // prefabs
         [SerializeField] private Block blockPrefab;
         [SerializeField] private BlockContainer blockContainerPrefab;
-        [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField] private DefaultCell defaultCellPrefab;
+
+        [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField]
+        private DefaultCell defaultCellPrefab;
 
         [SerializeField] private Grid grid;
 
@@ -22,6 +25,9 @@ namespace Designer.DI
 
         public override void InstallBindings()
         {
+            Container.Bind<EventChannel>().AsSingle();
+
+
             Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefab);
 
             Container.Bind<ICellFactory>().To<CellFactory>().AsSingle()

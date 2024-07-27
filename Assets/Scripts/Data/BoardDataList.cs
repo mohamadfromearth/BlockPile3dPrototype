@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Data
 {
@@ -16,7 +17,6 @@ namespace Data
         public int size;
         public List<Vector3Int> emptyPosArray;
         public List<Vector3Int> positions;
-        public float cameraSize;
 
         public void InitPositions()
         {
@@ -31,5 +31,26 @@ namespace Data
                 }
             }
         }
+    }
+
+
+    [CreateAssetMenu(fileName = "BoardData", menuName = "so/BoardData")]
+    public class BoardDataSo : ScriptableObject
+    {
+        public int size;
+        public List<Vector3Int> emptyPositions;
+        public List<BlockContainerData> blockContainersDataList;
+        public List<Vector3Int> advertiseBlocks;
+        public List<LockBlockData> lockBlockDataList;
+        public int targetScore;
+        
+    }
+
+
+    [System.Serializable]
+    public struct LockBlockData
+    {
+        public Vector3Int position;
+        public int count;
     }
 }

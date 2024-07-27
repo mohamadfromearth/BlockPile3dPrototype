@@ -22,6 +22,11 @@ namespace Objects.Cell
 
         private void Start()
         {
+            UpdateColor();
+        }
+
+        private void UpdateColor()
+        {
             foreach (var rendererMaterial in renderer.materials)
             {
                 rendererMaterial.color = color;
@@ -29,6 +34,16 @@ namespace Objects.Cell
         }
 
         public IBlockContainer BlockContainer { get; set; }
+
+        public void SetColor(Color color)
+        {
+            this.color = color;
+            UpdateColor();
+        }
+
+        public Color GetColor() => color;
+
+
         public void Destroy() => Destroy(gameObject);
 
         public void SetPosition(Vector3 position) => transform.position = position;
@@ -46,6 +61,7 @@ namespace Objects.Cell
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            Channel.Rise<CellClick>(new CellClick(this));
         }
     }
 }

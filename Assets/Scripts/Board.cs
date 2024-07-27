@@ -52,6 +52,19 @@ public class Board
         return null;
     }
 
+    public Vector3Int GetCellPosition(ICell cell)
+    {
+        foreach (var keyValuePair in _cellsDic)
+        {
+            if (keyValuePair.Value.Equals(cell))
+            {
+                return keyValuePair.Key;
+            }
+        }
+
+        return Vector3Int.zero;
+    }
+
     public void AddBlockContainer(IBlockContainer blockContainer, Vector3 worldPosition)
     {
         var gridPos = _grid.WorldToCell(worldPosition);
@@ -107,7 +120,7 @@ public class Board
     }
 
 
-    public void SpawnCells(List<Vector3Int> emptyHolders, int width, int height)
+    public Dictionary<Vector3Int, ICell> SpawnCells(List<Vector3Int> emptyHolders, int width, int height)
     {
         Width = width;
         Height = height;
@@ -127,6 +140,22 @@ public class Board
                 cell.SetPosition(pos);
 
                 _cellsDic[gridPos] = cell;
+            }
+        }
+
+        return _cellsDic;
+    }
+
+
+    public void DestroyCell(ICell cell)
+    {
+        foreach (var keyValuePair in _cellsDic)
+        {
+            if (cell.Equals(keyValuePair.Value))
+            {
+                cell.Destroy();
+                _cellsDic.Remove(keyValuePair.Key);
+                break;
             }
         }
     }

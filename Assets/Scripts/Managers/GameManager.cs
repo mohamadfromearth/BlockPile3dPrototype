@@ -39,6 +39,8 @@ namespace Managers
 
         private float _currentScore;
 
+        private Coroutine _updateBoardRoutine;
+
 
         private void Awake()
         {
@@ -80,6 +82,7 @@ namespace Managers
             _channel.Subscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
             _channel.Subscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
             _channel.Subscribe<BlockDestroy>(OnBlocksDestroyed);
+            _channel.Subscribe<UpdateBoardCompleted>(CheckWin);
 
             winUI.AddNextLevelClickListener(OnNextLevel);
         }
@@ -89,6 +92,7 @@ namespace Managers
             _channel.UnSubscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
             _channel.UnSubscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
             _channel.UnSubscribe<BlockDestroy>(OnBlocksDestroyed);
+            _channel.UnSubscribe<UpdateBoardCompleted>(CheckWin);
 
             winUI.RemoveNextLevelClickListener(OnNextLevel);
         }
@@ -123,7 +127,7 @@ namespace Managers
 
                     var boardPosition = _board.WorldToCell(holder.GetPosition());
                     blocksMatcher.StartMatchingPosition = boardPosition;
-                    StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition, true));
+                    _updateBoardRoutine = StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition, true));
 
                     _selectedBlockContainer = null;
 
@@ -147,12 +151,11 @@ namespace Managers
 
             gameUI.SetProgress(_currentScore / _levelRepository.GetLevelData().targetScore);
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
-
-            CheckWin();
         }
 
         private void OnNextLevel()
         {
+            if (_updateBoardRoutine != null) StopCoroutine(_updateBoardRoutine);
             _board.Clear();
             _levelRepository.NextLevel();
             var levelData = _levelRepository.GetLevelData();
