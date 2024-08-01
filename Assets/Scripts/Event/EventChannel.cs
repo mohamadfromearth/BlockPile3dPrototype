@@ -42,8 +42,11 @@ namespace Event
 
         public void Rise<T>(IEventData data)
         {
-            _eventDataDictionary[typeof(T)] = data;
-            _actionsDictionary[typeof(T)].Invoke();
+            if (_actionsDictionary.TryGetValue(typeof(T), out Action value))
+            {
+                _eventDataDictionary[typeof(T)] = data;
+                value.Invoke();
+            }
         }
     }
 

@@ -5,25 +5,28 @@ using Event;
 using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
+using Objects.LockBlock;
 using Scrips.Objects.Cell;
 using Scrips.Objects.CellsContainer;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
+using LockBlock = Objects.LockBlock.LockBlock;
 
 namespace Di
 {
     public class GameInstaller : MonoInstaller
     {
-        // prefabs
-        [SerializeField] private Block blockPrefab;
+        [Header("Prefabs")] [SerializeField] private Block blockPrefab;
         [SerializeField] private BlockContainer blockContainerPrefab;
 
         [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField]
         private DefaultCell defaultCellPrefab;
 
-        // so
-        [SerializeField] private LevelRepository levelRepository;
+        [SerializeField] private LockBlock lockBlockPrefab;
+
+
+        [Header("Header")] [SerializeField] private LevelRepository levelRepository;
         [SerializeField] private BoardDataList boardData;
         [SerializeField] private List<Color> levelColors;
 
@@ -46,6 +49,9 @@ namespace Di
 
             Container.Bind<IBlockContainerFactory>().To<BlockContainerFactory>().AsSingle()
                 .WithArguments(blockContainerPrefab);
+
+            Container.Bind<ILockBlockFactory>().To<LockBlockFactory>().AsSingle()
+                .WithArguments(lockBlockPrefab);
 
             Container.Bind<LevelGenerator>().AsSingle().WithArguments(boardData, levelColors);
 
