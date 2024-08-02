@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,41 +10,20 @@ namespace Designer
     public class ColorAdderUI : MonoBehaviour
     {
         [SerializeField] private TMP_Dropdown dropDown;
-
-        [SerializeField] private TMP_InputField colorsCountInput;
-
-        [SerializeField] private Button addButton;
-
-        [SerializeField] private Button cancelButton;
-
+        [SerializeField] private Button createButton;
         [SerializeField] private GameObject panel;
 
 
-        private void OnEnable()
+        public void SetColors(List<string> colors)
         {
-            cancelButton.onClick.AddListener(Hide);
+            dropDown.options =
+                colors.Select(color => new TMP_Dropdown.OptionData(color)).ToList();
         }
 
-        private void OnDisable()
-        {
-            cancelButton.onClick.RemoveListener(Hide);
-        }
+        public void AddCreateClickListener(UnityAction action) => createButton.onClick.AddListener(action);
+        public void RemoveCreateClickListener(UnityAction action) => createButton.onClick.RemoveListener(action);
 
-
-        public void AddDropDownSelectListener(UnityAction<int> action) => dropDown.onValueChanged.AddListener(action);
-
-
-        public void RemoveDropDownSelectListener(UnityAction<int> action) =>
-            dropDown.onValueChanged.RemoveListener(action);
-
-        public void AddAddClickListener(UnityAction action) => addButton.onClick.AddListener(action);
-
-        public void RemoveAddClickListener(UnityAction action) => addButton.onClick.RemoveListener(action);
-
-        public int GetColorsCount() => Int32.Parse(colorsCountInput.text);
-
-
-        public int GetColorIndex() => dropDown.value;
+        public int GetValue() => dropDown.value;
 
 
         public void Show() => panel.SetActive(true);

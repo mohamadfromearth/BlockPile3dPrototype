@@ -6,8 +6,6 @@ using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
-using Scrips.Objects.Cell;
-using Scrips.Objects.CellsContainer;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;

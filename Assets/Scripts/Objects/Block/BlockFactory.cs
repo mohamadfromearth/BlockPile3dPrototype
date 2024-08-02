@@ -1,8 +1,6 @@
-using System;
-using Objects.Block;
 using Object = UnityEngine.Object;
 
-namespace Scrips.Objects.Cell
+namespace Objects.Block
 {
     public class BlockFactory : IBlockFactory
     {

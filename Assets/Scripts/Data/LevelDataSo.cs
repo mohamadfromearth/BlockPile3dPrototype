@@ -7,11 +7,11 @@ namespace Data
     public class LevelDataSo : ScriptableObject
     {
         public int size;
-        public List<Color> colors;
+        public List<string> colors;
         public List<BlockContainerData> blockContainerDataList;
         public List<Vector3Int> emptyHoldersPosList;
         public List<Vector3Int> advertiseBlocks;
-        public List<LockBlock> lockBlocks;
+        public List<LockBlockData> lockBlocks;
         public int targetScore;
         public Vector3Int leftEdgePosition;
         public Vector3Int rightEdgePosition;

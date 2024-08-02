@@ -14,6 +14,9 @@ namespace Designer
         [SerializeField] private Button removeAdvertiseButton;
         [SerializeField] private Button addLockButton;
         [SerializeField] private Button removeLockButton;
+        [SerializeField] private Button setAsLeftEdgeButton;
+        [SerializeField] private Button setAsRightEdgeButton;
+        [SerializeField] private Button cancelButton;
 
         [SerializeField] private GameObject panel;
 
@@ -63,6 +66,26 @@ namespace Designer
 
         public void RemoveRemoveLockClickListener(UnityAction action) =>
             removeLockButton.onClick.RemoveListener(action);
+
+
+        public void AddCancelClick(UnityAction action) => cancelButton.onClick.AddListener(action);
+
+        public void RemoveCancelClick(UnityAction action) => cancelButton.onClick.RemoveListener(action);
+
+
+        public void AddSetAsLeftEdgeClickListener(UnityAction action) =>
+            setAsLeftEdgeButton.onClick.AddListener(action);
+
+        public void RemoveSetAsLeftEdgeClickListener(UnityAction action) =>
+            setAsLeftEdgeButton.onClick.RemoveListener(action);
+
+
+        public void AddSetRightEdgeClickListener(UnityAction action) =>
+            setAsRightEdgeButton.onClick.AddListener(action);
+
+
+        public void RemoveSetAsRightEdgeClickListener(UnityAction action) =>
+            setAsRightEdgeButton.onClick.RemoveListener(action);
 
 
         public void Show() => panel.SetActive(true);

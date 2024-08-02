@@ -1,12 +1,13 @@
 using System.Collections.Generic;
+using System.Linq;
 using Data;
 using Event;
 using Objects.AdvertiseBlock;
 using Objects.Block;
+using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
-using Scrips.Objects.Cell;
-using Scrips.Objects.CellsContainer;
+using UnityEditor;
 using UnityEngine;
 using Zenject;
 using LockBlock = Objects.LockBlock.LockBlock;
@@ -27,6 +28,7 @@ namespace Designer
         [SerializeField] private BoardSetUpUI boardSetUpUI;
         [SerializeField] private SetUpCellUI setUpCellUI;
         [SerializeField] private ColorAdderUI colorAdderUI;
+        [SerializeField] private CellColorAdderUI cellColorAdderUI;
         [SerializeField] private AddLockUI addLockUI;
 
         [SerializeField] private ColorRepository colorRepository;
@@ -37,6 +39,106 @@ namespace Designer
         private Dictionary<Vector3Int, ILockBlock> _lockBlocks = new();
         private Dictionary<Vector3Int, IAdvertiseBlock> _advertiseBlocks = new();
 
+        private List<string> _colors = new();
+
+        private LevelDataSo _levelData;
+
+
+        public void SaveBoard()
+        {
+            var path = "Assets/Data/Levels/Level";
+            var levelIndexKey = "LEVEL_INDEX_KEY";
+            var levelIndex = PlayerPrefs.GetInt(levelIndexKey, 1);
+            path += levelIndex;
+            path += ".asset";
+
+
+            _levelData.size = _board.Width;
+            _levelData.colors = _colors;
+            _levelData.blockContainerDataList = GetBlockContainerDataList();
+            _levelData.emptyHoldersPosList = GetEmptyPosList();
+            _levelData.advertiseBlocks = GetAdvertiseBlocks();
+            _levelData.lockBlocks = GetLockBlockDataList();
+            _levelData.targetScore = designerUI.GetTargetScore();
+
+            AssetDatabase.CreateAsset(_levelData, path);
+            AssetDatabase.SaveAssets();
+
+            _levelData = ScriptableObject.CreateInstance<LevelDataSo>();
+        }
+
+        private List<BlockContainerData> GetBlockContainerDataList()
+        {
+            var blockContainers = FindObjectsOfType<BlockContainer>();
+
+            var blockContainerDataList = new List<BlockContainerData>();
+
+            foreach (var blockContainer in blockContainers)
+            {
+                var blockContainerData = new BlockContainerData();
+                blockContainerData.position = _board.WorldToCell(blockContainer.GetPosition());
+                blockContainerData.color = blockContainer.Colors.ToList();
+
+                blockContainerDataList.Add(blockContainerData);
+            }
+
+            return blockContainerDataList;
+        }
+
+        private List<Vector3Int> GetEmptyPosList()
+        {
+            var emptyPosList = new List<Vector3Int>();
+
+            var cells = FindObjectsOfType<DefaultCell>();
+
+            foreach (var cell in cells)
+            {
+                if (cell.GetColor() == Color.red)
+                {
+                    emptyPosList.Add(_board.WorldToCell(cell.GetPosition()));
+                }
+            }
+
+            return emptyPosList;
+        }
+
+        private List<Vector3Int> GetAdvertiseBlocks()
+        {
+            var advertiseBlocksPos = new List<Vector3Int>();
+
+            var advertiseBlocks = FindObjectsOfType<AdvertiseBlock>();
+
+            foreach (var advertiseBlock in advertiseBlocks)
+            {
+                advertiseBlocksPos.Add(_board.WorldToCell(advertiseBlock.GetPosition()));
+            }
+
+            return advertiseBlocksPos;
+        }
+
+        private List<LockBlockData> GetLockBlockDataList()
+        {
+            var lockBlockDataList = new List<LockBlockData>();
+            var lockBlocks = FindObjectsOfType<LockBlock>();
+
+            foreach (var lockBlock in lockBlocks)
+            {
+                lockBlockDataList.Add(new LockBlockData(
+                    _board.WorldToCell(lockBlock.GetPosition()),
+                    lockBlock.Count
+                ));
+            }
+
+            return lockBlockDataList;
+        }
+
+
+        private void Start()
+        {
+            _levelData = ScriptableObject.CreateInstance<LevelDataSo>();
+            colorAdderUI.SetColors(colorRepository.colorsNames);
+            cellColorAdderUI.SetColors(colorRepository.colorsNames);
+        }
 
         private void OnEnable()
         {
@@ -65,10 +167,15 @@ namespace Designer
             setUpCellUI.AddRemoveAdvertiseClickListener(OnRemoveAdvertise);
             setUpCellUI.AddAddLockClickListener(OnAddLock);
             setUpCellUI.AddRemoveLockClickListener(OnRemoveLock);
+            setUpCellUI.AddCancelClick(CancelSetUpCellUI);
+            setUpCellUI.AddSetAsLeftEdgeClickListener(OnSetAsLeftEdge);
+            setUpCellUI.AddSetAsLeftEdgeClickListener(OnSetAsRightEdge);
+
+            colorAdderUI.AddCreateClickListener(OnCreateColor);
 
             addLockUI.AddCreateClickListener(OnCreateLock);
 
-            colorAdderUI.AddAddClickListener(OnColorAdderAdd);
+            cellColorAdderUI.AddAddClickListener(OnColorAddToCell);
         }
 
 
@@ -88,10 +195,15 @@ namespace Designer
             setUpCellUI.RemoveRemoveAdvertiseClickListener(OnRemoveAdvertise);
             setUpCellUI.RemoveAddLockClickListener(OnAddLock);
             setUpCellUI.RemoveRemoveLockClickListener(OnRemoveLock);
+            setUpCellUI.RemoveCancelClick(CancelSetUpCellUI);
+            setUpCellUI.RemoveSetAsRightEdgeClickListener(OnSetAsRightEdge);
+            setUpCellUI.RemoveSetAsRightEdgeClickListener(OnSetAsLeftEdge);
+
+            colorAdderUI.RemoveCreateClickListener(OnCreateColor);
 
             addLockUI.RemoveCreateClickListener(OnCreateLock);
 
-            colorAdderUI.RemoveAddClickListener(OnColorAdderAdd);
+            cellColorAdderUI.RemoveAddClickListener(OnColorAddToCell);
         }
 
 
@@ -142,7 +254,7 @@ namespace Designer
         private void OnAddColorToCell()
         {
             setUpCellUI.Hide();
-            colorAdderUI.Show();
+            cellColorAdderUI.Show();
         }
 
         private void OnRemoveColorFromCell()
@@ -165,10 +277,10 @@ namespace Designer
         }
 
 
-        private void OnColorAdderAdd()
+        private void OnColorAddToCell()
         {
-            var color = colorRepository.GetColor(colorAdderUI.GetColorIndex());
-            var count = colorAdderUI.GetColorsCount();
+            var color = colorRepository.GetColor(cellColorAdderUI.GetColorIndex());
+            var count = cellColorAdderUI.GetColorsCount();
 
             if (_selectedCell.BlockContainer == null)
             {
@@ -185,7 +297,7 @@ namespace Designer
                 _selectedCell.BlockContainer.Push(block);
             }
 
-            colorAdderUI.Hide();
+            cellColorAdderUI.Hide();
         }
 
 
@@ -194,7 +306,7 @@ namespace Designer
             var advertiseBlock = _advertiseBlockFactory.Create();
             advertiseBlock.SetPosition(_selectedCell.GetPosition());
             _advertiseBlocks[_board.WorldToCell(advertiseBlock.GetPosition())] = advertiseBlock;
-            
+
             setUpCellUI.Hide();
         }
 
@@ -239,6 +351,41 @@ namespace Designer
             lockBlock.Count = addLockUI.GetCount();
             _lockBlocks[_board.WorldToCell(_selectedCell.GetPosition())] = lockBlock;
             addLockUI.Hide();
+        }
+
+
+        private void CancelSetUpCellUI()
+        {
+            setUpCellUI.Hide();
+        }
+
+
+        public void OnAddColor()
+        {
+            setUpCellUI.Hide();
+            colorAdderUI.Show();
+        }
+
+        public void RemoveColor() => designerUI.RemoveColor();
+
+
+        private void OnCreateColor()
+        {
+            colorAdderUI.Hide();
+            var colorName = colorRepository.GetColorName(colorAdderUI.GetValue());
+            _colors.Add(colorName);
+            designerUI.AddColor(colorName);
+        }
+
+
+        private void OnSetAsLeftEdge()
+        {
+            _levelData.leftEdgePosition = _board.WorldToCell(_selectedCell.GetPosition());
+        }
+
+        private void OnSetAsRightEdge()
+        {
+            _levelData.rightEdgePosition = _board.WorldToCell(_selectedCell.GetPosition());
         }
 
         #endregion

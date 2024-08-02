@@ -1,9 +1,8 @@
 using Event;
-using Objects.BlocksContainer;
 using UnityEngine;
 using Zenject;
 
-namespace Scrips.Objects.CellsContainer
+namespace Objects.BlocksContainer
 {
     public class BlockContainerFactory : IBlockContainerFactory
     {

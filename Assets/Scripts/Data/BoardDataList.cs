@@ -52,5 +52,12 @@ namespace Data
     {
         public Vector3Int position;
         public int count;
+
+
+        public LockBlockData(Vector3Int position, int count)
+        {
+            this.position = position;
+            this.count = count;
+        }
     }
 }
