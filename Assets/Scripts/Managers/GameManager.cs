@@ -31,6 +31,7 @@ namespace Managers
         [Inject] private ILevelRepository _levelRepository;
         [Inject] private BlockContainerSelectionBar _selectionBar;
         [Inject] private BlockContainersPlacer _blockContainersPlacer;
+        [Inject] private Placer _placer;
         [Inject] private CameraSizeSetter _cameraSizeSetter;
 
 
@@ -58,7 +59,9 @@ namespace Managers
             var levelData = _levelRepository.GetLevelData();
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
 
-            _blockContainersPlacer.Place();
+            //_blockContainersPlacer.Place();
+            _placer.Place();
+
 
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
@@ -160,7 +163,8 @@ namespace Managers
             _levelRepository.NextLevel();
             var levelData = _levelRepository.GetLevelData();
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
-            _blockContainersPlacer.Place();
+            //_blockContainersPlacer.Place();
+            _placer.Place();
             winUI.Hide();
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);

@@ -1,5 +1,7 @@
 using Event;
+using Objects.AdvertiseBlock;
 using Objects.BlocksContainer;
+using Objects.LockBlock;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -34,6 +36,8 @@ namespace Objects.Cell
         }
 
         public IBlockContainer BlockContainer { get; set; }
+        public IAdvertiseBlock AdvertiseBlock { get; set; }
+        public ILockBlock LockBlock { get; set; }
 
         public void SetColor(Color color)
         {

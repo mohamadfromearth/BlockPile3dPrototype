@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Objects.AdvertiseBlock;
 using Objects.BlocksContainer;
 using Objects.Cell;
+using Objects.LockBlock;
 using UnityEngine;
 using Zenject;
 
@@ -90,6 +92,24 @@ public class Board
         }
     }
 
+    public void AddAdvertiseBlock(IAdvertiseBlock advertiseBlock, Vector3Int gridPosition)
+    {
+        if (_cellsDic.TryGetValue(gridPosition, out var cell))
+        {
+            cell.AdvertiseBlock = advertiseBlock;
+            advertiseBlock.SetPosition(cell.GetPosition());
+        }
+    }
+
+    public void AddLockBlock(ILockBlock lockBlock, Vector3Int gridPosition)
+    {
+        if (_cellsDic.TryGetValue(gridPosition, out var cell))
+        {
+            cell.LockBlock = lockBlock;
+            lockBlock.SetPosition(cell.GetPosition());
+        }
+    }
+
 
     public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
 
@@ -105,14 +125,13 @@ public class Board
                 var position = new Vector3Int(x, 0, z);
                 var cell = GetCell(position);
 
-                if (cell != null && cell.BlockContainer != null)
+                if (cell != null)
                 {
-                    cell.CanPlaceItem = true;
-                    cell.BlockContainer.Destroy(true);
-                    cell.BlockContainer = null;
+                    cell.BlockContainer?.Destroy(true);
+                    cell.AdvertiseBlock?.Destroy();
+                    cell.LockBlock?.Destroy();
+                    cell.Destroy();
                 }
-
-                if (cell != null) cell.Destroy();
             }
         }
 

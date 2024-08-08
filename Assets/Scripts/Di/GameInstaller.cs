@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Data;
 using Event;
+using Objects.AdvertiseBlock;
 using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
+using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
@@ -54,10 +56,10 @@ namespace Di
 
             Container.Bind<ColorRepository>().FromInstance(colorRepository).AsSingle();
 
-          //s  Container.Bind<LevelGenerator>().AsSingle().WithArguments(boardData, levelColors);
+            //s  Container.Bind<LevelGenerator>().AsSingle().WithArguments(boardData, levelColors);
 
 
-            Container.Bind<ILevelRepository>().To<LevelRepository>().AsSingle();
+            Container.Bind<ILevelRepository>().FromInstance(levelRepository).AsSingle();
 
 
             var levelData = levelRepository.GetLevelData();
@@ -67,6 +69,9 @@ namespace Di
                 .WithArguments(selectionBarPositionList.Select(t => t.position).ToList());
 
             Container.Bind<BlockContainersPlacer>().AsTransient();
+            Container.Bind<AdvertiseBlockPlacer>().AsTransient();
+            Container.Bind<LockBlockPlacer>().AsTransient();
+            Container.Bind<Placer>().AsTransient();
 
             Container.Bind<CameraSizeSetter>().AsTransient().WithArguments(camera);
         }
