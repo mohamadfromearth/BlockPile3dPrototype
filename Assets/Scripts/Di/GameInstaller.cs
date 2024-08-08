@@ -25,6 +25,7 @@ namespace Di
 
 
         [Header("Header")] [SerializeField] private LevelRepository levelRepository;
+        [SerializeField] private ColorRepository colorRepository;
         [SerializeField] private BoardDataList boardData;
         [SerializeField] private List<Color> levelColors;
 
@@ -51,14 +52,16 @@ namespace Di
             Container.Bind<ILockBlockFactory>().To<LockBlockFactory>().AsSingle()
                 .WithArguments(lockBlockPrefab);
 
-            Container.Bind<LevelGenerator>().AsSingle().WithArguments(boardData, levelColors);
+            Container.Bind<ColorRepository>().FromInstance(colorRepository).AsSingle();
+
+          //s  Container.Bind<LevelGenerator>().AsSingle().WithArguments(boardData, levelColors);
 
 
-            Container.Bind<ILevelRepository>().To<GenerativeLevelRepository>().AsSingle();
+            Container.Bind<ILevelRepository>().To<LevelRepository>().AsSingle();
 
 
             var levelData = levelRepository.GetLevelData();
-            Container.Bind<Board>().AsSingle().WithArguments(levelData.width, levelData.height, grid);
+            Container.Bind<Board>().AsSingle().WithArguments(levelData.size, levelData.size, grid);
 
             Container.Bind<BlockContainerSelectionBar>().AsTransient()
                 .WithArguments(selectionBarPositionList.Select(t => t.position).ToList());

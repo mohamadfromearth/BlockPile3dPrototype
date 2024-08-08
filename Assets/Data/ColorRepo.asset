@@ -12,15 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c027d6e37ec14181b11087a028ae279f, type: 3}
   m_Name: ColorRepo
   m_EditorClassIdentifier: 
-  colors:
-  - {r: 1, g: 0, b: 0, a: 0}
-  - {r: 0, g: 0, b: 0.54901963, a: 0}
-  - {r: 0, g: 0, b: 0.9098039, a: 0}
-  - {r: 0.5503144, g: 0.10642873, b: 0.52190524, a: 0}
-  - {r: 0.5503144, g: 0.10642873, b: 0.84705883, a: 0}
-  colorsNames:
-  - Red
-  - Blue
-  - DarkBlue
-  - Pink
-  - Dark Pink
+  colorDataList:
+  - name: Blue
+    color: {r: 0.19025154, g: 0.2217657, b: 0.7610062, a: 1}
+  - name: Yellow
+    color: {r: 1, g: 0.9293755, b: 0, a: 1}
+  - name: Red
+    color: {r: 0.8627451, g: 0, b: 0, a: 1}
+  - name: Light Blue
+    color: {r: 0.18238991, g: 0.36907136, b: 0.72955966, a: 1}
+  - name: Green
+    color: {r: 0.1395662, g: 0.9150943, b: 0.1395662, a: 1}
+  - name: Light pink
+    color: {r: 0.6981132, g: 0.3369823, b: 0.59241647, a: 1}
+  - name: Black
+    color: {r: 0, g: 0, b: 0, a: 1}
+  - name: Orange
+    color: {r: 1, g: 0.64705884, b: 0, a: 1}

@@ -19,13 +19,13 @@ namespace Data
     public struct BlockContainerData
     {
         public Vector3Int position;
-        public List<Color> color;
+        public List<string> color;
     }
 
 
     public interface ILevelRepository
     {
-        public LevelData GetLevelData();
+        public LevelDataSo GetLevelData();
 
         public void NextLevel();
     }

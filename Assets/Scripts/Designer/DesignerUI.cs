@@ -16,6 +16,8 @@ namespace Designer
         [SerializeField] private VerticalLayoutGroup colorsLg;
 
         [SerializeField] private TMP_InputField targetScoreInputField;
+        [SerializeField] private TMP_InputField coinInputField;
+        [SerializeField] private TMP_InputField buildingItemInputField;
 
 
         private Stack<TextMeshProUGUI> _colorsTexts = new();
@@ -48,5 +50,9 @@ namespace Designer
 
 
         public int GetTargetScore() => Int32.Parse(targetScoreInputField.text);
+
+        public int GetCoins() => Int32.Parse(coinInputField.text);
+
+        public int GetBuildingItemsCount => Int32.Parse(buildingItemInputField.text);
     }
 }

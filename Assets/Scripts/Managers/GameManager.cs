@@ -56,7 +56,7 @@ namespace Managers
             _selectionBar.Spawn(_levelRepository.GetLevelData().colors);
 
             var levelData = _levelRepository.GetLevelData();
-            _board.SpawnCells(levelData.emptyHoldersPosList, levelData.width, levelData.height);
+            _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
 
             _blockContainersPlacer.Place();
 
@@ -159,7 +159,7 @@ namespace Managers
             _board.Clear();
             _levelRepository.NextLevel();
             var levelData = _levelRepository.GetLevelData();
-            _board.SpawnCells(levelData.emptyHoldersPosList, levelData.width, levelData.height);
+            _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
             _blockContainersPlacer.Place();
             winUI.Hide();
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));

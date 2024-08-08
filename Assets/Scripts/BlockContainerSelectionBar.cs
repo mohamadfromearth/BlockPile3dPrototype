@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Data;
 using Objects.Block;
 using Objects.BlocksContainer;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class BlockContainerSelectionBar
 {
     [Inject] private IBlockContainerFactory _blockContainerFactory;
     [Inject] private IBlockFactory _blockFactory;
+    [Inject] private ColorRepository _colorRepository;
     private readonly List<Vector3> _containersPositionList;
 
 
@@ -20,7 +22,7 @@ public class BlockContainerSelectionBar
     }
 
 
-    public void Spawn(List<Color> colors)
+    public void Spawn(List<string> colors)
     {
         Count = _containersPositionList.Count;
 
@@ -80,7 +82,7 @@ public class BlockContainerSelectionBar
                 {
                     var block = _blockFactory.Create();
 
-                    block.Color = colors[colorIndex];
+                    block.Color = _colorRepository.GetColor(colors[colorIndex]);
 
                     container.Push(block);
                 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Data;
 using Event;
 using Objects.AdvertiseBlock;
@@ -60,11 +59,16 @@ namespace Designer
             _levelData.advertiseBlocks = GetAdvertiseBlocks();
             _levelData.lockBlocks = GetLockBlockDataList();
             _levelData.targetScore = designerUI.GetTargetScore();
+            _levelData.buildingItemReward = designerUI.GetBuildingItemsCount;
+            _levelData.coinReward = designerUI.GetCoins();
 
             AssetDatabase.CreateAsset(_levelData, path);
             AssetDatabase.SaveAssets();
 
             _levelData = ScriptableObject.CreateInstance<LevelDataSo>();
+
+            levelIndex += 1;
+            PlayerPrefs.SetInt(levelIndexKey, levelIndex);
         }
 
         private List<BlockContainerData> GetBlockContainerDataList()
@@ -77,8 +81,15 @@ namespace Designer
             {
                 var blockContainerData = new BlockContainerData();
                 blockContainerData.position = _board.WorldToCell(blockContainer.GetPosition());
-                blockContainerData.color = blockContainer.Colors.ToList();
+                var colors = new List<string>();
+                var blocks = blockContainer.GetBlocks();
 
+                foreach (var block in blocks)
+                {
+                    colors.Add(colorRepository.GetName(block.Color));
+                }
+
+                blockContainerData.color = colors;
                 blockContainerDataList.Add(blockContainerData);
             }
 
@@ -136,8 +147,8 @@ namespace Designer
         private void Start()
         {
             _levelData = ScriptableObject.CreateInstance<LevelDataSo>();
-            colorAdderUI.SetColors(colorRepository.colorsNames);
-            cellColorAdderUI.SetColors(colorRepository.colorsNames);
+            colorAdderUI.SetColors(colorRepository.GetColorsNames());
+            cellColorAdderUI.SetColors(colorRepository.GetColorsNames());
         }
 
         private void OnEnable()
@@ -158,6 +169,7 @@ namespace Designer
             designerUI.AddSetUpBoardClickListener(OnSetUpBoard);
             boardSetUpUI.AddGenerateClickListener(OnGenerate);
             boardSetUpUI.AddCancelListener(OnSetUpBoardCancel);
+            boardSetUpUI.AddClearClickListener(OnClear);
 
             setUpCellUI.AddRemoveCellClickListener(OnRemoveCell);
             setUpCellUI.AddAddColorClickListener(OnAddColorToCell);
@@ -186,6 +198,7 @@ namespace Designer
             designerUI.RemoveSetUpBoardClickListener(OnSetUpBoard);
             boardSetUpUI.RemoveGenerateClickListener(OnGenerate);
             boardSetUpUI.RemoveCancelListener(OnSetUpBoardCancel);
+            boardSetUpUI.RemoveClearClickListener(OnClear);
 
             setUpCellUI.RemoveRemoveCellClickListener(OnRemoveCell);
             setUpCellUI.RemoveAddColorClickListener(OnAddColorToCell);
@@ -253,6 +266,7 @@ namespace Designer
 
         private void OnAddColorToCell()
         {
+            cellColorAdderUI.SetColors(colorRepository.GetColorsNames());
             setUpCellUI.Hide();
             cellColorAdderUI.Show();
         }
@@ -363,10 +377,15 @@ namespace Designer
         public void OnAddColor()
         {
             setUpCellUI.Hide();
+            colorAdderUI.SetColors(colorRepository.GetColorsNames());
             colorAdderUI.Show();
         }
 
-        public void RemoveColor() => designerUI.RemoveColor();
+        public void RemoveColor()
+        {
+            designerUI.RemoveColor();
+            _colors.RemoveAt(_colors.Count - 1);
+        }
 
 
         private void OnCreateColor()
@@ -386,6 +405,13 @@ namespace Designer
         private void OnSetAsRightEdge()
         {
             _levelData.rightEdgePosition = _board.WorldToCell(_selectedCell.GetPosition());
+        }
+
+
+        private void OnClear()
+        {
+            _board.Clear();
+            boardSetUpUI.Hide();
         }
 
         #endregion

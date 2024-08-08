@@ -342,5 +342,8 @@ namespace Objects.BlocksContainer
             if (IsPlaced == true) return;
             Channel.Rise<CellContainerPointerUp>(new CellContainerPointerUp(this));
         }
+
+
+        public Stack<IBlock> GetBlocks() => blocks;
     }
 }

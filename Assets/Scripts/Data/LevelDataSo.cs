@@ -15,6 +15,8 @@ namespace Data
         public int targetScore;
         public Vector3Int leftEdgePosition;
         public Vector3Int rightEdgePosition;
+        public int buildingItemReward;
+        public int coinReward;
     }
 
     [System.Serializable]

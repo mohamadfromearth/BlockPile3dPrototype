@@ -24,6 +24,7 @@ namespace Objects.BlocksContainer
 
         public Stack<Color> Colors { get; }
 
+
         public bool IsPlaced { set; }
 
         public float Destroy(bool destroyImmediately = false);

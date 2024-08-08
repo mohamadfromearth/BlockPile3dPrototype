@@ -10,6 +10,7 @@ namespace Objects.BlocksContainer
         [Inject] private Board _board;
         [Inject] private IBlockContainerFactory _blockContainerFactory;
         [Inject] private IBlockFactory _blockFactory;
+        [Inject] private ColorRepository _colorRepository;
 
 
         public void Place()
@@ -32,7 +33,7 @@ namespace Objects.BlocksContainer
                 foreach (var color in containerData.color)
                 {
                     var block = _blockFactory.Create();
-                    block.Color = color;
+                    block.Color = _colorRepository.GetColor(color);
 
                     container.Push(block);
                 }
