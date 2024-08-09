@@ -7,7 +7,6 @@ using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
-using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
@@ -17,6 +16,8 @@ namespace Di
 {
     public class GameInstaller : MonoInstaller
     {
+        #region Prefabs
+
         [Header("Prefabs")] [SerializeField] private Block blockPrefab;
         [SerializeField] private BlockContainer blockContainerPrefab;
 
@@ -24,7 +25,9 @@ namespace Di
         private DefaultCell defaultCellPrefab;
 
         [SerializeField] private LockBlock lockBlockPrefab;
+        [SerializeField] private AdvertiseBlock advertiseBlockPrefab;
 
+        #endregion
 
         [Header("Header")] [SerializeField] private LevelRepository levelRepository;
         [SerializeField] private ColorRepository colorRepository;
@@ -41,7 +44,13 @@ namespace Di
 
         public override void InstallBindings()
         {
+            #region Core
+
             Container.Bind<EventChannel>().AsSingle().NonLazy();
+
+            #endregion
+
+            #region Factories
 
             Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefab);
 
@@ -51,8 +60,15 @@ namespace Di
             Container.Bind<IBlockContainerFactory>().To<BlockContainerFactory>().AsSingle()
                 .WithArguments(blockContainerPrefab);
 
-            Container.Bind<ILockBlockFactory>().To<LockBlockFactory>().AsSingle()
-                .WithArguments(lockBlockPrefab);
+            Container.Bind<ILockBlockFactory>().To<LockBlockFactory>().AsSingle().WithArguments(lockBlockPrefab);
+
+
+            Container.Bind<IAdvertiseBlockFactory>().To<AdvertiseBlockFactory>().AsSingle()
+                .WithArguments(advertiseBlockPrefab);
+
+            #endregion
+
+            #region Repositories
 
             Container.Bind<ColorRepository>().FromInstance(colorRepository).AsSingle();
 
@@ -61,6 +77,7 @@ namespace Di
 
             Container.Bind<ILevelRepository>().FromInstance(levelRepository).AsSingle();
 
+            #endregion
 
             var levelData = levelRepository.GetLevelData();
             Container.Bind<Board>().AsSingle().WithArguments(levelData.size, levelData.size, grid);
@@ -68,12 +85,20 @@ namespace Di
             Container.Bind<BlockContainerSelectionBar>().AsTransient()
                 .WithArguments(selectionBarPositionList.Select(t => t.position).ToList());
 
+            #region Placers
+
             Container.Bind<BlockContainersPlacer>().AsTransient();
             Container.Bind<AdvertiseBlockPlacer>().AsTransient();
             Container.Bind<LockBlockPlacer>().AsTransient();
             Container.Bind<Placer>().AsTransient();
 
+            #endregion
+
+            #region Helpers
+
             Container.Bind<CameraSizeSetter>().AsTransient().WithArguments(camera);
+
+            #endregion
         }
     }
 }

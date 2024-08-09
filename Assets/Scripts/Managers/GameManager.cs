@@ -86,6 +86,7 @@ namespace Managers
             _channel.Subscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
             _channel.Subscribe<BlockDestroy>(OnBlocksDestroyed);
             _channel.Subscribe<UpdateBoardCompleted>(CheckWin);
+            _channel.Subscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
 
             winUI.AddNextLevelClickListener(OnNextLevel);
         }
@@ -96,6 +97,8 @@ namespace Managers
             _channel.UnSubscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
             _channel.UnSubscribe<BlockDestroy>(OnBlocksDestroyed);
             _channel.UnSubscribe<UpdateBoardCompleted>(CheckWin);
+            _channel.UnSubscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
+
 
             winUI.RemoveNextLevelClickListener(OnNextLevel);
         }
@@ -146,6 +149,15 @@ namespace Managers
             }
         }
 
+
+        private void OnAdvertiseBlockPointerDown()
+        {
+            var data = _channel.GetData<AdvertiseBlockPointerDown>();
+            // Todo Show ad first then destroy the ad block
+            _board.AddAdvertiseBlock(null, data.AdvertiseBlock.GetPosition());
+            data.AdvertiseBlock.Destroy();
+        }
+
         private void OnBlocksDestroyed()
         {
             var data = _channel.GetData<BlockDestroy>();
@@ -158,7 +170,7 @@ namespace Managers
 
         private void OnNextLevel()
         {
-            if (_updateBoardRoutine != null) StopCoroutine(_updateBoardRoutine);
+            // if (_updateBoardRoutine != null) StopCoroutine(_updateBoardRoutine);
             _board.Clear();
             _levelRepository.NextLevel();
             var levelData = _levelRepository.GetLevelData();

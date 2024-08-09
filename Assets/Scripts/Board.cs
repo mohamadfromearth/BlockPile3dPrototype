@@ -73,10 +73,7 @@ public class Board
 
         if (_cellsDic.TryGetValue(gridPos, out var cell))
         {
-            if (blockContainer == null)
-                cell.CanPlaceItem = true;
-            else
-                cell.CanPlaceItem = false;
+            cell.CanPlaceItem = blockContainer == null;
 
 
             cell.BlockContainer = blockContainer;
@@ -96,9 +93,16 @@ public class Board
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
+            cell.CanPlaceItem = advertiseBlock == null;
+
             cell.AdvertiseBlock = advertiseBlock;
-            advertiseBlock.SetPosition(cell.GetPosition());
         }
+    }
+
+    public void AddAdvertiseBlock(IAdvertiseBlock advertiseBlock, Vector3 position)
+    {
+        var gridPos = WorldToCell(position);
+        AddAdvertiseBlock(advertiseBlock, gridPos);
     }
 
     public void AddLockBlock(ILockBlock lockBlock, Vector3Int gridPosition)
