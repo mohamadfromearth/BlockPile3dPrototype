@@ -5,8 +5,8 @@ namespace Event
 {
     public class EventChannel
     {
-        private readonly Dictionary<Type, Action> _actionsDictionary = new Dictionary<Type, Action>();
-        private readonly Dictionary<Type, IEventData> _eventDataDictionary = new Dictionary<Type, IEventData>();
+        private readonly Dictionary<Type, Action> _actionsDictionary = new();
+        private readonly Dictionary<Type, IEventData> _eventDataDictionary = new();
 
 
         public EventChannel()
@@ -44,8 +44,13 @@ namespace Event
         {
             if (_actionsDictionary.TryGetValue(typeof(T), out Action value))
             {
-                _eventDataDictionary[typeof(T)] = data;
-                value.Invoke();
+                var type = typeof(T);
+
+                _eventDataDictionary[type] = data;
+
+                value?.Invoke();
+
+                _eventDataDictionary[type] = null;
             }
         }
     }

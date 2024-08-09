@@ -87,6 +87,7 @@ namespace Managers
             _channel.Subscribe<BlockDestroy>(OnBlocksDestroyed);
             _channel.Subscribe<UpdateBoardCompleted>(CheckWin);
             _channel.Subscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
+            _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
 
             winUI.AddNextLevelClickListener(OnNextLevel);
         }
@@ -98,6 +99,7 @@ namespace Managers
             _channel.UnSubscribe<BlockDestroy>(OnBlocksDestroyed);
             _channel.UnSubscribe<UpdateBoardCompleted>(CheckWin);
             _channel.UnSubscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
+            _channel.UnSubscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
 
 
             winUI.RemoveNextLevelClickListener(OnNextLevel);
@@ -166,6 +168,8 @@ namespace Managers
 
             gameUI.SetProgress(_currentScore / _levelRepository.GetLevelData().targetScore);
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
+
+            _channel.Rise<ScoreChanged>(new ScoreChanged(_currentScore));
         }
 
         private void OnNextLevel()
@@ -181,6 +185,13 @@ namespace Managers
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
             _cameraSizeSetter.RefreshSize();
+        }
+
+        private void OnScoreHitLockBlock()
+        {
+            var lockBlock = _channel.GetData<ScoreHitLockBLock>().LockBlock;
+            _board.AddLockBlock(null, lockBlock.GetPosition());
+            lockBlock.Destroy();
         }
 
         public void OnPointerMove(Vector2 position)

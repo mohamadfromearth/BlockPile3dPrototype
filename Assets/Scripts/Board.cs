@@ -105,12 +105,19 @@ public class Board
         AddAdvertiseBlock(advertiseBlock, gridPos);
     }
 
+
+    public void AddLockBlock(ILockBlock lockBlock, Vector3 position)
+    {
+        var gridPos = WorldToCell(position);
+        AddLockBlock(lockBlock, gridPos);
+    }
+
     public void AddLockBlock(ILockBlock lockBlock, Vector3Int gridPosition)
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
             cell.LockBlock = lockBlock;
-            lockBlock.SetPosition(cell.GetPosition());
+            cell.CanPlaceItem = lockBlock == null;
         }
     }
 
