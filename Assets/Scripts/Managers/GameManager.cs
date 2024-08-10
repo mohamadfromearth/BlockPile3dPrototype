@@ -40,7 +40,9 @@ namespace Managers
 
         private float _currentScore;
 
-        private Coroutine _updateBoardRoutine;
+        private IGameState _currentState;
+        private DefaultState _defaultState;
+        private DoAbilityState _doAbilityState;
 
 
         private void Awake()
@@ -48,6 +50,10 @@ namespace Managers
             _camera = Camera.main;
 
             Application.targetFrameRate = 60;
+
+            _defaultState = new DefaultState(this);
+            _doAbilityState = new DoAbilityState();
+            _currentState = _defaultState;
         }
 
 
@@ -135,7 +141,7 @@ namespace Managers
 
                     var boardPosition = _board.WorldToCell(holder.GetPosition());
                     blocksMatcher.StartMatchingPosition = boardPosition;
-                    _updateBoardRoutine = StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition, true));
+                    StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition, true));
 
                     _selectedBlockContainer = null;
 
@@ -174,12 +180,10 @@ namespace Managers
 
         private void OnNextLevel()
         {
-            // if (_updateBoardRoutine != null) StopCoroutine(_updateBoardRoutine);
             _board.Clear();
             _levelRepository.NextLevel();
             var levelData = _levelRepository.GetLevelData();
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
-            //_blockContainersPlacer.Place();
             _placer.Place();
             winUI.Hide();
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
@@ -194,17 +198,7 @@ namespace Managers
             lockBlock.Destroy();
         }
 
-        public void OnPointerMove(Vector2 position)
-        {
-            if (_selectedBlockContainer != null)
-            {
-                var cellPos = PositionConverters.ScreenToWorldPosition(position, _camera, groundLayerMask);
-                if (cellPos != null)
-                {
-                    _selectedBlockContainer.SetPosition(cellPos.Value);
-                }
-            }
-        }
+        public void OnPointerMove(Vector2 position) => _currentState.OnPointerMove(position);
 
         #endregion
 
@@ -217,5 +211,38 @@ namespace Managers
                 winUI.Show();
             }
         }
+
+
+        #region States
+
+        private class DoAbilityState : IGameState
+        {
+            public void OnPointerMove(Vector3 position)
+            {
+                return;
+            }
+        }
+
+        private class DefaultState : IGameState
+        {
+            private GameManager _gameManager;
+
+            public DefaultState(GameManager gameManager) => _gameManager = gameManager;
+
+            public void OnPointerMove(Vector3 position)
+            {
+                if (_gameManager._selectedBlockContainer != null)
+                {
+                    var cellPos = PositionConverters.ScreenToWorldPosition(position, _gameManager._camera,
+                        _gameManager.groundLayerMask);
+                    if (cellPos != null)
+                    {
+                        _gameManager._selectedBlockContainer.SetPosition(cellPos.Value);
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }
