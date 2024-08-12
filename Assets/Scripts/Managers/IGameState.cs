@@ -5,5 +5,7 @@ namespace Managers
     public interface IGameState
     {
         public void OnPointerMove(Vector3 position);
+
+        public void OnContainerPointerDown();
     }
 }

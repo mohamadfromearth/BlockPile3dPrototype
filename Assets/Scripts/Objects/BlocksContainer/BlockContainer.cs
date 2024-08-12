@@ -333,13 +333,11 @@ namespace Objects.BlocksContainer
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (IsPlaced == true) return;
             Channel.Rise<CellContainerPointerDown>(new CellContainerPointerDown(this));
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (IsPlaced == true) return;
             Channel.Rise<CellContainerPointerUp>(new CellContainerPointerUp(this));
         }
 

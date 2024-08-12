@@ -42,7 +42,8 @@ namespace Managers
 
         private IGameState _currentState;
         private DefaultState _defaultState;
-        private DoAbilityState _doAbilityState;
+        private PunchState _punchState;
+        private SwapState _swapState;
 
 
         private void Awake()
@@ -52,7 +53,8 @@ namespace Managers
             Application.targetFrameRate = 60;
 
             _defaultState = new DefaultState(this);
-            _doAbilityState = new DoAbilityState();
+            _punchState = new PunchState(this);
+            _swapState = new SwapState(this);
             _currentState = _defaultState;
         }
 
@@ -96,6 +98,10 @@ namespace Managers
             _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
 
             winUI.AddNextLevelClickListener(OnNextLevel);
+
+            gameUI.AddPunchClickListener(OnGoToPunchState);
+            gameUI.AddSwapButtonClickListener(OnGoToSwapState);
+            gameUI.AddRefreshButtonClickListener(OnRefreshSelectionBar);
         }
 
         private void UnSubscribeToEvents()
@@ -109,18 +115,16 @@ namespace Managers
 
 
             winUI.RemoveNextLevelClickListener(OnNextLevel);
+
+            gameUI.RemovePunchClickListener(OnGoToPunchState);
+            gameUI.AddSwapButtonClickListener(OnGoToSwapState);
+            gameUI.AddRefreshButtonClickListener(OnRefreshSelectionBar);
         }
 
 
         #region Subscribers
 
-        private void OnCellContainerPointerDown()
-        {
-            _selectedBlockContainer = _channel.GetData<CellContainerPointerDown>().BlockContainer;
-
-            _selectionBarSelectedIndex =
-                ListUtils.GetIndex(_selectedBlockContainer.GetPosition(), _selectionBarCellContainerPosList);
-        }
+        private void OnCellContainerPointerDown() => _currentState.OnContainerPointerDown();
 
         private void OnCellContainerPointerUp()
         {
@@ -200,6 +204,24 @@ namespace Managers
 
         public void OnPointerMove(Vector2 position) => _currentState.OnPointerMove(position);
 
+
+        public void OnGoToPunchState()
+        {
+            gameUI.HideAbilityBar();
+            _currentState = _punchState;
+        }
+
+        public void OnGoToSwapState()
+        {
+            gameUI.HideAbilityBar();
+            _currentState = _swapState;
+        }
+
+
+        public void OnRefreshSelectionBar()
+        {
+        }
+
         #endregion
 
 
@@ -215,11 +237,74 @@ namespace Managers
 
         #region States
 
-        private class DoAbilityState : IGameState
+        private class PunchState : IGameState
         {
+            private GameManager _gameManager;
+            public PunchState(GameManager gameManager) => _gameManager = gameManager;
+
             public void OnPointerMove(Vector3 position)
             {
-                return;
+            }
+
+            public void OnContainerPointerDown()
+            {
+                var containerBlock = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
+                _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+                containerBlock.Destroy(true);
+                _gameManager.gameUI.ShowAbilityBar();
+                _gameManager._currentState = _gameManager._defaultState;
+            }
+        }
+
+        private class SwapState : IGameState
+        {
+            private GameManager _gameManager;
+
+            public SwapState(GameManager gameManager)
+            {
+                _gameManager = gameManager;
+            }
+
+            private IBlockContainer _firstSelectedBlockContainer = null;
+
+            public void OnPointerMove(Vector3 position)
+            {
+            }
+
+            public void OnContainerPointerDown()
+            {
+                var container = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
+
+                if (container.IsPlaced == false) return;
+
+                if (_firstSelectedBlockContainer == null)
+                {
+                    _firstSelectedBlockContainer = container;
+
+                    return;
+                }
+
+                if (container != _firstSelectedBlockContainer)
+                {
+                    var firstPos = _firstSelectedBlockContainer.GetPosition();
+                    var secondPos = container.GetPosition();
+                    _firstSelectedBlockContainer.SetPosition(secondPos);
+                    container.SetPosition(firstPos);
+                    _gameManager._board.AddBlockContainer(_firstSelectedBlockContainer, secondPos);
+                    _gameManager._board.AddBlockContainer(container, firstPos);
+
+                    _gameManager.StartCoroutine(
+                        _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(firstPos), true));
+
+                    _gameManager.StartCoroutine(
+                        _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(secondPos),
+                            true));
+
+                    _gameManager.gameUI.ShowAbilityBar();
+                    _gameManager._currentState = _gameManager._defaultState;
+
+                    _firstSelectedBlockContainer = null;
+                }
             }
         }
 
@@ -240,6 +325,18 @@ namespace Managers
                         _gameManager._selectedBlockContainer.SetPosition(cellPos.Value);
                     }
                 }
+            }
+
+            public void OnContainerPointerDown()
+            {
+                var container = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
+                if (container.IsPlaced) return;
+
+                _gameManager._selectedBlockContainer = container;
+
+                _gameManager._selectionBarSelectedIndex =
+                    ListUtils.GetIndex(_gameManager._selectedBlockContainer.GetPosition(),
+                        _gameManager._selectionBarCellContainerPosList);
             }
         }
 
