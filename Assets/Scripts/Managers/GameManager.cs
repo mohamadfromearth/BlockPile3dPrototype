@@ -40,10 +40,10 @@ namespace Managers
 
         private float _currentScore;
 
-        private IGameState _currentState;
         private DefaultState _defaultState;
         private PunchState _punchState;
         private SwapState _swapState;
+        private StateManager _stateManager = new();
 
 
         private void Awake()
@@ -55,7 +55,7 @@ namespace Managers
             _defaultState = new DefaultState(this);
             _punchState = new PunchState(this);
             _swapState = new SwapState(this);
-            _currentState = _defaultState;
+            _stateManager.State = _defaultState;
         }
 
 
@@ -124,7 +124,7 @@ namespace Managers
 
         #region Subscribers
 
-        private void OnCellContainerPointerDown() => _currentState.OnContainerPointerDown();
+        private void OnCellContainerPointerDown() => _stateManager.State.OnContainerPointerDown();
 
         private void OnCellContainerPointerUp()
         {
@@ -202,19 +202,17 @@ namespace Managers
             lockBlock.Destroy();
         }
 
-        public void OnPointerMove(Vector2 position) => _currentState.OnPointerMove(position);
+        public void OnPointerMove(Vector2 position) => _stateManager.State.OnPointerMove(position);
 
 
         public void OnGoToPunchState()
         {
-            gameUI.HideAbilityBar();
-            _currentState = _punchState;
+            _stateManager.ChangeState(_punchState);
         }
 
         public void OnGoToSwapState()
         {
-            gameUI.HideAbilityBar();
-            _currentState = _swapState;
+            _stateManager.ChangeState(_swapState);
         }
 
 
@@ -242,6 +240,14 @@ namespace Managers
             private GameManager _gameManager;
             public PunchState(GameManager gameManager) => _gameManager = gameManager;
 
+            public void OnEnter()
+            {
+            }
+
+            public void OnExit()
+            {
+            }
+
             public void OnPointerMove(Vector3 position)
             {
             }
@@ -251,8 +257,7 @@ namespace Managers
                 var containerBlock = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
                 _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
                 containerBlock.Destroy(true);
-                _gameManager.gameUI.ShowAbilityBar();
-                _gameManager._currentState = _gameManager._defaultState;
+                _gameManager._stateManager.ChangeState(_gameManager._defaultState);
             }
         }
 
@@ -266,6 +271,15 @@ namespace Managers
             }
 
             private IBlockContainer _firstSelectedBlockContainer = null;
+
+            public void OnEnter()
+            {
+            }
+
+            public void OnExit()
+            {
+                _firstSelectedBlockContainer = null;
+            }
 
             public void OnPointerMove(Vector3 position)
             {
@@ -300,10 +314,8 @@ namespace Managers
                         _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(secondPos),
                             true));
 
-                    _gameManager.gameUI.ShowAbilityBar();
-                    _gameManager._currentState = _gameManager._defaultState;
+                    _gameManager._stateManager.ChangeState(_gameManager._defaultState);
 
-                    _firstSelectedBlockContainer = null;
                 }
             }
         }
@@ -313,6 +325,16 @@ namespace Managers
             private GameManager _gameManager;
 
             public DefaultState(GameManager gameManager) => _gameManager = gameManager;
+
+            public void OnEnter()
+            {
+                _gameManager.gameUI.ShowAbilityBar();
+            }
+
+            public void OnExit()
+            {
+                _gameManager.gameUI.HideAbilityBar();
+            }
 
             public void OnPointerMove(Vector3 position)
             {
@@ -337,6 +359,19 @@ namespace Managers
                 _gameManager._selectionBarSelectedIndex =
                     ListUtils.GetIndex(_gameManager._selectedBlockContainer.GetPosition(),
                         _gameManager._selectionBarCellContainerPosList);
+            }
+        }
+
+
+        private class StateManager
+        {
+            public IGameState State;
+
+            public void ChangeState(IGameState gameState)
+            {
+                State.OnExit();
+                State = gameState;
+                State.OnEnter();
             }
         }
 
