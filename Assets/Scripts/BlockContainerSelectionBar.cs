@@ -12,6 +12,8 @@ public class BlockContainerSelectionBar
     [Inject] private ColorRepository _colorRepository;
     private readonly List<Vector3> _containersPositionList;
 
+    private IBlockContainer[] _blockContainers = new IBlockContainer[3];
+
 
     public int Count { get; private set; }
 
@@ -63,11 +65,15 @@ public class BlockContainerSelectionBar
         //     }
         // }  
 
-        foreach (var position in _containersPositionList)
+        for (int positionIndex = 0; positionIndex < _containersPositionList.Count; positionIndex++)
         {
-            var container = _blockContainerFactory.Create();
-            container.SetPosition(position);
+            var position = _containersPositionList[positionIndex];
 
+            var container = _blockContainerFactory.Create();
+
+            _blockContainers[positionIndex] = container;
+
+            container.SetPosition(position);
 
             var colorsCount = Random.Range(2, 4);
 
@@ -88,6 +94,25 @@ public class BlockContainerSelectionBar
                 }
             }
         }
+    }
+
+    public void Clear()
+    {
+        for (int i = 0; i < _blockContainers.Length; i++)
+        {
+            var container = _blockContainers[i];
+            if (container.IsPlaced == false)
+            {
+                container.Destroy(true);
+                _blockContainers[i] = null;
+            }
+        }
+    }
+
+    public void Refresh(List<string> colors)
+    {
+        Clear();
+        Spawn(colors);
     }
 
     public void Decrease() => Count--;

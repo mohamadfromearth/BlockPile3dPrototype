@@ -218,6 +218,7 @@ namespace Managers
 
         public void OnRefreshSelectionBar()
         {
+            _selectionBar.Refresh(_levelRepository.GetLevelData().colors);
         }
 
         #endregion
@@ -315,7 +316,6 @@ namespace Managers
                             true));
 
                     _gameManager._stateManager.ChangeState(_gameManager._defaultState);
-
                 }
             }
         }
