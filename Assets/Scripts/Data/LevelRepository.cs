@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Data
 {
@@ -10,7 +9,7 @@ namespace Data
         [SerializeField] private List<LevelDataSo> levelDataList;
 
 
-         public int levelIndex;
+        public int levelIndex;
 
 
         public LevelDataSo GetLevelData() => levelDataList[levelIndex];
@@ -18,6 +17,7 @@ namespace Data
         public void NextLevel()
         {
             if (levelIndex < levelDataList.Count - 1) levelIndex++;
+            else levelIndex = 0;
         }
     }
 }

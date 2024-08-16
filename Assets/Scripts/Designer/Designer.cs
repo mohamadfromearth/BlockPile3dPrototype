@@ -1,3 +1,5 @@
+/*
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using Data;
 using Event;
@@ -417,3 +419,7 @@ namespace Designer
         #endregion
     }
 }
+#endif
+*/
+
+

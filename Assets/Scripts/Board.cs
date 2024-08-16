@@ -6,6 +6,7 @@ using Objects.LockBlock;
 using UnityEngine;
 using Zenject;
 
+
 public class Board
 {
     private readonly Grid _grid;
@@ -19,6 +20,9 @@ public class Board
 
     private Dictionary<Vector3Int, ICell> _cellsDic = new();
 
+    private int _cellItemsCount;
+
+    public bool IsFilled => _cellItemsCount >= _cellsDic.Count;
 
     public Board(int width, int height, Grid grid)
     {
@@ -73,12 +77,14 @@ public class Board
 
         if (_cellsDic.TryGetValue(gridPos, out var cell))
         {
+            _cellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
+            Debug.Log("CellItemCount is :" + _cellItemsCount);
+
             cell.CanPlaceItem = blockContainer == null;
-
-
             cell.BlockContainer = blockContainer;
         }
     }
+
 
     public void AddBlockContainer(IBlockContainer blockContainer, Vector3Int gridPosition)
     {
@@ -93,6 +99,9 @@ public class Board
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
+            _cellItemsCount += BoardHelpers.GetItemsCountModifier(advertiseBlock, cell);
+            Debug.Log("CellItemCount is :" + _cellItemsCount);
+
             cell.CanPlaceItem = advertiseBlock == null;
 
             cell.AdvertiseBlock = advertiseBlock;
@@ -116,6 +125,9 @@ public class Board
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
+            _cellItemsCount += BoardHelpers.GetItemsCountModifier(lockBlock, cell);
+            Debug.Log("CellItemCount is :" + _cellItemsCount);
+
             cell.LockBlock = lockBlock;
             cell.CanPlaceItem = lockBlock == null;
         }
@@ -129,6 +141,8 @@ public class Board
 
     public void Clear()
     {
+        _cellItemsCount = 0;
+
         for (int x = 0; x < Width; x++)
         {
             for (int z = 0; z < Height; z++)
