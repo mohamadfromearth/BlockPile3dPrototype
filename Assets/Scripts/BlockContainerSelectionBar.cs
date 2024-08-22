@@ -104,7 +104,7 @@ public class BlockContainerSelectionBar
             if (container.IsPlaced == false)
             {
                 container.Destroy(true);
-                _blockContainers[i] = null;
+                _blockContainers[i] = null;  
             }
         }
     }

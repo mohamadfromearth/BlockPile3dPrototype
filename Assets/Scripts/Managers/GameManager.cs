@@ -26,10 +26,14 @@ namespace Managers
         private List<Vector3> _selectionBarCellContainerPosList = new();
         [SerializeField] private GameManagerHelpers helpers;
         [SerializeField] private BlocksMatcher blocksMatcher;
+        [SerializeField] private Grid grid;
 
         [Inject] private Board _board;
         [Inject] private EventChannel _channel;
         [Inject] private ILevelRepository _levelRepository;
+        [Inject] private MainRepository _mainRepository;
+        [Inject] private AbilityRepository _abilityRepository;
+        [Inject] private CurrencyRepository _currencyRepository;
         [Inject] private BlockContainerSelectionBar _selectionBar;
         [Inject] private BlockContainersPlacer _blockContainersPlacer;
         [Inject] private Placer _placer;
@@ -41,11 +45,8 @@ namespace Managers
 
         private float _currentScore;
 
-        private DefaultState _defaultState;
-        private PunchState _punchState;
-        private SwapState _swapState;
-        private GetAnotherChanceState _getAnotherChanceState;
-        private StateManager _stateManager = new();
+
+        private StateManager _stateManager;
 
 
         private void Awake()
@@ -54,29 +55,17 @@ namespace Managers
 
             Application.targetFrameRate = 60;
 
-            _defaultState = new DefaultState(this);
-            _punchState = new PunchState(this);
-            _swapState = new SwapState(this);
-            _getAnotherChanceState = new GetAnotherChanceState(this);
-            _stateManager.State = _defaultState;
+            _stateManager = new StateManager(this);
         }
 
 
         private void Start()
         {
             _selectionBarCellContainerPosList = selectionBarCellContainerTransformList.Select(t => t.position).ToList();
-            _selectionBar.Spawn(_levelRepository.GetLevelData().colors);
 
-            var levelData = _levelRepository.GetLevelData();
-            _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
+            StartLevel();
 
-            _placer.Place();
-
-
-            gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
-            gameUI.SetProgress(0);
-
-            _cameraSizeSetter.RefreshSize();
+            helpers.UpdateAbilityButtons(gameUI);
         }
 
         private void OnEnable()
@@ -103,9 +92,12 @@ namespace Managers
             loseUI.AddRetryClickListener(OnRetry);
             loseUI.AddGetChanceClickListener(OnGetAnotherChance);
 
-            gameUI.AddPunchClickListener(OnGoToPunchState);
-            gameUI.AddSwapButtonClickListener(OnGoToSwapState);
+            gameUI.AddPunchClickListener(OnPunch);
+            gameUI.AddSwapButtonClickListener(OnSwap);
             gameUI.AddRefreshButtonClickListener(OnRefreshSelectionBar);
+            gameUI.AddBuyAbilityClickListener(OnBuyAbility);
+            gameUI.AddWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
+            gameUI.AddAbilityCancelClickListener(OnAbilityCancel);
         }
 
         private void UnSubscribeToEvents()
@@ -122,15 +114,18 @@ namespace Managers
             loseUI.RemoveRetryClickListener(OnRetry);
             loseUI.RemoveGetChanceClickListener(OnGetAnotherChance);
 
-            gameUI.RemovePunchClickListener(OnGoToPunchState);
-            gameUI.AddSwapButtonClickListener(OnGoToSwapState);
-            gameUI.AddRefreshButtonClickListener(OnRefreshSelectionBar);
+            gameUI.RemovePunchClickListener(OnPunch);
+            gameUI.RemoveSwapButtonClickListener(OnSwap);
+            gameUI.RemoveRefreshButtonClickListener(OnRefreshSelectionBar);
+            gameUI.RemoveBuyAbilityClickListener(OnBuyAbility);
+            gameUI.RemoveWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
+            gameUI.RemoveAbilityCancelButtonListener(OnAbilityCancel);
         }
 
 
         #region Subscribers
 
-        private void OnCellContainerPointerDown() => _stateManager.State.OnContainerPointerDown();
+        private void OnCellContainerPointerDown() => _stateManager.OnContainerPointerDown();
 
         private void OnCellContainerPointerUp()
         {
@@ -148,6 +143,7 @@ namespace Managers
                     _selectedBlockContainer.SetPosition(holder.GetPosition());
 
                     _board.AddBlockContainer(_selectedBlockContainer, pos);
+                    _selectedBlockContainer.SetParent(grid.transform);
 
                     var boardPosition = _board.WorldToCell(holder.GetPosition());
                     blocksMatcher.StartMatchingPosition = boardPosition;
@@ -191,9 +187,11 @@ namespace Managers
         private void OnNextLevel()
         {
             _board.Clear();
+            _selectionBar.Clear();
             _levelRepository.NextLevel();
             winUI.Hide();
-            ResetLevel();
+            StartLevel();
+            helpers.UpdateAbilityButtons(gameUI);
         }
 
 
@@ -210,35 +208,89 @@ namespace Managers
             CheckLose();
         }
 
-        public void OnPointerMove(Vector2 position) => _stateManager.State.OnPointerMove(position);
+        public void OnPointerMove(Vector2 position) => _stateManager.OnPointerMove(position);
 
 
-        private void OnGoToPunchState()
+        private void OnPunch()
         {
-            _stateManager.ChangeState(_punchState);
+            if (_abilityRepository.GetAbilityData(AbilityType.Punch).count == 0)
+            {
+                gameUI.ShowBuyingAbilityDialog(_abilityRepository.GetAbilityData(AbilityType.Punch));
+            }
+            else
+            {
+                _stateManager.ChangeState(GameStateType.Punch);
+            }
         }
 
-        private void OnGoToSwapState()
+        private void OnSwap()
         {
-            _stateManager.ChangeState(_swapState);
+            if (_abilityRepository.GetAbilityData(AbilityType.Swap).count == 0)
+            {
+                gameUI.ShowBuyingAbilityDialog(_abilityRepository.GetAbilityData(AbilityType.Swap));
+            }
+            else
+            {
+                _stateManager.ChangeState(GameStateType.Swap);
+            }
         }
 
 
         private void OnRefreshSelectionBar()
         {
-            _selectionBar.Refresh(_levelRepository.GetLevelData().colors);
+            if (_abilityRepository.GetAbilityData(AbilityType.Refresh).count == 0)
+            {
+                gameUI.ShowBuyingAbilityDialog(_abilityRepository.GetAbilityData(AbilityType.Refresh));
+            }
+            else
+            {
+                _selectionBar.Refresh(_levelRepository.GetLevelData().colors);
+                _abilityRepository.RemoveAbility(AbilityType.Refresh, 1);
+                helpers.UpdateAbilityButtons(gameUI);
+            }
         }
 
         private void OnRetry()
         {
-            ResetLevel();
+            _board.Clear();
+            _selectionBar.Clear();
+            StartLevel();
             loseUI.Hide();
         }
 
         private void OnGetAnotherChance()
         {
             loseUI.Hide();
-            _stateManager.ChangeState(_getAnotherChanceState);
+            _stateManager.ChangeState(GameStateType.GetAnotherChance);
+        }
+
+
+        private void OnAbilityCancel() => _stateManager.ChangeState(GameStateType.Default);
+
+        private void OnBuyAbility()
+        {
+            if (_currencyRepository.GetCoin() >= gameUI.AbilityData.cost)
+            {
+                _abilityRepository.AddAbility(gameUI.AbilityData.type, 1);
+                helpers.UpdateAbilityButtons(gameUI);
+                _stateManager.ChangeState(gameUI.AbilityData.type.GameStateType());
+                _currencyRepository.RemoveCoin(gameUI.AbilityData.cost);
+                gameUI.SetCoinText("Coin" + _currencyRepository.GetCoin());
+            }
+            else
+            {
+                // TODO not implemented
+            }
+
+            gameUI.HideBuyingAbilityDialog();
+        }
+
+        private void OnWatchAdToGetAbility()
+        {
+            _abilityRepository.AddAbility(gameUI.AbilityData.type, 1);
+            helpers.UpdateAbilityButtons(gameUI);
+            _stateManager.ChangeState(gameUI.AbilityData.type.GameStateType());
+            gameUI.HideBuyingAbilityDialog();
         }
 
         #endregion
@@ -246,10 +298,16 @@ namespace Managers
 
         private bool CheckWin()
         {
-            if (_currentScore >= _levelRepository.GetLevelData().targetScore)
+            var levelData = _levelRepository.GetLevelData();
+
+            if (_currentScore >= levelData.targetScore)
             {
                 _currentScore = 0;
                 winUI.Show();
+
+                _currencyRepository.AddCoin(levelData.coinReward);
+                gameUI.SetCoinText("Coin:" + _currencyRepository.GetCoin());
+
                 return true;
             }
 
@@ -267,17 +325,16 @@ namespace Managers
             return false;
         }
 
-        private void ResetLevel()
+        private void StartLevel()
         {
-            _board.Clear();
             var levelData = _levelRepository.GetLevelData();
+            _selectionBar.Spawn(levelData.colors);
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
             _placer.Place();
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
             _cameraSizeSetter.RefreshSize();
         }
-
 
         #region States
 
@@ -288,10 +345,12 @@ namespace Managers
 
             public void OnEnter()
             {
+                _gameManager.gameUI.ShowAbilityCancelButton();
             }
 
             public void OnExit()
             {
+                _gameManager.gameUI.HideAbilityCancelButton();
             }
 
             public void OnPointerMove(Vector3 position)
@@ -303,7 +362,10 @@ namespace Managers
                 var containerBlock = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
                 _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
                 containerBlock.Destroy(true);
-                _gameManager._stateManager.ChangeState(_gameManager._defaultState);
+
+                _gameManager._abilityRepository.RemoveAbility(AbilityType.Punch, 1);
+
+                _gameManager._stateManager.ChangeState(GameStateType.Default);
             }
         }
 
@@ -320,10 +382,12 @@ namespace Managers
 
             public void OnEnter()
             {
+                _gameManager.gameUI.ShowAbilityCancelButton();
             }
 
             public void OnExit()
             {
+                _gameManager.gameUI.HideAbilityCancelButton();
                 _firstSelectedBlockContainer = null;
             }
 
@@ -360,7 +424,10 @@ namespace Managers
                         _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(secondPos),
                             true));
 
-                    _gameManager._stateManager.ChangeState(_gameManager._defaultState);
+
+                    _gameManager._abilityRepository.RemoveAbility(AbilityType.Swap, 1);
+
+                    _gameManager._stateManager.ChangeState(GameStateType.Default);
                 }
             }
         }
@@ -371,15 +438,11 @@ namespace Managers
 
             public DefaultState(GameManager gameManager) => _gameManager = gameManager;
 
-            public void OnEnter()
-            {
-                _gameManager.gameUI.ShowAbilityBar();
-            }
+            public void OnEnter() => _gameManager.gameUI.Show();
 
-            public void OnExit()
-            {
-                _gameManager.gameUI.HideAbilityBar();
-            }
+
+            public void OnExit() => _gameManager.gameUI.Hide();
+
 
             public void OnPointerMove(Vector3 position)
             {
@@ -445,21 +508,44 @@ namespace Managers
                 _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
                 containerBlock.Destroy(true);
 
-                _gameManager._stateManager.ChangeState(_gameManager._defaultState);
+                _gameManager._stateManager.ChangeState(GameStateType.Default);
             }
         }
 
 
-        private class StateManager
+        private class StateManager : IGameState
         {
-            public IGameState State;
+            private Dictionary<GameStateType, IGameState> _gameStates;
+            private IGameState _state;
 
-            public void ChangeState(IGameState gameState)
+
+            public StateManager(GameManager gameManager)
             {
-                State.OnExit();
-                State = gameState;
-                State.OnEnter();
+                _gameStates = new Dictionary<GameStateType, IGameState>()
+                {
+                    { GameStateType.Punch, new PunchState(gameManager) },
+                    { GameStateType.Default, new DefaultState(gameManager) },
+                    { GameStateType.Swap, new SwapState(gameManager) },
+                    { GameStateType.GetAnotherChance, new GetAnotherChanceState(gameManager) },
+                };
+
+                _state = _gameStates[GameStateType.Default];
             }
+
+            public void ChangeState(GameStateType type)
+            {
+                OnExit();
+                _state = _gameStates[type];
+                OnEnter();
+            }
+
+            public void OnEnter() => _state.OnEnter();
+
+            public void OnExit() => _state.OnExit();
+
+            public void OnPointerMove(Vector3 position) => _state.OnPointerMove(position);
+
+            public void OnContainerPointerDown() => _state.OnContainerPointerDown();
         }
 
         #endregion

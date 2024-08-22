@@ -25,6 +25,8 @@ namespace Data
 
     public interface ILevelRepository
     {
+        public int LevelIndex { get; }
+
         public LevelDataSo GetLevelData();
 
         public void NextLevel();

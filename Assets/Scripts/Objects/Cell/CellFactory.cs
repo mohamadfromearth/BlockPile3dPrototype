@@ -10,14 +10,17 @@ namespace Objects.Cell
 
         [Inject] private EventChannel _channel;
 
-        public CellFactory(DefaultCell defaultCellPrefab)
+        private Transform _parent;
+
+        public CellFactory(DefaultCell defaultCellPrefab, Transform parent)
         {
             _defaultCellPrefab = defaultCellPrefab;
+            _parent = parent;           
         }
 
         public ICell Create()
         {
-            var cell = Object.Instantiate(_defaultCellPrefab);
+            var cell = Object.Instantiate(_defaultCellPrefab, _parent);
             cell.Channel = _channel;
             return cell;
         }

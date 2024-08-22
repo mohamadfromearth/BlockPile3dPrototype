@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Objects.BlocksContainer
 {
-    public interface IBlockContainer : IPosition, IGameObject
+    public interface IBlockContainer : IPosition, IGameObject, IParent
     {
         public void Push(IBlock block);
 

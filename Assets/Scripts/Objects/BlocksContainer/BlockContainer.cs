@@ -80,6 +80,8 @@ namespace Objects.BlocksContainer
             return blocksBuffers.Count * destroyRate + 0.5f;
         }
 
+        public void SetParent(Transform parent) => transform.SetParent(parent);
+
         private void KillTweens()
         {
             _rotateTween?.Kill();

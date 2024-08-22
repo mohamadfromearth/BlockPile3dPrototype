@@ -12,8 +12,6 @@ namespace Objects.Cell
         public IBlockContainer BlockContainer { get; set; }
         public IAdvertiseBlock AdvertiseBlock { get; set; }
         public ILockBlock LockBlock { get; set; }
-
-
         public void Destroy();
     }
 }

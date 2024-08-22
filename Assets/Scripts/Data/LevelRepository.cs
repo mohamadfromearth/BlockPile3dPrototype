@@ -9,15 +9,17 @@ namespace Data
         [SerializeField] private List<LevelDataSo> levelDataList;
 
 
-        public int levelIndex;
+        private int _levelIndex;
+
+        public int LevelIndex => _levelIndex;
 
 
-        public LevelDataSo GetLevelData() => levelDataList[levelIndex];
+        public LevelDataSo GetLevelData() => levelDataList[_levelIndex];
 
         public void NextLevel()
         {
-            if (levelIndex < levelDataList.Count - 1) levelIndex++;
-            else levelIndex = 0;
+            if (_levelIndex < levelDataList.Count - 1) _levelIndex++;
+            else _levelIndex = 0;
         }
     }
 }

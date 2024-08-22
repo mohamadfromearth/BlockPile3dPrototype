@@ -1,13 +1,16 @@
 using System.Collections.Generic;
-using Cinemachine;
 using Data;
 using Objects.BlocksContainer;
+using UI;
 using UnityEngine;
 using Zenject;
 
 public class GameManagerHelpers : MonoBehaviour
 {
     [Inject] private ILevelRepository _levelRepository;
+    [Inject] private MainRepository _mainRepository;
+    [Inject] private AbilityRepository _abilityRepository;
+    [Inject] private CurrencyRepository _currencyRepository;
     [Inject] private Board _board;
 
     private Vector3Int[] _horizontalGridOffsets = new[]
@@ -69,5 +72,19 @@ public class GameManagerHelpers : MonoBehaviour
 
         return blockContainers;
     }
-    
+
+    public void UpdateAbilityButtons(GameUI gameUI)
+    {
+        gameUI.SetPunchIntractable(_levelRepository.LevelIndex >=
+                                   _abilityRepository.GetAbilityData(AbilityType.Punch).unLockLevel);
+        gameUI.SetSwapIntractable(_levelRepository.LevelIndex >=
+                                  _abilityRepository.GetAbilityData(AbilityType.Swap).unLockLevel);
+        gameUI.SetRefreshIntractable(_levelRepository.LevelIndex >=
+                                     _abilityRepository.GetAbilityData(AbilityType.Refresh).unLockLevel);
+
+        gameUI.SetCoinText("Coin:" + _currencyRepository.GetCoin());
+        gameUI.SetPunchButtonText("Punch" + _abilityRepository.GetAbilityData(AbilityType.Punch).count);
+        gameUI.SetSwapButtonText("Swap" + _abilityRepository.GetAbilityData(AbilityType.Swap).count);
+        gameUI.SetRefreshButtonText("Refresh" + _abilityRepository.GetAbilityData(AbilityType.Refresh).count);
+    }
 }

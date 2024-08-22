@@ -33,6 +33,9 @@ namespace Di
         [SerializeField] private ColorRepository colorRepository;
         [SerializeField] private BoardDataList boardData;
         [SerializeField] private List<Color> levelColors;
+        [SerializeField] private MainRepository mainRepository;
+        [SerializeField] private AbilityRepository abilityRepository;
+        [SerializeField] private CurrencyRepository currencyRepository;
 
         [SerializeField] private Grid grid;
 
@@ -55,7 +58,7 @@ namespace Di
             Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefab);
 
             Container.Bind<ICellFactory>().To<CellFactory>().AsSingle()
-                .WithArguments(defaultCellPrefab).NonLazy();
+                .WithArguments(defaultCellPrefab, grid.transform).NonLazy();
 
             Container.Bind<IBlockContainerFactory>().To<BlockContainerFactory>().AsSingle()
                 .WithArguments(blockContainerPrefab);
@@ -76,6 +79,12 @@ namespace Di
 
 
             Container.Bind<ILevelRepository>().FromInstance(levelRepository).AsSingle();
+
+            Container.Bind<MainRepository>().FromInstance(mainRepository).AsSingle();
+
+            Container.Bind<AbilityRepository>().FromInstance(abilityRepository).AsSingle();
+
+            Container.Bind<CurrencyRepository>().FromInstance(currencyRepository).AsSingle();
 
             #endregion
 

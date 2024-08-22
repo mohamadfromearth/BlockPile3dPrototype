@@ -134,6 +134,17 @@ public class Board
     }
 
 
+    public Vector3 GetBoardCenter()
+    {
+        int halfWidth = Width / 2;
+        Vector3Int centerCell = new Vector3Int(halfWidth, 0, halfWidth);
+        Vector3 centerPos = CellToWorld(centerCell);
+        centerPos.x -= 0.55f;
+        centerPos.z -= 0.55f;
+        return centerPos;
+    }
+
+
     public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
 
     public Vector3 CellToWorld(Vector3Int cellPosition) => _grid.CellToWorld(cellPosition);

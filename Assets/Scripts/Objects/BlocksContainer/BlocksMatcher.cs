@@ -5,6 +5,7 @@ using Data;
 using Event;
 using Objects.Block;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 using Zenject;
 
 namespace Objects.BlocksContainer
@@ -196,13 +197,15 @@ namespace Objects.BlocksContainer
                         yield return UpdateBoardRoutine(_blocksToMatchQueue.Dequeue(), true, false);
                     }
 
-                    _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
+                    //   _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
                 }
             }
             else
             {
                 _areBlocksMatching = false;
             }
+
+            if (isStaringPoint) _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
         }
 
 
