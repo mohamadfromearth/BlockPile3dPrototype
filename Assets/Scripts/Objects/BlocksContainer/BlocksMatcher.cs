@@ -5,7 +5,6 @@ using Data;
 using Event;
 using Objects.Block;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using Zenject;
 
 namespace Objects.BlocksContainer
@@ -118,11 +117,12 @@ namespace Objects.BlocksContainer
 
 
         public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition, bool isStaringPoint = false,
-            bool isLastIndex = false)
+            bool isLastIndex = false, bool isFromQueue = false)
         {
             if (_areBlocksMatching)
             {
                 _blocksToMatchQueue.Enqueue(boardPosition);
+                Debug.Log("Blocks are matching !");
 
                 yield break;
             }
@@ -166,7 +166,7 @@ namespace Objects.BlocksContainer
                     }
                 }
 
-                if (isStaringPoint || isLastIndex)
+                if (isStaringPoint || isLastIndex || isFromQueue)
                 {
                     for (int i = 0; i < _blocksToMatch.Count; i++)
                     {
@@ -188,24 +188,21 @@ namespace Objects.BlocksContainer
                     }
                 }
 
-                if (isStaringPoint)
+                if (isStaringPoint || isFromQueue)
                 {
-                    _areBlocksMatching = false;
-
                     while (_blocksToMatchQueue.Count > 0)
                     {
-                        yield return UpdateBoardRoutine(_blocksToMatchQueue.Dequeue(), true, false);
+                        _areBlocksMatching = false;
+                        yield return UpdateBoardRoutine(_blocksToMatchQueue.Dequeue(), false, false, true);
                     }
-
-                    //   _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
                 }
             }
-            else
+
+            if (isStaringPoint)
             {
                 _areBlocksMatching = false;
+                _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
             }
-
-            if (isStaringPoint) _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
         }
 
 

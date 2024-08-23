@@ -127,6 +127,7 @@ namespace Managers
 
         private void OnCellContainerPointerDown() => _stateManager.OnContainerPointerDown();
 
+
         private void OnCellContainerPointerUp()
         {
             if (_selectedBlockContainer != null)
@@ -147,7 +148,8 @@ namespace Managers
 
                     var boardPosition = _board.WorldToCell(holder.GetPosition());
                     blocksMatcher.StartMatchingPosition = boardPosition;
-                    StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition, true));
+                    StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition,
+                        true));
 
                     _selectedBlockContainer = null;
 
@@ -209,6 +211,10 @@ namespace Managers
         }
 
         public void OnPointerMove(Vector2 position) => _stateManager.OnPointerMove(position);
+
+        public void OnPointerUp()
+        {
+        }
 
 
         private void OnPunch()
@@ -357,6 +363,7 @@ namespace Managers
             {
             }
 
+
             public void OnContainerPointerDown()
             {
                 var containerBlock = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
@@ -394,6 +401,7 @@ namespace Managers
             public void OnPointerMove(Vector3 position)
             {
             }
+
 
             public void OnContainerPointerDown()
             {
@@ -436,7 +444,13 @@ namespace Managers
         {
             private GameManager _gameManager;
 
-            public DefaultState(GameManager gameManager) => _gameManager = gameManager;
+            private float _previousX = float.NaN;
+
+            public DefaultState(GameManager gameManager)
+            {
+                _gameManager = gameManager;
+                _gameManager._channel.Subscribe<PointerUp>(OnPointerUp);
+            }
 
             public void OnEnter() => _gameManager.gameUI.Show();
 
@@ -448,12 +462,43 @@ namespace Managers
             {
                 if (_gameManager._selectedBlockContainer != null)
                 {
-                    var cellPos = PositionConverters.ScreenToWorldPosition(position, _gameManager._camera,
-                        _gameManager.groundLayerMask);
-                    if (cellPos != null)
-                    {
-                        _gameManager._selectedBlockContainer.SetPosition(cellPos.Value);
-                    }
+                    MoveSelectedContainer(position);
+                }
+                else
+                {
+                    RotateBoard(position);
+                }
+            }
+
+
+            private void RotateBoard(Vector3 position)
+            {
+                if (float.IsNaN(_previousX))
+                {
+                    _previousX = position.x;
+                    return;
+                }
+
+                _gameManager._board.Rotate((position.x - _previousX));
+                _previousX = position.x;
+            }
+
+            private void MoveSelectedContainer(Vector3 position)
+            {
+                var cellPos = PositionConverters.ScreenToWorldPosition(position, _gameManager._camera,
+                    _gameManager.groundLayerMask);
+                if (cellPos != null)
+                {
+                    _gameManager._selectedBlockContainer.SetPosition(cellPos.Value);
+                }
+            }
+
+            private void OnPointerUp()
+            {
+                _previousX = float.NaN;
+                if (_gameManager._selectedBlockContainer == null)
+                {
+                    _gameManager._board.SnapRotation();
                 }
             }
 

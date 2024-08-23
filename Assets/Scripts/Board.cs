@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using Objects.AdvertiseBlock;
 using Objects.BlocksContainer;
 using Objects.Cell;
@@ -6,10 +7,11 @@ using Objects.LockBlock;
 using UnityEngine;
 using Zenject;
 
-
 public class Board
 {
     private readonly Grid _grid;
+    private readonly Transform _pivot;
+    private readonly float[] snapAngles = { 90f, 180f, 270f, 360f };
 
     public int Width { get; private set; }
     public int Height { get; private set; }
@@ -24,9 +26,10 @@ public class Board
 
     public bool IsFilled => _cellItemsCount >= _cellsDic.Count;
 
-    public Board(int width, int height, Grid grid)
+    public Board(int width, int height, Grid grid, Transform pivot)
     {
         _grid = grid;
+        _pivot = pivot;
     }
 
     [Inject]
@@ -145,6 +148,32 @@ public class Board
     }
 
 
+    public void Rotate(float amount)
+    {
+        var lastRotation = _pivot.transform.rotation.eulerAngles;
+        _pivot.transform.rotation = Quaternion.Euler(lastRotation.x, lastRotation.y + amount, lastRotation.z);
+    }
+
+    public void SnapRotation()
+    {
+        float currentAngle = _pivot.transform.rotation.eulerAngles.y;
+        float closestAngle = snapAngles[0];
+        float minDifference = Mathf.Abs(currentAngle - closestAngle);
+
+        foreach (float angle in snapAngles)
+        {
+            float difference = Mathf.Abs(currentAngle - angle);
+            if (difference < minDifference)
+            {
+                minDifference = difference;
+                closestAngle = angle;
+            }
+        }
+
+        _pivot.transform.DORotate(new Vector3(0, closestAngle, 0), 0.5f);
+    }
+
+
     public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
 
     public Vector3 CellToWorld(Vector3Int cellPosition) => _grid.CellToWorld(cellPosition);
@@ -197,6 +226,10 @@ public class Board
                 _cellsDic[gridPos] = cell;
             }
         }
+
+        _grid.transform.SetParent(null);
+        _pivot.transform.position = GetBoardCenter();
+        _grid.transform.SetParent(_pivot);
 
         return _cellsDic;
     }

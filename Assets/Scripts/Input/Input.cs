@@ -1,5 +1,8 @@
+using Event;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
+using Zenject;
 
 namespace Input
 {
@@ -8,6 +11,9 @@ namespace Input
         private PlayerControls _playerControls;
 
         [SerializeField] private UnityEvent<Vector2> PointerMoveEvent;
+        [SerializeField] private UnityEvent PointerUpEvent;
+
+        [Inject] private EventChannel _channel;
 
         private void Awake()
         {
@@ -17,11 +23,13 @@ namespace Input
         private void OnEnable()
         {
             _playerControls.Enable();
+            _playerControls.Game.PointerUp.performed += OnPointerUp;
         }
 
         private void OnDisable()
         {
             _playerControls.Disable();
+            _playerControls.Game.PointerUp.performed -= OnPointerUp;
         }
 
         private void Update()
@@ -32,5 +40,11 @@ namespace Input
                 PointerMoveEvent?.Invoke(position);
             }
         }
+
+        private void OnPointerUp(InputAction.CallbackContext context)
+        {
+            PointerUpEvent?.Invoke();
+            _channel.Rise<PointerUp>(new PointerUp());
+        } 
     }
 }

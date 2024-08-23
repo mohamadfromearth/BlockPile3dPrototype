@@ -44,6 +44,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PointerUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""6240fc88-5480-46c7-8f42-8d7a2363e585"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -90,6 +99,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""PointerDown"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""905270c4-0f78-461b-9b87-cc980402b4fb"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PointerUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bd919a22-4479-4549-a733-a2e1ea0b437d"",
+                    ""path"": ""<Touchscreen>/primaryTouch/press"",
+                    ""interactions"": ""Press(behavior=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PointerUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -100,6 +131,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
         m_Game_PointerMove = m_Game.FindAction("PointerMove", throwIfNotFound: true);
         m_Game_PointerDown = m_Game.FindAction("PointerDown", throwIfNotFound: true);
+        m_Game_PointerUp = m_Game.FindAction("PointerUp", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -163,12 +195,14 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
     private readonly InputAction m_Game_PointerMove;
     private readonly InputAction m_Game_PointerDown;
+    private readonly InputAction m_Game_PointerUp;
     public struct GameActions
     {
         private @PlayerControls m_Wrapper;
         public GameActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @PointerMove => m_Wrapper.m_Game_PointerMove;
         public InputAction @PointerDown => m_Wrapper.m_Game_PointerDown;
+        public InputAction @PointerUp => m_Wrapper.m_Game_PointerUp;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -184,6 +218,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @PointerDown.started += instance.OnPointerDown;
             @PointerDown.performed += instance.OnPointerDown;
             @PointerDown.canceled += instance.OnPointerDown;
+            @PointerUp.started += instance.OnPointerUp;
+            @PointerUp.performed += instance.OnPointerUp;
+            @PointerUp.canceled += instance.OnPointerUp;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -194,6 +231,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @PointerDown.started -= instance.OnPointerDown;
             @PointerDown.performed -= instance.OnPointerDown;
             @PointerDown.canceled -= instance.OnPointerDown;
+            @PointerUp.started -= instance.OnPointerUp;
+            @PointerUp.performed -= instance.OnPointerUp;
+            @PointerUp.canceled -= instance.OnPointerUp;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -215,5 +255,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     {
         void OnPointerMove(InputAction.CallbackContext context);
         void OnPointerDown(InputAction.CallbackContext context);
+        void OnPointerUp(InputAction.CallbackContext context);
     }
 }

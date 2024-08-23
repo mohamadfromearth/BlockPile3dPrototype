@@ -12,7 +12,7 @@ public class GameManagerHelpers : MonoBehaviour
     [Inject] private AbilityRepository _abilityRepository;
     [Inject] private CurrencyRepository _currencyRepository;
     [Inject] private Board _board;
-
+    
     private Vector3Int[] _horizontalGridOffsets = new[]
     {
         new Vector3Int(1, 0, 0),

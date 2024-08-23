@@ -38,6 +38,7 @@ namespace Di
         [SerializeField] private CurrencyRepository currencyRepository;
 
         [SerializeField] private Grid grid;
+        [SerializeField] private Transform gridPivot;
 
         // selectionBar
         [SerializeField] private List<Color> colors;
@@ -89,7 +90,7 @@ namespace Di
             #endregion
 
             var levelData = levelRepository.GetLevelData();
-            Container.Bind<Board>().AsSingle().WithArguments(levelData.size, levelData.size, grid);
+            Container.Bind<Board>().AsSingle().WithArguments(levelData.size, levelData.size, grid, gridPivot);
 
             Container.Bind<BlockContainerSelectionBar>().AsTransient()
                 .WithArguments(selectionBarPositionList.Select(t => t.position).ToList());

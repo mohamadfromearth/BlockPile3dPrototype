@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,11 @@ namespace Data
 
 
         private int _levelIndex;
+
+        private void OnEnable()
+        {
+            _levelIndex = 0;
+        }
 
         public int LevelIndex => _levelIndex;
 

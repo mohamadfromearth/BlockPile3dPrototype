@@ -101,10 +101,10 @@ public class BlockContainerSelectionBar
         for (int i = 0; i < _blockContainers.Length; i++)
         {
             var container = _blockContainers[i];
-            if (container.IsPlaced == false)
+            if (container?.IsPlaced == false)
             {
-                container.Destroy(true);
-                _blockContainers[i] = null;  
+                container?.Destroy(true);
+                _blockContainers[i] = null;
             }
         }
     }
