@@ -1,4 +1,5 @@
 ﻿using Data;
+using Utils;
 using Zenject;
 
 namespace Objects.LockBlock
@@ -15,12 +16,13 @@ namespace Objects.LockBlock
 
             foreach (var lockBlockData in lockBlocksDataList)
             {
-                var worldPosition = _board.CellToWorld(lockBlockData.position);
+                var cell = _board.GetCell(lockBlockData.position);
                 var lockBlock = _lockBlockFactory.Create();
-                lockBlock.SetPosition(worldPosition);
+                lockBlock.SetPosition(cell.GetPosition());
+                lockBlock.GameObj.transform.SetParent(cell.GameObj.transform.parent);
                 lockBlock.Count = lockBlockData.count;
-
-                _board.GetCell(lockBlockData.position).CanPlaceItem = false;
+                cell.LockBlock = lockBlock;
+                cell.CanPlaceItem = false;
                 _board.AddLockBlock(lockBlock, lockBlockData.position);
             }
         }

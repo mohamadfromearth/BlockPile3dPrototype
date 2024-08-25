@@ -136,17 +136,21 @@ namespace Managers
                 pos.x += 0.4f;
                 pos.z += 0.4f;
 
-                var holder = _board.GetCell(pos);
+                var holder = _board.GetCell(helpers.ModifyBlockContainerPositionForRotatedGrid(pos));
 
                 if (holder != null && holder.CanPlaceItem)
                 {
                     _selectedBlockContainer.IsPlaced = true;
                     _selectedBlockContainer.SetPosition(holder.GetPosition());
 
-                    _board.AddBlockContainer(_selectedBlockContainer, pos);
+                    _board.AddBlockContainer(_selectedBlockContainer, holder.GetPosition());
                     _selectedBlockContainer.SetParent(grid.transform);
 
+
                     var boardPosition = _board.WorldToCell(holder.GetPosition());
+
+                    Debug.Log("Board position is :" + boardPosition);
+
                     blocksMatcher.StartMatchingPosition = boardPosition;
                     StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition,
                         true));
@@ -473,13 +477,15 @@ namespace Managers
 
             private void RotateBoard(Vector3 position)
             {
+                if (_gameManager.blocksMatcher.AreBlocksMatching()) return;
+
                 if (float.IsNaN(_previousX))
                 {
                     _previousX = position.x;
                     return;
                 }
 
-                _gameManager._board.Rotate((position.x - _previousX));
+                _gameManager._board.Rotate((position.x - _previousX) / 5f);
                 _previousX = position.x;
             }
 

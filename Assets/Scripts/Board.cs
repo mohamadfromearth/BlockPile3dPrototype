@@ -5,13 +5,14 @@ using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
 using UnityEngine;
+using Utils;
 using Zenject;
 
 public class Board
 {
     private readonly Grid _grid;
     private readonly Transform _pivot;
-    private readonly float[] snapAngles = { 90f, 180f, 270f, 360f };
+    private readonly float[] _snapAngles = { 90f, 180f, 270f, 360f };
 
     public int Width { get; private set; }
     public int Height { get; private set; }
@@ -41,7 +42,7 @@ public class Board
 
     public ICell GetCell(Vector3 worldPosition)
     {
-        var gridPos = _grid.WorldToCell(worldPosition);
+        var gridPos = WorldToCell(worldPosition);
         if (_cellsDic.TryGetValue(gridPos, out var holder))
         {
             return holder;
@@ -53,6 +54,7 @@ public class Board
 
     public ICell GetCell(Vector3Int boardPosition)
     {
+        Debug.Log("Board position from GetCell is " + boardPosition);
         if (_cellsDic.TryGetValue(boardPosition, out var holder))
         {
             return holder;
@@ -76,12 +78,14 @@ public class Board
 
     public void AddBlockContainer(IBlockContainer blockContainer, Vector3 worldPosition)
     {
-        var gridPos = _grid.WorldToCell(worldPosition);
+        var gridPos = WorldToCell(worldPosition);
 
         if (_cellsDic.TryGetValue(gridPos, out var cell))
         {
             _cellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
             Debug.Log("CellItemCount is :" + _cellItemsCount);
+
+            Debug.Log("Block is Adding to: " + gridPos);
 
             cell.CanPlaceItem = blockContainer == null;
             cell.BlockContainer = blockContainer;
@@ -142,8 +146,12 @@ public class Board
         int halfWidth = Width / 2;
         Vector3Int centerCell = new Vector3Int(halfWidth, 0, halfWidth);
         Vector3 centerPos = CellToWorld(centerCell);
-        centerPos.x -= 0.55f;
-        centerPos.z -= 0.55f;
+        if (Width % 2 == 0)
+        {
+            centerPos.x -= 0.55f;
+            centerPos.z -= 0.55f;
+        }
+
         return centerPos;
     }
 
@@ -157,10 +165,10 @@ public class Board
     public void SnapRotation()
     {
         float currentAngle = _pivot.transform.rotation.eulerAngles.y;
-        float closestAngle = snapAngles[0];
+        float closestAngle = _snapAngles[0];
         float minDifference = Mathf.Abs(currentAngle - closestAngle);
 
-        foreach (float angle in snapAngles)
+        foreach (float angle in _snapAngles)
         {
             float difference = Mathf.Abs(currentAngle - angle);
             if (difference < minDifference)
@@ -170,13 +178,55 @@ public class Board
             }
         }
 
-        _pivot.transform.DORotate(new Vector3(0, closestAngle, 0), 0.5f);
+        _pivot.transform.DORotate(new Vector3(0, closestAngle, 0), 0.5f).SetEase(Ease.InExpo);
     }
 
 
-    public Vector3Int WorldToCell(Vector3 worldPosition) => _grid.WorldToCell(worldPosition);
+    public Vector3Int WorldToCell(Vector3 worldPosition)
+    {
+        var gridPos = _grid.WorldToCell(worldPosition);
 
-    public Vector3 CellToWorld(Vector3Int cellPosition) => _grid.CellToWorld(cellPosition);
+        // Debug.Log("Pivot y rot" + _pivot.rotation.eulerAngles.y);
+        //
+        // if (_pivot.rotation.eulerAngles.y == 0)
+        // {
+        //     return gridPos;
+        // }
+        //
+        // if (_pivot.rotation.eulerAngles.y == 90)
+        // {
+        //     gridPos.x += 1;
+        //     return gridPos;
+        // }
+        //
+        // if (_pivot.rotation.eulerAngles.y == 180)
+        // {
+        //     gridPos.x += 1;
+        //     gridPos.z += 1;
+        //     return gridPos;
+        // }
+
+        return gridPos;
+    }
+
+    public Vector3Int WordToCellUnRotated(Vector3 worldPosition)
+    {
+        return _grid.WorldToCell(worldPosition);
+    }
+
+    public Vector3Int WorldToCell2(Vector3 worldPosition)
+    {
+        var gridPos = _grid.WorldToCell(worldPosition);
+
+
+        return gridPos;
+    }
+
+
+    public Vector3 CellToWorld(Vector3Int cellPosition)
+    {
+        return _grid.CellToWorld(cellPosition);
+    }
 
 
     public void Clear()
@@ -228,6 +278,7 @@ public class Board
         }
 
         _grid.transform.SetParent(null);
+        _pivot.rotation = Quaternion.identity;
         _pivot.transform.position = GetBoardCenter();
         _grid.transform.SetParent(_pivot);
 

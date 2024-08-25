@@ -1,4 +1,5 @@
 ﻿using Data;
+using Utils;
 using Zenject;
 
 namespace Objects.AdvertiseBlock
@@ -17,10 +18,12 @@ namespace Objects.AdvertiseBlock
             foreach (var position in advertiseBlocksPositions)
             {
                 var worldPosition = _board.CellToWorld(position);
+                var cell = _board.GetCell(position);
                 var advertiseBlock = _advertiseBlockFactory.Create();
                 advertiseBlock.SetPosition(worldPosition);
-
-                _board.GetCell(position).CanPlaceItem = false;
+                advertiseBlock.GameObj.transform.SetParent(cell.GameObj.transform.parent);
+                cell.CanPlaceItem = false;
+                cell.AdvertiseBlock = advertiseBlock;
                 _board.AddAdvertiseBlock(advertiseBlock, position);
             }
         }

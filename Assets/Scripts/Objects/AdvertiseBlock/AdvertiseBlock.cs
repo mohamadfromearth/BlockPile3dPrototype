@@ -25,5 +25,7 @@ namespace Objects.AdvertiseBlock
         {
             Channel.Rise<AdvertiseBlockPointerDown>(new AdvertiseBlockPointerDown(this));
         }
+
+        public GameObject GameObj => gameObject;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Objects.AdvertiseBlock
 {
-    public interface IAdvertiseBlock : IPosition, IDestroyable
+    public interface IAdvertiseBlock : IPosition, IDestroyable, IGameObject
     {
     }
 }

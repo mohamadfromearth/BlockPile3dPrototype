@@ -12,7 +12,9 @@ public class GameManagerHelpers : MonoBehaviour
     [Inject] private AbilityRepository _abilityRepository;
     [Inject] private CurrencyRepository _currencyRepository;
     [Inject] private Board _board;
-    
+
+    [SerializeField] private Transform gridPivot;
+
     private Vector3Int[] _horizontalGridOffsets = new[]
     {
         new Vector3Int(1, 0, 0),
@@ -86,5 +88,34 @@ public class GameManagerHelpers : MonoBehaviour
         gameUI.SetPunchButtonText("Punch" + _abilityRepository.GetAbilityData(AbilityType.Punch).count);
         gameUI.SetSwapButtonText("Swap" + _abilityRepository.GetAbilityData(AbilityType.Swap).count);
         gameUI.SetRefreshButtonText("Refresh" + _abilityRepository.GetAbilityData(AbilityType.Refresh).count);
+    }
+
+    public Vector3 ModifyBlockContainerPositionForRotatedGrid(Vector3 position)
+    {
+        if (gridPivot.rotation.eulerAngles.y == 0)
+        {
+            return position;
+        }
+
+        if (gridPivot.rotation.eulerAngles.y == 90)
+        {
+            position.z -= 1;
+            return position;
+        }
+
+        if (gridPivot.rotation.eulerAngles.y == 180)
+        {
+            position.x -= 1;
+            position.z -= 1;
+            return position;
+        }
+
+        if (gridPivot.rotation.eulerAngles.y == 270)
+        {
+            position.x -= 1;
+            return position;
+        }
+
+        return position;
     }
 }

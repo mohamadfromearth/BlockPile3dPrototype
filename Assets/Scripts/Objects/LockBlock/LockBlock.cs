@@ -57,5 +57,6 @@ namespace Objects.LockBlock
 
 
         private int _count;
+        public GameObject GameObj => gameObject;
     }
 }

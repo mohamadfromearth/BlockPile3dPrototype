@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Data
@@ -22,7 +20,7 @@ namespace Data
                 Debug.Log("Ability repo enabled!");
 
                 _abilityDataDic[abilityData.type] = abilityData;
-                abilityData.count = PlayerPrefs.GetInt(AbilityPrefKey + abilityData.type.HumanName(), 0);
+                abilityData.count = PlayerPrefs.GetInt(AbilityPrefKey + abilityData.type, 0);
             }
         }
 
@@ -32,13 +30,13 @@ namespace Data
         public void AddAbility(AbilityType type, int amount)
         {
             _abilityDataDic[type].count += amount;
-            PlayerPrefs.SetInt(AbilityPrefKey + type.HumanName(), _abilityDataDic[type].count);
+            PlayerPrefs.SetInt(AbilityPrefKey + type, _abilityDataDic[type].count);
         }
 
         public void RemoveAbility(AbilityType type, int amount)
         {
             _abilityDataDic[type].count -= amount;
-            PlayerPrefs.SetInt(AbilityPrefKey + type.HumanName(), _abilityDataDic[type].count);
+            PlayerPrefs.SetInt(AbilityPrefKey + type, _abilityDataDic[type].count);
         }
     }
 }

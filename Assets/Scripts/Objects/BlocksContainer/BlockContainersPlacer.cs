@@ -1,5 +1,6 @@
 ﻿using Data;
 using Objects.Block;
+using UnityEngine;
 using Zenject;
 
 namespace Objects.BlocksContainer
@@ -29,6 +30,7 @@ namespace Objects.BlocksContainer
                 holder.CanPlaceItem = false;
 
                 container.SetPosition(holder.GetPosition());
+                container.SetParent(holder.GameObj.transform.parent);
 
                 foreach (var color in containerData.color)
                 {

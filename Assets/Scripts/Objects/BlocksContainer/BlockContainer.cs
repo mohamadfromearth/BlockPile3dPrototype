@@ -261,6 +261,8 @@ namespace Objects.BlocksContainer
             points[1] = mid;
             points[2] = targetBlockPosition;
 
+            block.GameObj.transform.rotation = Quaternion.identity;
+            transform.rotation = Quaternion.identity;
             var rotation = block.GameObj.transform.rotation.eulerAngles;
             rotation = rotation + GetTargetRotation(currentBlockPosition, targetBlockPosition);
             _pathTween = block.GameObj.transform.DOPath(points, duration, PathType.CatmullRom);
