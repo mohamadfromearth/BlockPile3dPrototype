@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Objects.AdvertiseBlock;
@@ -254,7 +255,7 @@ public class Board
     }
 
 
-    public Dictionary<Vector3Int, ICell> SpawnCells(List<Vector3Int> emptyHolders, int width, int height)
+    public void SpawnCells(List<Vector3Int> emptyHolders, int width, int height)
     {
         Width = width;
         Height = height;
@@ -277,12 +278,10 @@ public class Board
             }
         }
 
-        _grid.transform.SetParent(null);
         _pivot.rotation = Quaternion.identity;
+        _grid.transform.SetParent(null);
         _pivot.transform.position = GetBoardCenter();
         _grid.transform.SetParent(_pivot);
-
-        return _cellsDic;
     }
 
 

@@ -119,11 +119,9 @@ namespace Objects.BlocksContainer
         public IEnumerator UpdateBoardRoutine(Vector3Int boardPosition, bool isStaringPoint = false,
             bool isLastIndex = false, bool isFromQueue = false)
         {
-            if (_areBlocksMatching)
+            if (_areBlocksMatching && isFromQueue == false)
             {
                 _blocksToMatchQueue.Enqueue(boardPosition);
-                Debug.Log("Blocks are matching !");
-
                 yield break;
             }
 
@@ -192,7 +190,6 @@ namespace Objects.BlocksContainer
                 {
                     while (_blocksToMatchQueue.Count > 0)
                     {
-                        _areBlocksMatching = false;
                         yield return UpdateBoardRoutine(_blocksToMatchQueue.Dequeue(), false, false, true);
                     }
                 }
@@ -202,6 +199,7 @@ namespace Objects.BlocksContainer
             {
                 _areBlocksMatching = false;
                 _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
+                Debug.Log("Update board is completed");
             }
         }
 

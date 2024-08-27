@@ -133,8 +133,9 @@ namespace Managers
             if (_selectedBlockContainer != null)
             {
                 var pos = _selectedBlockContainer.GetPosition();
-                pos.x += 0.4f;
-                pos.z += 0.4f;
+                pos.y = 0;
+                pos.x += 0.8f;
+                pos.z += 0.8f;
 
                 var holder = _board.GetCell(helpers.ModifyBlockContainerPositionForRotatedGrid(pos));
 
@@ -149,7 +150,6 @@ namespace Managers
 
                     var boardPosition = _board.WorldToCell(holder.GetPosition());
 
-                    Debug.Log("Board position is :" + boardPosition);
 
                     blocksMatcher.StartMatchingPosition = boardPosition;
                     StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition,
@@ -493,16 +493,19 @@ namespace Managers
             {
                 var cellPos = PositionConverters.ScreenToWorldPosition(position, _gameManager._camera,
                     _gameManager.groundLayerMask);
-                if (cellPos != null)
+                if (cellPos.HasValue)
                 {
-                    _gameManager._selectedBlockContainer.SetPosition(cellPos.Value);
+                    var pos = cellPos.Value;
+                    pos.y += 2;
+                    _gameManager._selectedBlockContainer.SetPosition(pos);
                 }
             }
 
             private void OnPointerUp()
             {
                 _previousX = float.NaN;
-                if (_gameManager._selectedBlockContainer == null)
+                if (_gameManager._selectedBlockContainer == null &&
+                    _gameManager.blocksMatcher.AreBlocksMatching() == false)
                 {
                     _gameManager._board.SnapRotation();
                 }
