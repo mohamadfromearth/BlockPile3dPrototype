@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Core;
 using Objects.Block;
@@ -11,6 +12,8 @@ namespace Objects.BlocksContainer
 
 
         public int Count { get; }
+
+        public void SetCountText(string text, float delay);
 
         public bool WasUpperColorChanged { get; set; }
 

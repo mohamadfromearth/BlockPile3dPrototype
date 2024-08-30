@@ -5,6 +5,7 @@ using DG.Tweening;
 using Event;
 using Objects.Block;
 using Scrips.Event;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -18,13 +19,15 @@ namespace Objects.BlocksContainer
 
         private List<int> _countList = new List<int>();
 
+        [SerializeField] private TextMeshPro countText;
+
         public Stack<Color> Colors { get; set; }
 
         public bool IsPlaced { get; set; }
 
 
         [SerializeField] private float height = 0.21f;
-        [SerializeField] private float destroyRate = 0.08f;
+        [SerializeField] private float destroyRate = 0.03f;
 
         private WaitForSeconds _destroyRateWaitForSeconds;
 
@@ -63,6 +66,9 @@ namespace Objects.BlocksContainer
                     if (blocks.Peek().Color != color)
                     {
                         Colors.Pop();
+                        _countList.RemoveAt(_countIndex);
+                        _countIndex--;
+
                         break;
                     }
                 }
@@ -105,6 +111,10 @@ namespace Objects.BlocksContainer
                 KillTweens();
                 Object.Destroy(gameObject);
             }
+            else
+            {
+                SetCountText(Count.ToString(), 0);
+            }
 
             Channel.Rise<BlockDestroy>(new BlockDestroy(count));
         }
@@ -134,6 +144,27 @@ namespace Objects.BlocksContainer
                 return 0;
             }
         }
+
+        public void SetCountText(string text, float duration)
+        {
+            if (_hasBeenDestroyed) return;
+            StartCoroutine(SetCountTextRoutine(text, duration));
+        }
+
+        private IEnumerator SetCountTextRoutine(string text, float duration)
+        {
+            yield return new WaitForSeconds(duration);
+            countText.text = text;
+
+            if (blocks.Count != 0)
+            {
+                var pos = blocks.Peek().GetPosition();
+                Debug.Log("Pos is :" + pos + "And text is : " + text);
+                pos.y += 0.15f;
+                countText.transform.position = pos;
+            }
+        }
+
 
         public bool WasUpperColorChanged { get; set; }
 
@@ -184,6 +215,7 @@ namespace Objects.BlocksContainer
                 _countList.Add(1);
                 _countIndex++;
 
+
                 return;
             }
 
@@ -211,6 +243,7 @@ namespace Objects.BlocksContainer
             block.GameObj.transform.SetParent(transform);
         }
 
+
         public void Push(IBlock block, float duration)
         {
             if (_hasBeenDestroyed) return;
@@ -219,7 +252,6 @@ namespace Objects.BlocksContainer
             var currentBlockPosition = block.GetPosition();
             Vector3[] points = new Vector3[3];
             Vector3 mid;
-
 
             targetBlockPosition.y += height * blocks.Count;
 

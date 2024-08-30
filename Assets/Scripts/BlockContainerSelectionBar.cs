@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Data;
 using Objects.Block;
 using Objects.BlocksContainer;
@@ -27,6 +28,7 @@ public class BlockContainerSelectionBar
     public void Spawn(List<string> colors)
     {
         Count = _containersPositionList.Count;
+
 
         // foreach (var position in _containersPositionList)
         // {
@@ -77,12 +79,13 @@ public class BlockContainerSelectionBar
 
             var colorsCount = Random.Range(2, 4);
 
+
             for (int i = 0; i < colorsCount; i++)
             {
-                var blockCount = Random.Range(1, 8);
+                var blockCount = Random.Range(1, 4);
+
 
                 var colorIndex = Random.Range(0, colors.Count);
-
 
                 for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
                 {
@@ -90,9 +93,13 @@ public class BlockContainerSelectionBar
 
                     block.Color = _colorRepository.GetColor(colors[colorIndex]);
 
+
                     container.Push(block);
                 }
             }
+
+
+            container.SetCountText(container.Count.ToString(), 0);
         }
     }
 

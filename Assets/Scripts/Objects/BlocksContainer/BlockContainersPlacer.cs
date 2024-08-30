@@ -39,6 +39,8 @@ namespace Objects.BlocksContainer
 
                     container.Push(block);
                 }
+
+                container.SetCountText(container.Count.ToString(),0);
             }
         }
     }

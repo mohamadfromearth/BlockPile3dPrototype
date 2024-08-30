@@ -28,7 +28,7 @@ namespace Objects.BlocksContainer
 
 
         private const float BlockPlacementDuration = 0.35f;
-        private const float BlockPlacementRate = 0.175f;
+        private const float BlockPlacementRate = 0.06f;
         private const float BlockPlacementDelay = 0.175f;
 
 
@@ -78,34 +78,45 @@ namespace Objects.BlocksContainer
                     {
                         yield return MatchBlock(position, gridOffset * -1);
 
+
                         var block = matchedContainer.Pop();
                         var color = container.Colors.Peek();
 
                         while (true)
                         {
                             container.Push(block, BlockPlacementDuration);
-
-                            yield return _blockPlacementRateWaitForSeconds;
+                            container.SetCountText("", 0);
+                            matchedContainer.SetCountText("", 0);
 
 
                             block = matchedContainer.Peek();
 
                             if (block == null)
                             {
+                                container.SetCountText(container.Count.ToString(), BlockPlacementDuration);
                                 _board.AddBlockContainer(null, matchedContainer.GetPosition());
+                                matchedContainer.SetCountText("", 0);
                                 matchedContainer.Destroy();
+                                yield return _blockPlacementDelayWaitForSeconds;
+
                                 break;
                             }
 
                             if (block.Color != color)
                             {
+                                container.SetCountText(container.Count.ToString(), BlockPlacementDuration);
+                                matchedContainer.SetCountText(matchedContainer.Count.ToString(),
+                                    0);
                                 _checkedList.Add(_board.WorldToCell(matchedContainer.GetPosition()));
                                 _blocksToMatch.Add(position);
+                                yield return _blockPlacementDelayWaitForSeconds;
+
                                 break;
                             }
 
                             block = matchedContainer.Pop();
 
+                            yield return _blockPlacementRateWaitForSeconds;
                             yield return null;
                         }
 
@@ -138,6 +149,7 @@ namespace Objects.BlocksContainer
                 if (targetContainer.Count >= MaxBlock)
                 {
                     var targetPosition = targetContainer.GetPosition();
+                    targetContainer.SetCountText("", 0.18f);
                     yield return new WaitForSeconds(targetContainer.Destroy());
 
                     if (targetContainer.Colors.Count == 0)
@@ -197,6 +209,7 @@ namespace Objects.BlocksContainer
 
             if (isStaringPoint)
             {
+                yield return _blockPlacementRateWaitForSeconds;
                 _areBlocksMatching = false;
                 _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
                 Debug.Log("Update board is completed");
