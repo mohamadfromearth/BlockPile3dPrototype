@@ -149,7 +149,7 @@ namespace Objects.BlocksContainer
                 if (targetContainer.Count >= MaxBlock)
                 {
                     var targetPosition = targetContainer.GetPosition();
-                    targetContainer.SetCountText("", 0.18f);
+                    targetContainer.SetCountText("", 0);
                     yield return new WaitForSeconds(targetContainer.Destroy());
 
                     if (targetContainer.Colors.Count == 0)
@@ -209,7 +209,6 @@ namespace Objects.BlocksContainer
 
             if (isStaringPoint)
             {
-                yield return _blockPlacementRateWaitForSeconds;
                 _areBlocksMatching = false;
                 _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
                 Debug.Log("Update board is completed");

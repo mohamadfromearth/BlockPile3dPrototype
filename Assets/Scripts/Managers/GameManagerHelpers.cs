@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Data;
 using Objects.BlocksContainer;
@@ -12,6 +13,7 @@ public class GameManagerHelpers : MonoBehaviour
     [Inject] private AbilityRepository _abilityRepository;
     [Inject] private CurrencyRepository _currencyRepository;
     [Inject] private Board _board;
+    [SerializeField] private BlocksMatcher blockMatcher;
 
     [SerializeField] private Transform gridPivot;
 
@@ -117,5 +119,19 @@ public class GameManagerHelpers : MonoBehaviour
         }
 
         return position;
+    }
+
+
+    public IEnumerator UpdateAllBoard()
+    {
+        var cells = _board.Cells;
+        foreach (var keyValuePair in cells)
+        {
+            var cell = keyValuePair.Value;
+            if (cell.BlockContainer != null)
+            {
+                yield return blockMatcher.UpdateBoardRoutine(_board.WorldToCell(cell.GetPosition()), true);
+            }
+        }
     }
 }

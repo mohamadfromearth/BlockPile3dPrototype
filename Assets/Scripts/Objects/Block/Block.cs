@@ -34,6 +34,7 @@ namespace Objects.Block
                 {
                     material.color = value;
                 }
+                
 
                 color = value;
             }

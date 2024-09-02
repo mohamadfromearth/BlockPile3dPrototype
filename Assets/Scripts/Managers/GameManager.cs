@@ -5,7 +5,6 @@ using Data;
 using Event;
 using Objects.BlocksContainer;
 using Scrips.Event;
-using Scrips.Utils;
 using UI;
 using UnityEngine;
 using Utils;
@@ -32,11 +31,9 @@ namespace Managers
         [Inject] private Board _board;
         [Inject] private EventChannel _channel;
         [Inject] private ILevelRepository _levelRepository;
-        [Inject] private MainRepository _mainRepository;
         [Inject] private AbilityRepository _abilityRepository;
         [Inject] private CurrencyRepository _currencyRepository;
         [Inject] private BlockContainerSelectionBar _selectionBar;
-        [Inject] private BlockContainersPlacer _blockContainersPlacer;
         [Inject] private Placer _placer;
         [Inject] private CameraSizeSetter _cameraSizeSetter;
 
@@ -264,6 +261,12 @@ namespace Managers
             helpers.UpdateAbilityButtons(gameUI);
             _stateManager.ChangeState(gameUI.AbilityData.type.GameStateType());
             gameUI.HideBuyingAbilityDialog();
+        }
+
+        public void OnShuffle()
+        {
+            _board.Shuffle();
+            StartCoroutine(helpers.UpdateAllBoard());
         }
 
         #endregion

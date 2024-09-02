@@ -5,6 +5,7 @@ using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
 using UnityEngine;
+using Utils;
 using Zenject;
 
 public class Board
@@ -21,6 +22,11 @@ public class Board
 
 
     private Dictionary<Vector3Int, ICell> _cellsDic = new();
+
+    public Dictionary<Vector3Int, ICell> Cells => _cellsDic;
+
+    private List<Vector3Int> _positions = new();
+
 
     private int _cellItemsCount;
 
@@ -110,8 +116,6 @@ public class Board
             cell.CanPlaceItem = advertiseBlock == null;
 
             cell.AdvertiseBlock = advertiseBlock;
-            
-
         }
     }
 
@@ -185,26 +189,6 @@ public class Board
     {
         var gridPos = _grid.WorldToCell(worldPosition);
 
-        // Debug.Log("Pivot y rot" + _pivot.rotation.eulerAngles.y);
-        //
-        // if (_pivot.rotation.eulerAngles.y == 0)
-        // {
-        //     return gridPos;
-        // }
-        //
-        // if (_pivot.rotation.eulerAngles.y == 90)
-        // {
-        //     gridPos.x += 1;
-        //     return gridPos;
-        // }
-        //
-        // if (_pivot.rotation.eulerAngles.y == 180)
-        // {
-        //     gridPos.x += 1;
-        //     gridPos.z += 1;
-        //     return gridPos;
-        // }
-
         return gridPos;
     }
 
@@ -250,6 +234,7 @@ public class Board
         }
 
         _cellsDic.Clear();
+        _positions.Clear();
     }
 
 
@@ -273,6 +258,7 @@ public class Board
                 cell.SetPosition(pos);
 
                 _cellsDic[gridPos] = cell;
+                _positions.Add(gridPos);
             }
         }
 
@@ -280,6 +266,36 @@ public class Board
         _grid.transform.SetParent(null);
         _pivot.transform.position = GetBoardCenter();
         _grid.transform.SetParent(_pivot);
+    }
+
+
+    public void Shuffle()
+    {
+        var shuffledPosition = _positions.Shuffle();
+        var index = 0;
+        var blockContainers = new List<KeyValuePair<Vector3Int, IBlockContainer>>();
+
+        foreach (var keyValuePair in _cellsDic)
+        {
+            var container = keyValuePair.Value.BlockContainer;
+            if (container != null)
+            {
+                var newPos = shuffledPosition[index];
+                blockContainers.Add(new(newPos, container));
+                keyValuePair.Value.BlockContainer = null;
+                keyValuePair.Value.CanPlaceItem = true;
+            }
+
+            index++;
+        }
+
+
+        foreach (var keyValuePair in blockContainers)
+        {
+            _cellsDic[keyValuePair.Key].BlockContainer = keyValuePair.Value;
+            _cellsDic[keyValuePair.Key].CanPlaceItem = false;
+            keyValuePair.Value.SetPosition(_cellsDic[keyValuePair.Key].GetPosition());
+        }
     }
 
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Scrips.Utils
+namespace Utils
 {
     public class ListUtils
     {
@@ -30,6 +30,28 @@ namespace Scrips.Utils
             }
 
             return uniqueInts.ToList();
+        }
+    }
+
+
+    public static class ListUtilsExt
+    {
+        public static List<T> Shuffle<T>(this List<T> list)
+        {
+            List<T> clonedList = new List<T>(list);
+
+            var rng = new System.Random();
+            int n = clonedList.Count;
+
+            for (int i = n - 1; i > 0; i--)
+            {
+                int j = rng.Next(i + 1);
+                T temp = clonedList[i];
+                clonedList[i] = clonedList[j];
+                clonedList[j] = temp;
+            }
+
+            return clonedList;
         }
     }
 }
