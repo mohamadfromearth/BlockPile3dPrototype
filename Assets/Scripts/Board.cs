@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Objects.AdvertiseBlock;
@@ -6,7 +5,6 @@ using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 public class Board
@@ -84,10 +82,6 @@ public class Board
         if (_cellsDic.TryGetValue(gridPos, out var cell))
         {
             _cellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
-            Debug.Log("CellItemCount is :" + _cellItemsCount);
-
-            Debug.Log("Block is Adding to: " + gridPos);
-
             cell.CanPlaceItem = blockContainer == null;
             cell.BlockContainer = blockContainer;
         }
@@ -98,8 +92,12 @@ public class Board
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
+            _cellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
+
+            cell.CanPlaceItem = blockContainer == null;
             cell.BlockContainer = blockContainer;
-            blockContainer.SetPosition(cell.GetPosition());
+            cell.BlockContainer = blockContainer;
+            blockContainer?.SetPosition(cell.GetPosition());
         }
     }
 
@@ -108,11 +106,12 @@ public class Board
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
             _cellItemsCount += BoardHelpers.GetItemsCountModifier(advertiseBlock, cell);
-            Debug.Log("CellItemCount is :" + _cellItemsCount);
 
             cell.CanPlaceItem = advertiseBlock == null;
 
             cell.AdvertiseBlock = advertiseBlock;
+            
+
         }
     }
 
@@ -134,7 +133,6 @@ public class Board
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
             _cellItemsCount += BoardHelpers.GetItemsCountModifier(lockBlock, cell);
-            Debug.Log("CellItemCount is :" + _cellItemsCount);
 
             cell.LockBlock = lockBlock;
             cell.CanPlaceItem = lockBlock == null;

@@ -82,7 +82,7 @@ public class BlockContainerSelectionBar
 
             for (int i = 0; i < colorsCount; i++)
             {
-                var blockCount = Random.Range(1, 4);
+                var blockCount = Random.Range(1, 5);
 
 
                 var colorIndex = Random.Range(0, colors.Count);

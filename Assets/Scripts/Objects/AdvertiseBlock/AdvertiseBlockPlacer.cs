@@ -22,8 +22,6 @@ namespace Objects.AdvertiseBlock
                 var advertiseBlock = _advertiseBlockFactory.Create();
                 advertiseBlock.SetPosition(worldPosition);
                 advertiseBlock.GameObj.transform.SetParent(cell.GameObj.transform.parent);
-                cell.CanPlaceItem = false;
-                cell.AdvertiseBlock = advertiseBlock;
                 _board.AddAdvertiseBlock(advertiseBlock, position);
             }
         }

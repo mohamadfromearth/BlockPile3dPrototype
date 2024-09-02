@@ -10,7 +10,9 @@ namespace Managers
 
         public void OnPointerMove(Vector3 position);
 
-
         public void OnContainerPointerDown();
+
+
+        public void OnContainerPointerUp();
     }
 }

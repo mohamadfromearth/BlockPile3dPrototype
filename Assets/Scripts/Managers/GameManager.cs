@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Data;
@@ -128,46 +129,7 @@ namespace Managers
         private void OnCellContainerPointerDown() => _stateManager.OnContainerPointerDown();
 
 
-        private void OnCellContainerPointerUp()
-        {
-            if (_selectedBlockContainer != null)
-            {
-                var pos = _selectedBlockContainer.GetPosition();
-                pos.y = 0;
-                pos.x += 0.8f;
-                pos.z += 0.8f;
-
-                var holder = _board.GetCell(helpers.ModifyBlockContainerPositionForRotatedGrid(pos));
-
-                if (holder != null && holder.CanPlaceItem)
-                {
-                    _selectedBlockContainer.IsPlaced = true;
-                    _selectedBlockContainer.SetPosition(holder.GetPosition());
-
-                    _board.AddBlockContainer(_selectedBlockContainer, holder.GetPosition());
-                    _selectedBlockContainer.SetParent(grid.transform);
-
-
-                    var boardPosition = _board.WorldToCell(holder.GetPosition());
-
-
-                    blocksMatcher.StartMatchingPosition = boardPosition;
-                    StartCoroutine(blocksMatcher.UpdateBoardRoutine(boardPosition,
-                        true));
-
-                    _selectedBlockContainer = null;
-
-                    _selectionBar.Decrease();
-
-                    if (_selectionBar.Count == 0) _selectionBar.Spawn(_levelRepository.GetLevelData().colors);
-                }
-                else
-                {
-                    _selectedBlockContainer.SetPosition(_selectionBarCellContainerPosList[_selectionBarSelectedIndex]);
-                    _selectedBlockContainer = null;
-                }
-            }
-        }
+        private void OnCellContainerPointerUp() => _stateManager.OnContainerPointerUp();
 
 
         private void OnAdvertiseBlockPointerDown()
@@ -208,7 +170,8 @@ namespace Managers
             lockBlock.Destroy();
         }
 
-        private void OnUpdateBoardCompleted()
+        private void OnUpdateBoardCompleted
+            ()
         {
             if (CheckWin()) return;
             CheckLose();
@@ -367,16 +330,22 @@ namespace Managers
             {
             }
 
-
             public void OnContainerPointerDown()
             {
-                var containerBlock = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
+            }
+
+
+            public void OnContainerPointerUp()
+            {
+                var containerBlock = _gameManager._channel.GetData<CellContainerPointerUp>().BlockContainer;
                 _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
                 containerBlock.Destroy(true);
 
                 _gameManager._abilityRepository.RemoveAbility(AbilityType.Punch, 1);
 
                 _gameManager._stateManager.ChangeState(GameStateType.Default);
+
+                _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
             }
         }
 
@@ -406,10 +375,14 @@ namespace Managers
             {
             }
 
-
             public void OnContainerPointerDown()
             {
-                var container = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
+            }
+
+
+            public void OnContainerPointerUp()
+            {
+                var container = _gameManager._channel.GetData<CellContainerPointerUp>().BlockContainer;
 
                 if (container.IsPlaced == false) return;
 
@@ -429,18 +402,21 @@ namespace Managers
                     _gameManager._board.AddBlockContainer(_firstSelectedBlockContainer, secondPos);
                     _gameManager._board.AddBlockContainer(container, firstPos);
 
-                    _gameManager.StartCoroutine(
-                        _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(firstPos), true));
-
-                    _gameManager.StartCoroutine(
-                        _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(secondPos),
-                            true));
-
+                    _gameManager.StartCoroutine(SwapUpdateRoutine(_gameManager._board.WorldToCell(firstPos),
+                        _gameManager._board.WorldToCell(secondPos)));
 
                     _gameManager._abilityRepository.RemoveAbility(AbilityType.Swap, 1);
 
                     _gameManager._stateManager.ChangeState(GameStateType.Default);
+
+                    _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
                 }
+            }
+
+            private IEnumerator SwapUpdateRoutine(Vector3Int firstPos, Vector3Int secondPos)
+            {
+                yield return _gameManager.blocksMatcher.UpdateBoardRoutine(firstPos, true);
+                yield return _gameManager.blocksMatcher.UpdateBoardRoutine(secondPos, true);
             }
         }
 
@@ -472,6 +448,18 @@ namespace Managers
                 {
                     RotateBoard(position);
                 }
+            }
+
+            public void OnContainerPointerDown()
+            {
+                var container = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
+                if (container.IsPlaced) return;
+
+                _gameManager._selectedBlockContainer = container;
+
+                _gameManager._selectionBarSelectedIndex =
+                    ListUtils.GetIndex(_gameManager._selectedBlockContainer.GetPosition(),
+                        _gameManager._selectionBarCellContainerPosList);
             }
 
 
@@ -511,16 +499,50 @@ namespace Managers
                 }
             }
 
-            public void OnContainerPointerDown()
+            public void OnContainerPointerUp()
             {
-                var container = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
-                if (container.IsPlaced) return;
+                if (_gameManager._selectedBlockContainer != null)
+                {
+                    var pos = _gameManager._selectedBlockContainer.GetPosition();
+                    pos.y = 0;
+                    pos.x += 0.8f;
+                    pos.z += 0.8f;
 
-                _gameManager._selectedBlockContainer = container;
+                    var holder =
+                        _gameManager._board.GetCell(
+                            _gameManager.helpers.ModifyBlockContainerPositionForRotatedGrid(pos));
 
-                _gameManager._selectionBarSelectedIndex =
-                    ListUtils.GetIndex(_gameManager._selectedBlockContainer.GetPosition(),
-                        _gameManager._selectionBarCellContainerPosList);
+                    if (holder != null && holder.CanPlaceItem)
+                    {
+                        _gameManager._selectedBlockContainer.IsPlaced = true;
+                        _gameManager._selectedBlockContainer.SetPosition(holder.GetPosition());
+
+                        _gameManager._board.AddBlockContainer(_gameManager._selectedBlockContainer,
+                            holder.GetPosition());
+                        _gameManager._selectedBlockContainer.SetParent(_gameManager.grid.transform);
+
+
+                        var boardPosition = _gameManager._board.WorldToCell(holder.GetPosition());
+
+
+                        _gameManager.blocksMatcher.StartMatchingPosition = boardPosition;
+                        _gameManager.StartCoroutine(_gameManager.blocksMatcher.UpdateBoardRoutine(boardPosition,
+                            true));
+
+                        _gameManager._selectedBlockContainer = null;
+
+                        _gameManager._selectionBar.Decrease();
+
+                        if (_gameManager._selectionBar.Count == 0)
+                            _gameManager._selectionBar.Spawn(_gameManager._levelRepository.GetLevelData().colors);
+                    }
+                    else
+                    {
+                        _gameManager._selectedBlockContainer.SetPosition(
+                            _gameManager._selectionBarCellContainerPosList[_gameManager._selectionBarSelectedIndex]);
+                        _gameManager._selectedBlockContainer = null;
+                    }
+                }
             }
         }
 
@@ -547,7 +569,11 @@ namespace Managers
 
             public void OnContainerPointerDown()
             {
-                var containerBlock = _gameManager._channel.GetData<CellContainerPointerDown>().BlockContainer;
+            }
+
+            public void OnContainerPointerUp()
+            {
+                var containerBlock = _gameManager._channel.GetData<CellContainerPointerUp>().BlockContainer;
 
                 var gridPos = _gameManager._board.WorldToCell(containerBlock.GetPosition());
 
@@ -598,8 +624,9 @@ namespace Managers
             public void OnExit() => _state.OnExit();
 
             public void OnPointerMove(Vector3 position) => _state.OnPointerMove(position);
-
             public void OnContainerPointerDown() => _state.OnContainerPointerDown();
+
+            public void OnContainerPointerUp() => _state.OnContainerPointerUp();
         }
 
         #endregion

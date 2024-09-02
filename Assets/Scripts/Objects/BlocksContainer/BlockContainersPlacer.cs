@@ -21,16 +21,13 @@ namespace Objects.BlocksContainer
 
             foreach (var containerData in containerDataList)
             {
-                var holder = _board.GetCell(containerData.position);
+                var cell = _board.GetCell(containerData.position);
 
                 var container = _blockContainerFactory.Create();
                 container.IsPlaced = true;
 
-                holder.BlockContainer = container;
-                holder.CanPlaceItem = false;
-
-                container.SetPosition(holder.GetPosition());
-                container.SetParent(holder.GameObj.transform.parent);
+                _board.AddBlockContainer(container, containerData.position);
+                container.SetParent(cell.GameObj.transform.parent);
 
                 foreach (var color in containerData.color)
                 {
@@ -40,7 +37,7 @@ namespace Objects.BlocksContainer
                     container.Push(block);
                 }
 
-                container.SetCountText(container.Count.ToString(),0);
+                container.SetCountText(container.Count.ToString(), 0);
             }
         }
     }

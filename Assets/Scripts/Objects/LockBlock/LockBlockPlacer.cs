@@ -21,8 +21,6 @@ namespace Objects.LockBlock
                 lockBlock.SetPosition(cell.GetPosition());
                 lockBlock.GameObj.transform.SetParent(cell.GameObj.transform.parent);
                 lockBlock.Count = lockBlockData.count;
-                cell.LockBlock = lockBlock;
-                cell.CanPlaceItem = false;
                 _board.AddLockBlock(lockBlock, lockBlockData.position);
             }
         }
