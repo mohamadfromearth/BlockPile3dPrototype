@@ -435,6 +435,9 @@ namespace Managers
 
             private bool _isRotating = false;
 
+
+            private Quaternion _initialRotation = Quaternion.identity;
+
             public DefaultState(GameManager gameManager)
             {
                 _gameManager = gameManager;
@@ -474,7 +477,8 @@ namespace Managers
 
             private void RotateBoard(Vector3 position)
             {
-                if (_gameManager.blocksMatcher.AreBlocksMatching()) return;
+                if (_gameManager.blocksMatcher.AreBlocksMatching() || _gameManager.helpers.IsShuffling ||
+                    _gameManager._board.IsRotationSnapping) return;
 
                 if (float.IsNaN(_previousX))
                 {
@@ -482,8 +486,10 @@ namespace Managers
                     return;
                 }
 
-                _gameManager._board.Rotate((position.x - _previousX) / 5f);
+                if (_previousX == position.x) return;
+
                 _isRotating = true;
+                _gameManager._board.Rotate((position.x - _previousX) / 5f);
                 _previousX = position.x;
             }
 
@@ -502,6 +508,7 @@ namespace Managers
             private void OnPointerUp()
             {
                 _previousX = float.NaN;
+
                 if (_gameManager._selectedBlockContainer == null &&
                     _gameManager.blocksMatcher.AreBlocksMatching() == false &&
                     _gameManager.helpers.IsShuffling == false && _isRotating)
@@ -560,6 +567,9 @@ namespace Managers
 
             public void Shuffle()
             {
+                if (_isRotating || _gameManager.helpers.IsShuffling ||
+                    _gameManager.blocksMatcher.AreBlocksMatching() || _gameManager._board.IsRotationSnapping) return;
+
                 _gameManager.helpers.ShuffleBoard();
             }
         }

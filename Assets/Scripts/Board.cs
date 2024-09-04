@@ -11,7 +11,7 @@ public class Board
 {
     private readonly Grid _grid;
     private readonly Transform _pivot;
-    private readonly float[] _snapAngles = { 90f, 180f, 270f, 360f };
+    private readonly float[] _snapAngles = { 0, 90f, 180f, 270f, 360f };
 
     public int Width { get; private set; }
     public int Height { get; private set; }

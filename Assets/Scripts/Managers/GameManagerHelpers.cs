@@ -128,7 +128,6 @@ public class GameManagerHelpers : MonoBehaviour
 
     public void ShuffleBoard()
     {
-        if (_isShuffling || blockMatcher.AreBlocksMatching()) return;
         _isShuffling = true;
         StartCoroutine(ShuffleBoardRoutine());
     }
