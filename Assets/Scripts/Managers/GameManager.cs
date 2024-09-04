@@ -263,12 +263,7 @@ namespace Managers
             gameUI.HideBuyingAbilityDialog();
         }
 
-        public void OnShuffle()
-        {
-            if (helpers.IsShuffling) return;
-            _board.Shuffle();
-            StartCoroutine(helpers.UpdateAllBoard());
-        }
+        public void OnShuffle() => _stateManager.Shuffle();
 
         #endregion
 
@@ -351,6 +346,10 @@ namespace Managers
 
                 _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
             }
+
+            public void Shuffle()
+            {
+            }
         }
 
         private class SwapState : IGameState
@@ -415,6 +414,10 @@ namespace Managers
 
                     _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
                 }
+            }
+
+            public void Shuffle()
+            {
             }
 
             private IEnumerator SwapUpdateRoutine(Vector3Int firstPos, Vector3Int secondPos)
@@ -500,11 +503,13 @@ namespace Managers
             {
                 _previousX = float.NaN;
                 if (_gameManager._selectedBlockContainer == null &&
-                    _gameManager.blocksMatcher.AreBlocksMatching() == false && _isRotating)
+                    _gameManager.blocksMatcher.AreBlocksMatching() == false &&
+                    _gameManager.helpers.IsShuffling == false && _isRotating)
                 {
-                    _isRotating = false;
                     _gameManager._board.SnapRotation();
                 }
+
+                _isRotating = false;
             }
 
             public void OnContainerPointerUp()
@@ -552,6 +557,11 @@ namespace Managers
                     }
                 }
             }
+
+            public void Shuffle()
+            {
+                _gameManager.helpers.ShuffleBoard();
+            }
         }
 
         private class GetAnotherChanceState : IGameState
@@ -598,6 +608,10 @@ namespace Managers
 
                 _gameManager._stateManager.ChangeState(GameStateType.Default);
             }
+
+            public void Shuffle()
+            {
+            }
         }
 
 
@@ -635,6 +649,7 @@ namespace Managers
             public void OnContainerPointerDown() => _state.OnContainerPointerDown();
 
             public void OnContainerPointerUp() => _state.OnContainerPointerUp();
+            public void Shuffle() => _state.Shuffle();
         }
 
         #endregion

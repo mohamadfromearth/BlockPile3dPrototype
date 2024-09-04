@@ -31,6 +31,10 @@ public class Board
 
     private int _cellItemsCount;
 
+    private bool _isRotationSnapping = false;
+
+    public bool IsRotationSnapping => _isRotationSnapping;
+
     public bool IsFilled => _cellItemsCount >= _cellsDic.Count;
 
     public Board(int width, int height, Grid grid, Transform pivot)
@@ -178,6 +182,7 @@ public class Board
 
     public void SnapRotation()
     {
+        _isRotationSnapping = true;
         float currentAngle = _pivot.transform.rotation.eulerAngles.y;
         float closestAngle = _snapAngles[0];
         float minDifference = Mathf.Abs(currentAngle - closestAngle);
@@ -192,7 +197,10 @@ public class Board
             }
         }
 
-        _pivot.transform.DORotate(new Vector3(0, closestAngle, 0), 0.5f).SetEase(Ease.InExpo);
+        _pivot.transform.DORotate(new Vector3(0, closestAngle, 0), 0.5f).onComplete = () =>
+        {
+            _isRotationSnapping = false;
+        };
     }
 
 
@@ -245,6 +253,7 @@ public class Board
         }
 
         _cellsDic.Clear();
+        _shuffleHandler.Clear();
     }
 
 
@@ -280,7 +289,7 @@ public class Board
     }
 
 
-    public void Shuffle()
+    public float Shuffle()
     {
         var index = 0;
         var blockContainers = new List<KeyValuePair<Vector3Int, IBlockContainer>>();
@@ -306,8 +315,10 @@ public class Board
         {
             _cellsDic[keyValuePair.Key].BlockContainer = keyValuePair.Value;
             _cellsDic[keyValuePair.Key].CanPlaceItem = false;
-            keyValuePair.Value.SetPosition(_cellsDic[keyValuePair.Key].GetPosition());
+            keyValuePair.Value.MoveTo(_cellsDic[keyValuePair.Key].GameObj.transform, 0.5f);
         }
+
+        return 0.5f;
     }
 
 

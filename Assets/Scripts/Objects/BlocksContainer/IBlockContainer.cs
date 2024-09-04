@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Core;
 using Objects.Block;
@@ -10,6 +9,11 @@ namespace Objects.BlocksContainer
     {
         public void Push(IBlock block);
 
+
+        public void MoveTo(Vector3 position, float duration);
+
+
+        public void MoveTo(Transform target, float duration);
 
         public int Count { get; }
 

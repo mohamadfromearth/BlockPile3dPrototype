@@ -21,6 +21,7 @@ namespace Objects.BlocksContainer
 
         [SerializeField] private TextMeshPro countText;
 
+
         public Stack<Color> Colors { get; set; }
 
         public bool IsPlaced { get; set; }
@@ -131,6 +132,38 @@ namespace Objects.BlocksContainer
         {
             get => Colors.Count == 1;
         }
+
+        public void MoveTo(Vector3 position, float duration)
+        {
+            transform.DOMove(position, duration);
+        }
+
+        public void MoveTo(Transform target, float duration)
+        {
+            StartCoroutine(MoveRoutine(target, duration));
+        }
+
+        private IEnumerator MoveRoutine(Transform target, float duration)
+        {
+            var startPos = GetPosition();
+
+            float passedTime = 0;
+
+            while (true)
+            {
+                transform.position = Vector3.Lerp(startPos, target.position, passedTime / duration);
+
+                if (passedTime >= duration)
+                {
+                    transform.position = target.position;
+                    break;
+                }
+
+                passedTime += Time.deltaTime;
+                yield return null;
+            }
+        }
+
 
         public int Count
         {

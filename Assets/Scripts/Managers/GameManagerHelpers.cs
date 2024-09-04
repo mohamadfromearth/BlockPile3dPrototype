@@ -18,6 +18,7 @@ public class GameManagerHelpers : MonoBehaviour
     [SerializeField] private Transform gridPivot;
 
     private bool _isShuffling = false;
+
     public bool IsShuffling => _isShuffling;
 
     private Vector3Int[] _horizontalGridOffsets = new[]
@@ -125,10 +126,18 @@ public class GameManagerHelpers : MonoBehaviour
     }
 
 
-    public IEnumerator UpdateAllBoard()
+    public void ShuffleBoard()
     {
-        var cells = _board.Cells;
+        if (_isShuffling || blockMatcher.AreBlocksMatching()) return;
         _isShuffling = true;
+        StartCoroutine(ShuffleBoardRoutine());
+    }
+
+    private IEnumerator ShuffleBoardRoutine()
+    {
+        yield return new WaitForSeconds(_board.Shuffle());
+
+        var cells = _board.Cells;
         foreach (var keyValuePair in cells)
         {
             var cell = keyValuePair.Value;

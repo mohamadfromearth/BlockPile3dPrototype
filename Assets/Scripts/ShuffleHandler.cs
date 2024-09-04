@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem.Composites;
 using Utils;
 
 public class ShuffleHandler
@@ -17,4 +16,6 @@ public class ShuffleHandler
 
 
     public List<Vector3Int> GetShuffledPositions() => _availableShufflingPosDic.Keys.ToList().Shuffle();
+
+    public void Clear() => _availableShufflingPosDic.Clear();
 }

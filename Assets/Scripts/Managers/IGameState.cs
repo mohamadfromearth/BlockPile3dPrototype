@@ -14,5 +14,7 @@ namespace Managers
 
 
         public void OnContainerPointerUp();
+
+        public void Shuffle();
     }
 }
