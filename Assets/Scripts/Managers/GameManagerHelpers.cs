@@ -17,6 +17,9 @@ public class GameManagerHelpers : MonoBehaviour
 
     [SerializeField] private Transform gridPivot;
 
+    private bool _isShuffling = false;
+    public bool IsShuffling => _isShuffling;
+
     private Vector3Int[] _horizontalGridOffsets = new[]
     {
         new Vector3Int(1, 0, 0),
@@ -125,6 +128,7 @@ public class GameManagerHelpers : MonoBehaviour
     public IEnumerator UpdateAllBoard()
     {
         var cells = _board.Cells;
+        _isShuffling = true;
         foreach (var keyValuePair in cells)
         {
             var cell = keyValuePair.Value;
@@ -133,5 +137,7 @@ public class GameManagerHelpers : MonoBehaviour
                 yield return blockMatcher.UpdateBoardRoutine(_board.WorldToCell(cell.GetPosition()), true);
             }
         }
+
+        _isShuffling = false;
     }
 }

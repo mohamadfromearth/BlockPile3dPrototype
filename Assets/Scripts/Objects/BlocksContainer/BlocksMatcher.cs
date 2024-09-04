@@ -211,7 +211,6 @@ namespace Objects.BlocksContainer
             {
                 _areBlocksMatching = false;
                 _channel.Rise<UpdateBoardCompleted>(new UpdateBoardCompleted());
-                Debug.Log("Update board is completed");
             }
         }
 

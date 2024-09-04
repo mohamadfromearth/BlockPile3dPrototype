@@ -5,7 +5,6 @@ using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 public class Board
@@ -23,9 +22,11 @@ public class Board
 
     private Dictionary<Vector3Int, ICell> _cellsDic = new();
 
+
     public Dictionary<Vector3Int, ICell> Cells => _cellsDic;
 
-    private List<Vector3Int> _positions = new();
+
+    private ShuffleHandler _shuffleHandler = new ShuffleHandler();
 
 
     private int _cellItemsCount;
@@ -85,11 +86,14 @@ public class Board
     {
         var gridPos = WorldToCell(worldPosition);
 
+
         if (_cellsDic.TryGetValue(gridPos, out var cell))
         {
             _cellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
             cell.CanPlaceItem = blockContainer == null;
             cell.BlockContainer = blockContainer;
+
+            _shuffleHandler.Add(gridPos);
         }
     }
 
@@ -104,6 +108,7 @@ public class Board
             cell.BlockContainer = blockContainer;
             cell.BlockContainer = blockContainer;
             blockContainer?.SetPosition(cell.GetPosition());
+            _shuffleHandler.Add(gridPosition);
         }
     }
 
@@ -116,6 +121,9 @@ public class Board
             cell.CanPlaceItem = advertiseBlock == null;
 
             cell.AdvertiseBlock = advertiseBlock;
+
+            if (cell.CanPlaceItem) _shuffleHandler.Add(gridPosition);
+            else _shuffleHandler.Remove(gridPosition);
         }
     }
 
@@ -140,6 +148,9 @@ public class Board
 
             cell.LockBlock = lockBlock;
             cell.CanPlaceItem = lockBlock == null;
+
+            if (cell.CanPlaceItem) _shuffleHandler.Add(gridPosition);
+            else _shuffleHandler.Remove(gridPosition);
         }
     }
 
@@ -234,7 +245,6 @@ public class Board
         }
 
         _cellsDic.Clear();
-        _positions.Clear();
     }
 
 
@@ -258,7 +268,8 @@ public class Board
                 cell.SetPosition(pos);
 
                 _cellsDic[gridPos] = cell;
-                _positions.Add(gridPos);
+
+                _shuffleHandler.Add(gridPos);
             }
         }
 
@@ -271,9 +282,10 @@ public class Board
 
     public void Shuffle()
     {
-        var shuffledPosition = _positions.Shuffle();
         var index = 0;
         var blockContainers = new List<KeyValuePair<Vector3Int, IBlockContainer>>();
+        var shuffledPosition = _shuffleHandler.GetShuffledPositions();
+
 
         foreach (var keyValuePair in _cellsDic)
         {
@@ -281,12 +293,12 @@ public class Board
             if (container != null)
             {
                 var newPos = shuffledPosition[index];
+
                 blockContainers.Add(new(newPos, container));
                 keyValuePair.Value.BlockContainer = null;
                 keyValuePair.Value.CanPlaceItem = true;
+                index++;
             }
-
-            index++;
         }
 
 

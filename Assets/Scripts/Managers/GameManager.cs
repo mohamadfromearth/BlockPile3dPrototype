@@ -265,6 +265,7 @@ namespace Managers
 
         public void OnShuffle()
         {
+            if (helpers.IsShuffling) return;
             _board.Shuffle();
             StartCoroutine(helpers.UpdateAllBoard());
         }
@@ -429,6 +430,8 @@ namespace Managers
 
             private float _previousX = float.NaN;
 
+            private bool _isRotating = false;
+
             public DefaultState(GameManager gameManager)
             {
                 _gameManager = gameManager;
@@ -477,6 +480,7 @@ namespace Managers
                 }
 
                 _gameManager._board.Rotate((position.x - _previousX) / 5f);
+                _isRotating = true;
                 _previousX = position.x;
             }
 
@@ -496,8 +500,9 @@ namespace Managers
             {
                 _previousX = float.NaN;
                 if (_gameManager._selectedBlockContainer == null &&
-                    _gameManager.blocksMatcher.AreBlocksMatching() == false)
+                    _gameManager.blocksMatcher.AreBlocksMatching() == false && _isRotating)
                 {
+                    _isRotating = false;
                     _gameManager._board.SnapRotation();
                 }
             }
