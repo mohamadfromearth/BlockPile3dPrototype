@@ -42,7 +42,7 @@ namespace Di
 
         // selectionBar
         [SerializeField] private List<Color> colors;
-        [SerializeField] private List<Transform> selectionBarPositionList;
+        [SerializeField] private BlockContainerSelectionBarData blockContainerSelectionBarData;
 
         [SerializeField] private Camera camera;
 
@@ -93,7 +93,7 @@ namespace Di
             Container.Bind<Board>().AsSingle().WithArguments(levelData.size, levelData.size, grid, gridPivot);
 
             Container.Bind<BlockContainerSelectionBar>().AsTransient()
-                .WithArguments(selectionBarPositionList.Select(t => t.position).ToList());
+                .WithArguments(blockContainerSelectionBarData);
 
             #region Placers
 

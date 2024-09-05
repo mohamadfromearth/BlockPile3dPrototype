@@ -1,33 +1,45 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Data;
+using DG.Tweening;
 using Objects.Block;
 using Objects.BlocksContainer;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
+
+[System.Serializable]
+public struct BlockContainerSelectionBarData
+{
+    public List<Transform> containersPositionList;
+    public List<Transform> containersSpawningPositionList;
+    public float movingDuration;
+    public int count;
+    public Ease movingEase;
+}
 
 public class BlockContainerSelectionBar
 {
     [Inject] private IBlockContainerFactory _blockContainerFactory;
     [Inject] private IBlockFactory _blockFactory;
     [Inject] private ColorRepository _colorRepository;
-    private readonly List<Vector3> _containersPositionList;
+
 
     private IBlockContainer[] _blockContainers = new IBlockContainer[3];
+
+    private BlockContainerSelectionBarData _data;
 
 
     public int Count { get; private set; }
 
-    public BlockContainerSelectionBar(List<Vector3> containersPositionList)
+    public BlockContainerSelectionBar(BlockContainerSelectionBarData data)
     {
-        _containersPositionList = containersPositionList;
-        Count = 3;
+        _data = data;
     }
 
 
     public void Spawn(List<string> colors)
     {
-        Count = _containersPositionList.Count;
+        Count = _data.count;
 
 
         // foreach (var position in _containersPositionList)
@@ -67,15 +79,17 @@ public class BlockContainerSelectionBar
         //     }
         // }  
 
-        for (int positionIndex = 0; positionIndex < _containersPositionList.Count; positionIndex++)
+        for (int positionIndex = 0; positionIndex < _data.containersPositionList.Count; positionIndex++)
         {
-            var position = _containersPositionList[positionIndex];
+            var position = _data.containersSpawningPositionList[positionIndex].position;
+            var targetPos = _data.containersPositionList[positionIndex];
 
             var container = _blockContainerFactory.Create();
 
             _blockContainers[positionIndex] = container;
 
             container.SetPosition(position);
+            container.MoveTo(targetPos.position, _data.movingDuration, _data.movingEase);
 
             var colorsCount = Random.Range(2, 4);
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Core;
+using DG.Tweening;
 using Objects.Block;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace Objects.BlocksContainer
         public void Push(IBlock block);
 
 
-        public void MoveTo(Vector3 position, float duration);
+        public void MoveTo(Vector3 position, float duration, Ease ease = Ease.Linear);
 
 
         public void MoveTo(Transform target, float duration);

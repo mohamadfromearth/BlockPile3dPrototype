@@ -4,6 +4,7 @@ using System.Linq;
 using Data;
 using Event;
 using Objects.BlocksContainer;
+using Objects.Cell;
 using Scrips.Event;
 using UI;
 using UnityEngine;
@@ -435,8 +436,8 @@ namespace Managers
 
             private bool _isRotating = false;
 
+            private ICell _currentCell;
 
-            private Quaternion _initialRotation = Quaternion.identity;
 
             public DefaultState(GameManager gameManager)
             {
@@ -502,6 +503,26 @@ namespace Managers
                     var pos = cellPos.Value;
                     pos.y += 2;
                     _gameManager._selectedBlockContainer.SetPosition(pos);
+
+
+                    pos.y = 0;
+                    pos.x += 0.8f;
+                    pos.z += 0.8f;
+
+                    var cell =
+                        _gameManager._board.GetCell(
+                            _gameManager.helpers.ModifyBlockContainerPositionForRotatedGrid(pos));
+
+                    if (cell != null)
+                    {
+                        if (_currentCell != null)
+                        {
+                            _currentCell.SetColor(Color.cyan);
+                        }
+
+                        cell.SetColor(Color.white);
+                        _currentCell = cell;
+                    }
                 }
             }
 

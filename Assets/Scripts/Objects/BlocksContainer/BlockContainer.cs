@@ -133,9 +133,9 @@ namespace Objects.BlocksContainer
             get => Colors.Count == 1;
         }
 
-        public void MoveTo(Vector3 position, float duration)
+        public void MoveTo(Vector3 position, float duration, Ease ease = Ease.Linear)
         {
-            transform.DOMove(position, duration);
+            transform.DOMove(position, duration).SetEase(ease);
         }
 
         public void MoveTo(Transform target, float duration)
