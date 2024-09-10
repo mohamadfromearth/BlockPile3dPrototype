@@ -7,7 +7,9 @@ namespace Objects.Block
     {
         [SerializeField] private new MeshRenderer renderer;
 
+
         private Tween _scaleTween;
+
 
         private bool _hasBeenDestroyed = false;
 
@@ -34,7 +36,7 @@ namespace Objects.Block
                 {
                     material.color = value;
                 }
-                
+
 
                 color = value;
             }

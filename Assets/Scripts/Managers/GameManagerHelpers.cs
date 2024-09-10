@@ -83,17 +83,22 @@ public class GameManagerHelpers : MonoBehaviour
 
     public void UpdateAbilityButtons(GameUI gameUI)
     {
-        gameUI.SetPunchIntractable(_levelRepository.LevelIndex >=
+        var level = _levelRepository.LevelIndex + 1;
+        gameUI.SetPunchIntractable(level >=
                                    _abilityRepository.GetAbilityData(AbilityType.Punch).unLockLevel);
-        gameUI.SetSwapIntractable(_levelRepository.LevelIndex >=
+        gameUI.SetSwapIntractable(level >=
                                   _abilityRepository.GetAbilityData(AbilityType.Swap).unLockLevel);
-        gameUI.SetRefreshIntractable(_levelRepository.LevelIndex >=
+        gameUI.SetRefreshIntractable(level >=
                                      _abilityRepository.GetAbilityData(AbilityType.Refresh).unLockLevel);
 
-        gameUI.SetCoinText("Coin:" + _currencyRepository.GetCoin());
-        gameUI.SetPunchButtonText("Punch" + _abilityRepository.GetAbilityData(AbilityType.Punch).count);
-        gameUI.SetSwapButtonText("Swap" + _abilityRepository.GetAbilityData(AbilityType.Swap).count);
-        gameUI.SetRefreshButtonText("Refresh" + _abilityRepository.GetAbilityData(AbilityType.Refresh).count);
+        gameUI.SetCoinText(_currencyRepository.GetCoin().ToString());
+        gameUI.SetPunchCountText(_abilityRepository.GetAbilityData(AbilityType.Punch).count.ToString());
+        gameUI.SetSwapCountText(_abilityRepository.GetAbilityData(AbilityType.Swap).count.ToString());
+        gameUI.SetRefreshCountText(_abilityRepository.GetAbilityData(AbilityType.Refresh).count.ToString());
+
+        gameUI.SetPunchUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Punch).unLockLevel);
+        gameUI.SetSwapUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Swap).unLockLevel);
+        gameUI.SetRefreshUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Refresh).unLockLevel);
     }
 
     public Vector3 ModifyBlockContainerPositionForRotatedGrid(Vector3 position)

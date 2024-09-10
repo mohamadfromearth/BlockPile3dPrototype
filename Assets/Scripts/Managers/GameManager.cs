@@ -508,21 +508,6 @@ namespace Managers
                     pos.y = 0;
                     pos.x += 0.8f;
                     pos.z += 0.8f;
-
-                    var cell =
-                        _gameManager._board.GetCell(
-                            _gameManager.helpers.ModifyBlockContainerPositionForRotatedGrid(pos));
-
-                    if (cell != null)
-                    {
-                        if (_currentCell != null)
-                        {
-                            _currentCell.SetColor(Color.cyan);
-                        }
-
-                        cell.SetColor(Color.white);
-                        _currentCell = cell;
-                    }
                 }
             }
 

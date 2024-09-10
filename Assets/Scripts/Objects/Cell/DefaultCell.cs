@@ -48,6 +48,7 @@ namespace Objects.Cell
         public Color GetColor() => color;
 
 
+        // Todo crash
         public void Destroy() => Destroy(gameObject);
 
         public void SetPosition(Vector3 position) => transform.position = position;

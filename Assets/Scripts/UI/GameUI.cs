@@ -1,3 +1,4 @@
+using System;
 using CoreUI;
 using Data;
 using TMPro;
@@ -7,19 +8,39 @@ using UnityEngine.UI;
 
 namespace UI
 {
+    [Serializable]
+    public struct AbilityButton
+    {
+        public Button button;
+        public Image countBackground;
+        public TextMeshProUGUI countText;
+        public Image lockImage;
+        public TextMeshProUGUI unLockLevelText;
+
+        public void SetIntractable(bool isIntractable)
+        {
+            button.interactable = isIntractable;
+            countBackground.gameObject.SetActive(isIntractable);
+            countText.gameObject.SetActive(isIntractable);
+            lockImage.gameObject.SetActive(!isIntractable);
+            unLockLevelText.gameObject.SetActive(!isIntractable);
+        }
+    }
+
     public class GameUI : MonoBehaviour
     {
         [SerializeField] private GameObject panel;
         [SerializeField] private TextMeshProUGUI progressText;
         [SerializeField] private Image progressImage;
+
         [SerializeField] private Image progressBackgroundImage;
-        [SerializeField] private Button punchButton;
-        [SerializeField] private Button swapButton;
-        [SerializeField] private Button refreshButton;
-        [SerializeField] private TextMeshProUGUI punchButtonText;
-        [SerializeField] private TextMeshProUGUI swapButtonText;
-        [SerializeField] private TextMeshProUGUI refreshButtonText;
-        [SerializeField] private HorizontalLayoutGroup abilityBarLg;
+
+
+        [SerializeField] private AbilityButton punchButton;
+        [SerializeField] private AbilityButton swapButton;
+        [SerializeField] private AbilityButton refreshButton;
+
+
         [SerializeField] private DialogueTypeA buyingAbilityDialog;
         [SerializeField] private TextMeshProUGUI coinText;
         [SerializeField] private Button abilityCancelButton;
@@ -34,18 +55,24 @@ namespace UI
 
         public void SetCoinText(string text) => coinText.text = text;
 
-        public void SetPunchButtonText(string text) => punchButtonText.text = text;
+        public void SetPunchCountText(string text) => punchButton.countText.text = text;
 
-        public void SetSwapButtonText(string text) => swapButtonText.text = text;
+        public void SetSwapCountText(string text) => swapButton.countText.text = text;
 
-        public void SetRefreshButtonText(string text) => refreshButtonText.text = text;
+        public void SetRefreshCountText(string text) => refreshButton.countText.text = text;
 
 
-        public void AddPunchClickListener(UnityAction action) => punchButton.onClick.AddListener(action);
-        public void RemovePunchClickListener(UnityAction action) => punchButton.onClick.RemoveListener(action);
-        public void AddSwapButtonClickListener(UnityAction action) => swapButton.onClick.AddListener(action);
-        public void RemoveSwapButtonClickListener(UnityAction action) => swapButton.onClick.RemoveListener(action);
-        public void AddRefreshButtonClickListener(UnityAction action) => refreshButton.onClick.AddListener(action);
+        public void AddPunchClickListener(UnityAction action) =>
+            punchButton.button.onClick.AddListener(action);
+
+        public void RemovePunchClickListener(UnityAction action) => punchButton.button.onClick.RemoveListener(action);
+        public void AddSwapButtonClickListener(UnityAction action) => swapButton.button.onClick.AddListener(action);
+
+        public void RemoveSwapButtonClickListener(UnityAction action) =>
+            swapButton.button.onClick.RemoveListener(action);
+
+        public void AddRefreshButtonClickListener(UnityAction action) =>
+            refreshButton.button.onClick.AddListener(action);
 
         public void AddBuyAbilityClickListener(UnityAction action) =>
             buyingAbilityDialog.AddButtonAClickListener(action);
@@ -61,7 +88,7 @@ namespace UI
             buyingAbilityDialog.RemoveButtonBClickListener(action);
 
         public void RemoveRefreshButtonClickListener(UnityAction action) =>
-            refreshButton.onClick.RemoveListener(action);
+            refreshButton.button.onClick.RemoveListener(action);
 
         public void AddAbilityCancelClickListener(UnityAction action) =>
             abilityCancelButton.onClick.AddListener(action);
@@ -70,11 +97,16 @@ namespace UI
             abilityCancelButton.onClick.AddListener(action);
 
 
-        public void SetRefreshIntractable(bool isIntractable) => refreshButton.interactable = isIntractable;
+        public void SetRefreshIntractable(bool isIntractable) => refreshButton.SetIntractable(isIntractable);
 
-        public void SetSwapIntractable(bool isIntractable) => swapButton.interactable = isIntractable;
 
-        public void SetPunchIntractable(bool isIntractable) => punchButton.interactable = isIntractable;
+        public void SetSwapIntractable(bool isIntractable) => swapButton.SetIntractable(isIntractable);
+
+        public void SetPunchIntractable(bool isIntractable) => punchButton.SetIntractable(isIntractable);
+
+        public void SetRefreshUnLockLevelText(string text) => refreshButton.unLockLevelText.text = text;
+        public void SetSwapUnLockLevelText(string text) => swapButton.unLockLevelText.text = text;
+        public void SetPunchUnLockLevelText(string text) => punchButton.unLockLevelText.text = text;
 
 
         public void ShowBuyingAbilityDialog(AbilityData abilityData)
