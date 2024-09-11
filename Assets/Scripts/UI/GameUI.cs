@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace UI
 {
     [Serializable]
-    public struct AbilityButton
+    public class AbilityButton
     {
         public Button button;
         public Image countBackground;
@@ -27,6 +27,7 @@ namespace UI
         }
     }
 
+
     public class GameUI : MonoBehaviour
     {
         [SerializeField] private GameObject panel;
@@ -40,6 +41,8 @@ namespace UI
         [SerializeField] private AbilityButton swapButton;
         [SerializeField] private AbilityButton refreshButton;
 
+        [SerializeField] private TargetGoalUI targetGoal;
+
 
         [SerializeField] private DialogueTypeA buyingAbilityDialog;
         [SerializeField] private TextMeshProUGUI coinText;
@@ -47,6 +50,12 @@ namespace UI
         private AbilityData _abilityData;
 
         public AbilityData AbilityData => _abilityData;
+
+
+        public void ShowTargetGoal(string level, string goal) => StartCoroutine(targetGoal.Show(
+            level,
+            goal
+        ));
 
 
         public void SetProgress(float value) => progressImage.fillAmount = value;

@@ -301,6 +301,12 @@ namespace Managers
         private void StartLevel()
         {
             var levelData = _levelRepository.GetLevelData();
+
+            gameUI.ShowTargetGoal(
+                "Level: " + _levelRepository.LevelIndex,
+                levelData.targetScore.ToString()
+            );
+
             _selectionBar.Spawn(levelData.colors);
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
             _placer.Place();
