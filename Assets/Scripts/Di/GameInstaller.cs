@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Data;
 using Event;
 using Objects.AdvertiseBlock;
@@ -45,6 +44,7 @@ namespace Di
         [SerializeField] private BlockContainerSelectionBarData blockContainerSelectionBarData;
 
         [SerializeField] private Camera camera;
+        [SerializeField] private CameraSizeSetterData cameraSizeSetterData;
 
         public override void InstallBindings()
         {
@@ -106,7 +106,7 @@ namespace Di
 
             #region Helpers
 
-            Container.Bind<CameraSizeSetter>().AsTransient().WithArguments(camera);
+            Container.Bind<CameraSizeSetter>().AsTransient().WithArguments(cameraSizeSetterData);
 
             #endregion
         }

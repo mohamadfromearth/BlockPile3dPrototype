@@ -1,17 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Data;
 using DG.Tweening;
 using Objects.Block;
 using Objects.BlocksContainer;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
+using Random = UnityEngine.Random;
 
-[System.Serializable]
+[Serializable]
 public struct BlockContainerSelectionBarData
 {
     public List<Transform> containersPositionList;
     public List<Transform> containersSpawningPositionList;
+    public Transform blockSelectionBarTransform;
     public float movingDuration;
     public int count;
     public Ease movingEase;
@@ -39,6 +41,12 @@ public class BlockContainerSelectionBar
 
     public void Spawn(List<string> colors)
     {
+        Spawn(colors, _data.blockSelectionBarTransform.position);
+    }
+
+    public void Spawn(List<string> colors, Vector3 parentPos)
+    {
+        _data.blockSelectionBarTransform.position = parentPos;
         Count = _data.count;
 
 
@@ -117,6 +125,19 @@ public class BlockContainerSelectionBar
         }
     }
 
+
+    public void BackToInitialPosition(IBlockContainer blockContainer)
+    {
+        for (int i = 0; i < _blockContainers.Length; i++)
+        {
+            if (blockContainer == _blockContainers[i])
+            {
+                blockContainer.SetPosition(_data.containersPositionList[i].position);
+                break;
+            }
+        }
+    }
+
     public void Clear()
     {
         for (int i = 0; i < _blockContainers.Length; i++)
@@ -133,7 +154,7 @@ public class BlockContainerSelectionBar
     public void Refresh(List<string> colors)
     {
         Clear();
-        Spawn(colors);
+        Spawn(colors, _data.blockSelectionBarTransform.position);
     }
 
     public void Decrease() => Count--;

@@ -39,5 +39,13 @@ namespace Utils
 
             return position;
         }
+
+
+        public static Vector3 UiToWorld(this RectTransform rectTransform, Camera camera, LayerMask layer)
+        {
+            var screenPoint = RectTransformUtility.WorldToScreenPoint(camera, rectTransform.position);
+            var screenPosition = PositionConverters.ScreenToWorldPosition(screenPoint, camera, layer);
+            return screenPosition ?? Vector3.zero;
+        }
     }
 }

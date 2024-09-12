@@ -1,32 +1,55 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Zenject;
+
+[Serializable]
+public class CameraSizeSetterData
+{
+    public Camera camera;
+    public RectTransform top;
+    public RectTransform down;
+    public LayerMask mask;
+}
+
 
 public class CameraSizeSetter
 {
-    private readonly Camera _camera;
-
+    private CameraSizeSetterData _data;
 
     [Inject] private Board _board;
 
-    public CameraSizeSetter(Camera camera)
+
+    public CameraSizeSetter(CameraSizeSetterData data)
     {
-        _camera = camera;
+        _data = data;
     }
 
 
     public void RefreshSize()
     {
-        if (Screen.width > Screen.height) return;
+        Vector3 cameraPos = _data.camera.transform.position;
+        if (Screen.height > Screen.width)
+        {
+            float screenAspect = (float)Screen.width / (float)Screen.height;
 
-        var leftPosition = _board.CellToWorld(new Vector3Int(0, 0, _board.Height));
-        var rightPosition = _board.CellToWorld(new Vector3Int(_board.Width, 0, 0));
+            var leftPosition = _board.CellToWorld(new Vector3Int(0, 0, _board.Height));
+            var rightPosition = _board.CellToWorld(new Vector3Int(_board.Width, 0, 0));
 
-        var topPosition = _board.CellToWorld(new Vector3Int(_board.Width, 0, 0));
+            float cameraWidth = Vector3.Distance(leftPosition, rightPosition);
+            var size = cameraWidth / (2 * screenAspect);
+            _data.camera.orthographicSize = cameraWidth / (2 * screenAspect);
+            cameraPos.y = size;
+        }
+        else
+        {
+            var topPosition = _board.CellToWorld(new Vector3Int(_board.Width + 1, 0, _board.Width + 1));
+            var downPosition = _board.CellToWorld(new Vector3Int(-1, 0, -1));
+            float cameraHeight = Vector3.Distance(topPosition, downPosition);
+            var size = cameraHeight / 2;
+            _data.camera.orthographicSize = size;
+            cameraPos.y = size;
+        }
 
-        float screenAspect = (float)Screen.width / (float)Screen.height;
-
-        float cameraWidth = Vector3.Distance(leftPosition, rightPosition);
-
-        _camera.orthographicSize = cameraWidth / (2 * screenAspect);
+        _data.camera.transform.position = cameraPos;
     }
 }

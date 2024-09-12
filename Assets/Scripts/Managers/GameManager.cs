@@ -23,8 +23,6 @@ namespace Managers
 
         [SerializeField] private LayerMask groundLayerMask;
 
-        [SerializeField] private List<Transform> selectionBarCellContainerTransformList;
-        private List<Vector3> _selectionBarCellContainerPosList = new();
         [SerializeField] private GameManagerHelpers helpers;
         [SerializeField] private BlocksMatcher blocksMatcher;
         [SerializeField] private Grid grid;
@@ -60,9 +58,8 @@ namespace Managers
 
         private void Start()
         {
-            _selectionBarCellContainerPosList = selectionBarCellContainerTransformList.Select(t => t.position).ToList();
-
             StartLevel();
+
 
             helpers.UpdateAbilityButtons(gameUI);
         }
@@ -307,12 +304,13 @@ namespace Managers
                 levelData.targetScore.ToString()
             );
 
-            _selectionBar.Spawn(levelData.colors);
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
             _placer.Place();
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
             _cameraSizeSetter.RefreshSize();
+            _selectionBar.Spawn(levelData.colors, _board.WorldToCell(Vector3Int.zero));
+
         }
 
         #region States
@@ -475,10 +473,6 @@ namespace Managers
                 if (container.IsPlaced) return;
 
                 _gameManager._selectedBlockContainer = container;
-
-                _gameManager._selectionBarSelectedIndex =
-                    ListUtils.GetIndex(_gameManager._selectedBlockContainer.GetPosition(),
-                        _gameManager._selectionBarCellContainerPosList);
             }
 
 
@@ -570,8 +564,7 @@ namespace Managers
                     }
                     else
                     {
-                        _gameManager._selectedBlockContainer.SetPosition(
-                            _gameManager._selectionBarCellContainerPosList[_gameManager._selectionBarSelectedIndex]);
+                        _gameManager._selectionBar.BackToInitialPosition(_gameManager._selectedBlockContainer);
                         _gameManager._selectedBlockContainer = null;
                     }
                 }
