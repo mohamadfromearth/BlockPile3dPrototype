@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Data;
 using Event;
 using Objects.BlocksContainer;
@@ -147,7 +146,7 @@ namespace Managers
             _channel.Rise<ScoreChanged>(new ScoreChanged(_currentScore));
         }
 
-        private void OnNextLevel()
+        public void OnNextLevel()
         {
             _board.Clear();
             _selectionBar.Clear();
@@ -300,7 +299,7 @@ namespace Managers
             var levelData = _levelRepository.GetLevelData();
 
             gameUI.ShowTargetGoal(
-                "Level: " + _levelRepository.LevelIndex,
+                "Level: " + (_levelRepository.LevelIndex + 1),
                 levelData.targetScore.ToString()
             );
 
@@ -309,8 +308,7 @@ namespace Managers
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
             _cameraSizeSetter.RefreshSize();
-            _selectionBar.Spawn(levelData.colors, _board.WorldToCell(Vector3Int.zero));
-
+            _selectionBar.Spawn(levelData.colors, _board.WorldToCell(new Vector3Int(0, 0, 0)));
         }
 
         #region States
@@ -442,6 +440,8 @@ namespace Managers
 
             private ICell _currentCell;
 
+            private ICell _cellToDrop = null;
+
 
             public DefaultState(GameManager gameManager)
             {
@@ -496,11 +496,11 @@ namespace Managers
 
             private void MoveSelectedContainer(Vector3 position)
             {
-                var cellPos = PositionConverters.ScreenToWorldPosition(position, _gameManager._camera,
+                var blockContainerPos = PositionConverters.ScreenToWorldPosition(position, _gameManager._camera,
                     _gameManager.groundLayerMask);
-                if (cellPos.HasValue)
+                if (blockContainerPos.HasValue)
                 {
-                    var pos = cellPos.Value;
+                    var pos = blockContainerPos.Value;
                     pos.y += 2;
                     _gameManager._selectedBlockContainer.SetPosition(pos);
 
@@ -508,12 +508,25 @@ namespace Managers
                     pos.y = 0;
                     pos.x += 0.8f;
                     pos.z += 0.8f;
+
+
+                    var cell = _gameManager._board.GetCell(_gameManager.helpers
+                        .ModifyBlockContainerPositionForRotatedGrid(pos));
+
+                    _cellToDrop?.SetSelected(false);
+
+                    if (cell != null)
+                    {
+                        cell.SetSelected(true);
+                        _cellToDrop = cell;
+                    }
                 }
             }
 
             private void OnPointerUp()
             {
                 _previousX = float.NaN;
+                _cellToDrop?.SetSelected(false);
 
                 if (_gameManager._selectedBlockContainer == null &&
                     _gameManager.blocksMatcher.AreBlocksMatching() == false &&

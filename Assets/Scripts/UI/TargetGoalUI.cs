@@ -24,6 +24,7 @@ namespace UI
         public Ease hidingTranslationEase = Ease.Linear;
         public float hidingTranslationDuration = 0.8f;
         public float hidingFadeDuration = 0.8f;
+        public float hideDelay = 0.3f;
 
         private Vector3 _initPos;
 
@@ -34,7 +35,7 @@ namespace UI
             goalText.text = goal;
             _initPos = background.transform.position;
 
-            background.transform.DOScale(Vector3.one, scaleUpDuration);
+            background.transform.DOScale(Vector3.one, scaleUpDuration).SetEase(scaleUpEase);
 
             yield return new WaitForSeconds(scaleUpDuration);
 
@@ -43,7 +44,8 @@ namespace UI
             blocksImage.transform.DOScale(Vector3.one, scaleUpDuration).SetEase(scaleUpEase);
             goalText.transform.DOScale(Vector3.one, scaleUpDuration).SetEase(scaleUpEase);
 
-            yield return new WaitForSeconds(scaleUpDuration);
+            yield return new WaitForSeconds(scaleUpDuration + hideDelay);
+
 
             yield return Hide();
         }

@@ -19,7 +19,7 @@ namespace UI
 
         public void SetIntractable(bool isIntractable)
         {
-            button.interactable = isIntractable;
+            button.enabled = isIntractable;
             countBackground.gameObject.SetActive(isIntractable);
             countText.gameObject.SetActive(isIntractable);
             lockImage.gameObject.SetActive(!isIntractable);
@@ -33,6 +33,9 @@ namespace UI
         [SerializeField] private GameObject panel;
         [SerializeField] private TextMeshProUGUI progressText;
         [SerializeField] private Image progressImage;
+        [SerializeField] private Image background;
+        [SerializeField] private Sprite verticalSprite;
+        [SerializeField] private Sprite horizontalSprite;
 
         [SerializeField] private Image progressBackgroundImage;
 
@@ -40,6 +43,16 @@ namespace UI
         [SerializeField] private AbilityButton punchButton;
         [SerializeField] private AbilityButton swapButton;
         [SerializeField] private AbilityButton refreshButton;
+
+        [SerializeField] private HorizontalLayoutGroup abilitiesHl;
+        [SerializeField] private VerticalLayoutGroup abilitiesVl;
+
+        [SerializeField] private Transform verticalY;
+        [SerializeField] private Transform horizontalY;
+
+        [SerializeField] private Button settingButton;
+        [SerializeField] private Transform coinTransform;
+        [SerializeField] private Transform progressTransform;
 
         [SerializeField] private TargetGoalUI targetGoal;
 
@@ -50,6 +63,26 @@ namespace UI
         private AbilityData _abilityData;
 
         public AbilityData AbilityData => _abilityData;
+
+
+        private void Start()
+        {
+            bool isLandScape = Screen.width > Screen.height;
+
+            float y = isLandScape ? horizontalY.position.y : verticalY.position.y;
+
+            progressTransform.position = new Vector3(progressTransform.position.x, y, progressTransform.position.z);
+            coinTransform.position = new Vector3(coinTransform.position.x, y, coinTransform.position.z);
+            settingButton.transform.position =
+                new Vector3(settingButton.transform.position.x, y, settingButton.transform.position.z);
+
+            var abilityButtonsParent = isLandScape ? abilitiesVl.transform : abilitiesHl.transform;
+            punchButton.button.transform.SetParent(abilityButtonsParent);
+            swapButton.button.transform.SetParent(abilityButtonsParent);
+            refreshButton.button.transform.SetParent(abilityButtonsParent);
+
+            background.sprite = isLandScape ? horizontalSprite : verticalSprite;
+        }
 
 
         public void ShowTargetGoal(string level, string goal) => StartCoroutine(targetGoal.Show(

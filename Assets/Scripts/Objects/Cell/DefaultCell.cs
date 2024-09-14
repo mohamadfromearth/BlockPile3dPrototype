@@ -12,6 +12,9 @@ namespace Objects.Cell
         [SerializeField] private new MeshRenderer renderer;
         [SerializeField] private Color color;
 
+        [SerializeField] private Color selectedColor;
+        [SerializeField] private Color unSelectedColor;
+
         public bool canPlaceItem = true;
 
         public bool CanPlaceItem
@@ -49,6 +52,12 @@ namespace Objects.Cell
 
 
         // Todo crash
+        public void SetSelected(bool isSelected)
+        {
+            var color = isSelected ? selectedColor : unSelectedColor;
+            SetColor(color);
+        }
+
         public void Destroy() => Destroy(gameObject);
 
         public void SetPosition(Vector3 position) => transform.position = position;

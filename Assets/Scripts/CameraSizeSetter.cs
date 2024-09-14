@@ -32,8 +32,8 @@ public class CameraSizeSetter
         {
             float screenAspect = (float)Screen.width / (float)Screen.height;
 
-            var leftPosition = _board.CellToWorld(new Vector3Int(0, 0, _board.Height));
-            var rightPosition = _board.CellToWorld(new Vector3Int(_board.Width, 0, 0));
+            var leftPosition = _board.CellToWorld(new Vector3Int(0, 0, _board.Height + 1));
+            var rightPosition = _board.CellToWorld(new Vector3Int(_board.Width - 1, 0, 0));
 
             float cameraWidth = Vector3.Distance(leftPosition, rightPosition);
             var size = cameraWidth / (2 * screenAspect);
@@ -42,8 +42,8 @@ public class CameraSizeSetter
         }
         else
         {
-            var topPosition = _board.CellToWorld(new Vector3Int(_board.Width + 1, 0, _board.Width + 1));
-            var downPosition = _board.CellToWorld(new Vector3Int(-1, 0, -1));
+            var topPosition = _board.CellToWorld(new Vector3Int(_board.Width, 0, _board.Width));
+            var downPosition = _board.CellToWorld(new Vector3Int(-2, 0, -2));
             float cameraHeight = Vector3.Distance(topPosition, downPosition);
             var size = cameraHeight / 2;
             _data.camera.orthographicSize = size;
