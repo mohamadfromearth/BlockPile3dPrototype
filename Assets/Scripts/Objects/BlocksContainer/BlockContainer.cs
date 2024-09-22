@@ -99,6 +99,7 @@ namespace Objects.BlocksContainer
             bool destroyContainer)
         {
             int count = 0;
+            var pos = transform.position;
 
             foreach (var block in blocksBuffer)
             {
@@ -117,7 +118,7 @@ namespace Objects.BlocksContainer
                 SetCountText(Count.ToString(), 0);
             }
 
-            Channel.Rise<BlockDestroy>(new BlockDestroy(count));
+            Channel.Rise<BlockDestroy>(new BlockDestroy(count, pos));
         }
 
         private bool _hasBeenDestroyed = false;

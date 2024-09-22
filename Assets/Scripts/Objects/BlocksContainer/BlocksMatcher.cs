@@ -149,8 +149,11 @@ namespace Objects.BlocksContainer
                 if (targetContainer.Count >= MaxBlock)
                 {
                     var targetPosition = targetContainer.GetPosition();
+                    var targetCount = targetContainer.Count;
                     targetContainer.SetCountText("", 0);
                     yield return new WaitForSeconds(targetContainer.Destroy());
+
+                    _channel.Rise<TargetBlockDestroyed>(new TargetBlockDestroyed(targetPosition, targetCount));
 
                     if (targetContainer.Colors.Count == 0)
                     {

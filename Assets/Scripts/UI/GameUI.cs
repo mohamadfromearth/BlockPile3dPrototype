@@ -1,10 +1,12 @@
 using System;
 using CoreUI;
 using Data;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Utils;
 
 namespace UI
 {
@@ -30,14 +32,18 @@ namespace UI
 
     public class GameUI : MonoBehaviour
     {
+        [SerializeField] private Camera camera;
         [SerializeField] private GameObject panel;
         [SerializeField] private TextMeshProUGUI progressText;
         [SerializeField] private Image progressImage;
+        [SerializeField] private Transform blockProgressImage;
         [SerializeField] private Image background;
         [SerializeField] private Sprite verticalSprite;
         [SerializeField] private Sprite horizontalSprite;
 
         [SerializeField] private Image progressBackgroundImage;
+
+        [SerializeField] private Transform blockToTargetScoreImage;
 
 
         [SerializeField] private AbilityButton punchButton;
@@ -53,6 +59,7 @@ namespace UI
         [SerializeField] private Button settingButton;
         [SerializeField] private Transform coinTransform;
         [SerializeField] private Transform progressTransform;
+        [SerializeField] private Transform blocksImageTransform;
 
         [SerializeField] private TargetGoalUI targetGoal;
 
@@ -60,10 +67,19 @@ namespace UI
         [SerializeField] private DialogueTypeA buyingAbilityDialog;
         [SerializeField] private TextMeshProUGUI coinText;
         [SerializeField] private Button abilityCancelButton;
+        [SerializeField] private TextMeshProUGUI abilityHintText;
+        [SerializeField] private Image abilityHintImage;
+        [SerializeField] private GameObject abilityHint;
         private AbilityData _abilityData;
+
+        [SerializeField] private float progressFillingDuration = 0.2f;
+        [SerializeField] private float blockToProgressDuration = 0.5f;
+        [SerializeField] private Ease blockToProgressEase = Ease.Linear;
 
         public AbilityData AbilityData => _abilityData;
 
+
+        private Action blockToProgressAnimationFinished;
 
         private void Start()
         {
@@ -91,7 +107,7 @@ namespace UI
         ));
 
 
-        public void SetProgress(float value) => progressImage.fillAmount = value;
+        public void SetProgress(float value) => progressImage.DOFillAmount(value, progressFillingDuration);
 
         public void SetProgressText(string text) => progressText.text = text;
 
@@ -165,6 +181,30 @@ namespace UI
         public void HideBuyingAbilityDialog() => buyingAbilityDialog.Hide();
 
 
+        public void ShowBlockToProgressAnimation(Vector3 position)
+        {
+            var screenPosition = camera.WorldToScreenPoint(position);
+            blockToTargetScoreImage.gameObject.SetActive(true);
+            blockToTargetScoreImage.localScale = Vector3.one;
+            blockToTargetScoreImage.position = screenPosition;
+            blockToTargetScoreImage.DOScale(Vector3.zero, blockToProgressDuration + blockToProgressDuration);
+            var tween = blockToTargetScoreImage.DOMove(blockProgressImage.position, blockToProgressDuration);
+            tween.SetEase(blockToProgressEase);
+            tween.onComplete = () =>
+            {
+                blockToTargetScoreImage.gameObject.SetActive(false);
+                blockToProgressAnimationFinished?.Invoke();
+            };
+        }
+
+        public void AddBlockToProgressAnimationFinishListener(Action action) =>
+            blockToProgressAnimationFinished += action;
+
+
+        public void RemoveBlockToProgressAnimationFinishListener(Action action) =>
+            blockToProgressAnimationFinished -= action;
+
+
         public void Show()
         {
             panel.SetActive(true);
@@ -181,9 +221,19 @@ namespace UI
             progressBackgroundImage.gameObject.SetActive(false);
         }
 
-        public void ShowAbilityCancelButton() => abilityCancelButton.gameObject.SetActive(true);
+        public void ShowAbilityHintButton(AbilityData abilityData)
+        {
+            abilityHint.SetActive(true);
+            abilityHintText.text = abilityData.description;
+            abilityHintImage.sprite = abilityData.image;
+            abilityHint.transform.ShowPopUp();
+        }
 
 
-        public void HideAbilityCancelButton() => abilityCancelButton.gameObject.SetActive(false);
+        public void HideAbilityHintButton()
+        {
+            abilityHint.SetActive(false);
+            abilityHint.transform.localScale = Vector3.zero;
+        }
     }
 }

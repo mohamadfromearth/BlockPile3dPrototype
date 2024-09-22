@@ -25,12 +25,17 @@ namespace UI
         public float hidingTranslationDuration = 0.8f;
         public float hidingFadeDuration = 0.8f;
         public float hideDelay = 0.3f;
+        public Color panelColor;
+
 
         private Vector3 _initPos;
+
 
         public IEnumerator Show(string level, string goal)
         {
             panel.gameObject.SetActive(true);
+            panel.color = panelColor;
+
             levelText.text = level;
             goalText.text = goal;
             _initPos = background.transform.position;

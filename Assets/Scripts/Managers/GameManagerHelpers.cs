@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using Data;
+using DG.Tweening;
 using Objects.BlocksContainer;
 using UI;
 using UnityEngine;
+using Utils;
 using Zenject;
 
 public class GameManagerHelpers : MonoBehaviour
@@ -14,9 +16,18 @@ public class GameManagerHelpers : MonoBehaviour
     [Inject] private CurrencyRepository _currencyRepository;
     [Inject] private Board _board;
     [SerializeField] private BlocksMatcher blockMatcher;
+    [SerializeField] private Transform blockToProgressImage;
+    [SerializeField] private Transform progressImageTransform;
+    [SerializeField] private Camera camera;
+    [SerializeField] private Vector3 abilityModeCameraRotation;
 
+    [SerializeField] private float cameraRotationDuration = 0.6f;
+
+    [SerializeField] private LayerMask layer;
     [SerializeField] private Transform gridPivot;
+    private Vector3 _progressImagePosition;
 
+    private Vector3 _cameraDefaultRotation;
     private bool _isShuffling = false;
 
     public bool IsShuffling => _isShuffling;
@@ -32,6 +43,15 @@ public class GameManagerHelpers : MonoBehaviour
         new Vector3Int(0, 0, 1),
         new Vector3Int(0, 0, -1)
     };
+
+
+    private void Start()
+    {
+        _progressImagePosition =
+            PositionConverters.ScreenToWorldPosition(progressImageTransform.position, camera, layer).Value;
+
+        _cameraDefaultRotation = camera.transform.rotation.eulerAngles;
+    }
 
     public string GetTargetScoreString(float currentScore)
     {
@@ -135,6 +155,16 @@ public class GameManagerHelpers : MonoBehaviour
     {
         _isShuffling = true;
         StartCoroutine(ShuffleBoardRoutine());
+    }
+
+    public void ChangeCameraToAbilitiesState()
+    {
+        camera.transform.DORotate(abilityModeCameraRotation, cameraRotationDuration);
+    }
+
+    public void ChangeCameraToDefaultState()
+    {
+        camera.transform.DORotate(_cameraDefaultRotation, cameraRotationDuration);
     }
 
     private IEnumerator ShuffleBoardRoutine()

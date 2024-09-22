@@ -26,11 +26,14 @@ namespace Managers
         [SerializeField] private BlocksMatcher blocksMatcher;
         [SerializeField] private Grid grid;
 
+        [SerializeField] private float backToSelectionBarDuration = 0.3f;
+
         [Inject] private Board _board;
         [Inject] private EventChannel _channel;
         [Inject] private ILevelRepository _levelRepository;
         [Inject] private AbilityRepository _abilityRepository;
         [Inject] private CurrencyRepository _currencyRepository;
+        [Inject] private IProgressRewardsRepository _progressRewardsRepository;
         [Inject] private BlockContainerSelectionBar _selectionBar;
         [Inject] private Placer _placer;
         [Inject] private CameraSizeSetter _cameraSizeSetter;
@@ -82,8 +85,10 @@ namespace Managers
             _channel.Subscribe<UpdateBoardCompleted>(OnUpdateBoardCompleted);
             _channel.Subscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
             _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
+            _channel.Subscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
 
             winUI.AddNextLevelClickListener(OnNextLevel);
+            winUI.AddAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.AddRetryClickListener(OnRetry);
             loseUI.AddGetChanceClickListener(OnGetAnotherChance);
 
@@ -93,6 +98,7 @@ namespace Managers
             gameUI.AddBuyAbilityClickListener(OnBuyAbility);
             gameUI.AddWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
             gameUI.AddAbilityCancelClickListener(OnAbilityCancel);
+            gameUI.AddBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
         }
 
         private void UnSubscribeToEvents()
@@ -103,9 +109,11 @@ namespace Managers
             _channel.UnSubscribe<UpdateBoardCompleted>(OnUpdateBoardCompleted);
             _channel.UnSubscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
             _channel.UnSubscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
+            _channel.UnSubscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
 
 
             winUI.RemoveNextLevelClickListener(OnNextLevel);
+            winUI.RemoveAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.RemoveRetryClickListener(OnRetry);
             loseUI.RemoveGetChanceClickListener(OnGetAnotherChance);
 
@@ -115,6 +123,7 @@ namespace Managers
             gameUI.RemoveBuyAbilityClickListener(OnBuyAbility);
             gameUI.RemoveWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
             gameUI.RemoveAbilityCancelButtonListener(OnAbilityCancel);
+            gameUI.RemoveBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
         }
 
 
@@ -137,23 +146,37 @@ namespace Managers
         private void OnBlocksDestroyed()
         {
             var data = _channel.GetData<BlockDestroy>();
+        }
+
+        private void OnTargetBlockDestroyed()
+        {
+            var data = _channel.GetData<TargetBlockDestroyed>();
+
+            gameUI.ShowBlockToProgressAnimation(data.Position);
 
             _currentScore += data.Count;
+            _channel.Rise<ScoreChanged>(new ScoreChanged(_currentScore));
+        }
 
+
+        private void OnBlockToProgressAnimationFinished()
+        {
             gameUI.SetProgress(_currentScore / _levelRepository.GetLevelData().targetScore);
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
-
-            _channel.Rise<ScoreChanged>(new ScoreChanged(_currentScore));
         }
 
         public void OnNextLevel()
         {
             _board.Clear();
             _selectionBar.Clear();
-            _levelRepository.NextLevel();
             winUI.Hide();
             StartLevel();
             helpers.UpdateAbilityButtons(gameUI);
+        }
+
+
+        private void OnWinRewardAdvertiseClick()
+        {
         }
 
 
@@ -180,6 +203,7 @@ namespace Managers
 
         private void OnPunch()
         {
+            if (blocksMatcher.AreBlocksMatching()) return;
             if (_abilityRepository.GetAbilityData(AbilityType.Punch).count == 0)
             {
                 gameUI.ShowBuyingAbilityDialog(_abilityRepository.GetAbilityData(AbilityType.Punch));
@@ -192,6 +216,7 @@ namespace Managers
 
         private void OnSwap()
         {
+            if (blocksMatcher.AreBlocksMatching()) return;
             if (_abilityRepository.GetAbilityData(AbilityType.Swap).count == 0)
             {
                 gameUI.ShowBuyingAbilityDialog(_abilityRepository.GetAbilityData(AbilityType.Swap));
@@ -242,7 +267,7 @@ namespace Managers
                 helpers.UpdateAbilityButtons(gameUI);
                 _stateManager.ChangeState(gameUI.AbilityData.type.GameStateType());
                 _currencyRepository.RemoveCoin(gameUI.AbilityData.cost);
-                gameUI.SetCoinText("Coin" + _currencyRepository.GetCoin());
+                gameUI.SetCoinText(_currencyRepository.GetCoin().ToString());
             }
             else
             {
@@ -271,8 +296,18 @@ namespace Managers
 
             if (_currentScore >= levelData.targetScore)
             {
+                _progressRewardsRepository.IncreaseIndex();
+
+                winUI.Show("Level: " + _levelRepository.LevelIndex, _currentScore.ToString(),
+                    _levelRepository.GetLevelData().coinReward.ToString(),
+                    _levelRepository.GetLevelData().buildingItemReward.ToString(),
+                    _progressRewardsRepository.SpinLevelIndex /
+                    (float)_progressRewardsRepository.SpinLevelTarget
+                );
+
+                _levelRepository.NextLevel();
                 _currentScore = 0;
-                winUI.Show();
+
 
                 _currencyRepository.AddCoin(levelData.coinReward);
                 gameUI.SetCoinText("Coin:" + _currencyRepository.GetCoin());
@@ -320,12 +355,13 @@ namespace Managers
 
             public void OnEnter()
             {
-                _gameManager.gameUI.ShowAbilityCancelButton();
+                _gameManager.gameUI.ShowAbilityHintButton(
+                    _gameManager._abilityRepository.GetAbilityData(AbilityType.Punch));
             }
 
             public void OnExit()
             {
-                _gameManager.gameUI.HideAbilityCancelButton();
+                _gameManager.gameUI.HideAbilityHintButton();
             }
 
             public void OnPointerMove(Vector3 position)
@@ -368,12 +404,14 @@ namespace Managers
 
             public void OnEnter()
             {
-                _gameManager.gameUI.ShowAbilityCancelButton();
+                _gameManager.gameUI.ShowAbilityHintButton(
+                    _gameManager._abilityRepository.GetAbilityData(AbilityType.Swap));
+                _gameManager.helpers.ChangeCameraToAbilitiesState();
             }
 
             public void OnExit()
             {
-                _gameManager.gameUI.HideAbilityCancelButton();
+                _gameManager.gameUI.HideAbilityHintButton();
                 _firstSelectedBlockContainer = null;
             }
 
@@ -449,7 +487,11 @@ namespace Managers
                 _gameManager._channel.Subscribe<PointerUp>(OnPointerUp);
             }
 
-            public void OnEnter() => _gameManager.gameUI.Show();
+            public void OnEnter()
+            {
+                _gameManager.helpers.ChangeCameraToDefaultState();
+                _gameManager.gameUI.Show();
+            }
 
 
             public void OnExit() => _gameManager.gameUI.Hide();
@@ -527,6 +569,7 @@ namespace Managers
             {
                 _previousX = float.NaN;
                 _cellToDrop?.SetSelected(false);
+                _cellToDrop = null;
 
                 if (_gameManager._selectedBlockContainer == null &&
                     _gameManager.blocksMatcher.AreBlocksMatching() == false &&
@@ -577,7 +620,8 @@ namespace Managers
                     }
                     else
                     {
-                        _gameManager._selectionBar.BackToInitialPosition(_gameManager._selectedBlockContainer);
+                        _gameManager._selectionBar.BackToInitialPosition(_gameManager._selectedBlockContainer,
+                            _gameManager.backToSelectionBarDuration);
                         _gameManager._selectedBlockContainer = null;
                     }
                 }

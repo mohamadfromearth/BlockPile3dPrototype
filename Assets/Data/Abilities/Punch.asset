@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 2
   name: Punch
-  image: {fileID: 0}
+  image: {fileID: 21300000, guid: 7526a7eb91cb7114f965137272a32c21, type: 3}
   description: Punch Ability
   cost: 5
   count: 1

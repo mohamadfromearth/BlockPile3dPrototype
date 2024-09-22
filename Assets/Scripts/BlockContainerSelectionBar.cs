@@ -126,17 +126,18 @@ public class BlockContainerSelectionBar
     }
 
 
-    public void BackToInitialPosition(IBlockContainer blockContainer)
+    public void BackToInitialPosition(IBlockContainer blockContainer, float duration)
     {
         for (int i = 0; i < _blockContainers.Length; i++)
         {
             if (blockContainer == _blockContainers[i])
             {
-                blockContainer.SetPosition(_data.containersPositionList[i].position);
+                blockContainer.MoveTo(_data.containersPositionList[i].position, duration);
                 break;
             }
         }
     }
+
 
     public void Clear()
     {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Data
 {
@@ -47,7 +46,7 @@ namespace Data
     }
 
 
-    [System.Serializable]
+    [Serializable]
     public struct LockBlockData
     {
         public Vector3Int position;

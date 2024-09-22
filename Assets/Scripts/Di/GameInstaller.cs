@@ -35,6 +35,7 @@ namespace Di
         [SerializeField] private MainRepository mainRepository;
         [SerializeField] private AbilityRepository abilityRepository;
         [SerializeField] private CurrencyRepository currencyRepository;
+        [SerializeField] private ProgressRewardsRepository progressRewardsRepository;
 
         [SerializeField] private Grid grid;
         [SerializeField] private Transform gridPivot;
@@ -86,6 +87,8 @@ namespace Di
             Container.Bind<AbilityRepository>().FromInstance(abilityRepository).AsSingle();
 
             Container.Bind<CurrencyRepository>().FromInstance(currencyRepository).AsSingle();
+
+            Container.Bind<IProgressRewardsRepository>().FromInstance(progressRewardsRepository).AsSingle();
 
             #endregion
 
