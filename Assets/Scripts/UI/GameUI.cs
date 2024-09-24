@@ -211,6 +211,8 @@ namespace UI
             progressImage.gameObject.SetActive(true);
             progressText.gameObject.SetActive(true);
             progressBackgroundImage.gameObject.SetActive(true);
+            blocksImageTransform.gameObject.SetActive(true);
+
         }
 
         public void Hide()
@@ -219,6 +221,7 @@ namespace UI
             progressImage.gameObject.SetActive(false);
             progressText.gameObject.SetActive(false);
             progressBackgroundImage.gameObject.SetActive(false);
+            blocksImageTransform.gameObject.SetActive(false);
         }
 
         public void ShowAbilityHintButton(AbilityData abilityData)

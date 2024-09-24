@@ -90,7 +90,8 @@ namespace Managers
             winUI.AddNextLevelClickListener(OnNextLevel);
             winUI.AddAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.AddRetryClickListener(OnRetry);
-            loseUI.AddGetChanceClickListener(OnGetAnotherChance);
+            loseUI.AddCoinReviveClickListener(OnLosingCoinRevive);
+            loseUI.AddAdvertiseReviveClickListener(OnLosingAdvertiseRevive);
 
             gameUI.AddPunchClickListener(OnPunch);
             gameUI.AddSwapButtonClickListener(OnSwap);
@@ -115,7 +116,9 @@ namespace Managers
             winUI.RemoveNextLevelClickListener(OnNextLevel);
             winUI.RemoveAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.RemoveRetryClickListener(OnRetry);
-            loseUI.RemoveGetChanceClickListener(OnGetAnotherChance);
+            loseUI.RemoveCoinReviveClickListener(OnLosingCoinRevive);
+            loseUI.RemoveCoinReviveClickListener(OnLosingAdvertiseRevive);
+
 
             gameUI.RemovePunchClickListener(OnPunch);
             gameUI.RemoveSwapButtonClickListener(OnSwap);
@@ -250,7 +253,13 @@ namespace Managers
             loseUI.Hide();
         }
 
-        private void OnGetAnotherChance()
+        private void OnLosingCoinRevive()
+        {
+            loseUI.Hide();
+            _stateManager.ChangeState(GameStateType.GetAnotherChance);
+        }
+
+        private void OnLosingAdvertiseRevive()
         {
             loseUI.Hide();
             _stateManager.ChangeState(GameStateType.GetAnotherChance);
@@ -298,7 +307,7 @@ namespace Managers
             {
                 _progressRewardsRepository.IncreaseIndex();
 
-                winUI.Show("Level: " + _levelRepository.LevelIndex, _currentScore.ToString(),
+                winUI.Show("Level: " + (_levelRepository.LevelIndex + 1), _currentScore.ToString(),
                     _levelRepository.GetLevelData().coinReward.ToString(),
                     _levelRepository.GetLevelData().buildingItemReward.ToString(),
                     _progressRewardsRepository.SpinLevelIndex /
@@ -322,7 +331,8 @@ namespace Managers
         {
             if (_board.IsFilled)
             {
-                loseUI.Show();
+                loseUI.Show("Level: " + (_levelRepository.LevelIndex + 1),
+                    (_levelRepository.GetLevelData().targetScore - _currentScore).ToString());
                 return true;
             }
 
@@ -357,6 +367,7 @@ namespace Managers
             {
                 _gameManager.gameUI.ShowAbilityHintButton(
                     _gameManager._abilityRepository.GetAbilityData(AbilityType.Punch));
+                _gameManager.helpers.ChangeCameraToAbilitiesState();
             }
 
             public void OnExit()
@@ -412,7 +423,13 @@ namespace Managers
             public void OnExit()
             {
                 _gameManager.gameUI.HideAbilityHintButton();
-                _firstSelectedBlockContainer = null;
+                if (_firstSelectedBlockContainer != null)
+                {
+                    var pos = _firstSelectedBlockContainer.GetPosition();
+                    pos.y = 0;
+                    _firstSelectedBlockContainer.MoveTo(pos, 0.2f);
+                    _firstSelectedBlockContainer = null;
+                }
             }
 
             public void OnPointerMove(Vector3 position)
@@ -434,26 +451,18 @@ namespace Managers
                 {
                     _firstSelectedBlockContainer = container;
 
+                    var pos = _firstSelectedBlockContainer.GetPosition();
+                    pos.y = 0.5f;
+
+                    _firstSelectedBlockContainer.MoveTo(pos, 0.2f);
+
+
                     return;
                 }
 
                 if (container != _firstSelectedBlockContainer)
                 {
-                    var firstPos = _firstSelectedBlockContainer.GetPosition();
-                    var secondPos = container.GetPosition();
-                    _firstSelectedBlockContainer.SetPosition(secondPos);
-                    container.SetPosition(firstPos);
-                    _gameManager._board.AddBlockContainer(_firstSelectedBlockContainer, secondPos);
-                    _gameManager._board.AddBlockContainer(container, firstPos);
-
-                    _gameManager.StartCoroutine(SwapUpdateRoutine(_gameManager._board.WorldToCell(firstPos),
-                        _gameManager._board.WorldToCell(secondPos)));
-
-                    _gameManager._abilityRepository.RemoveAbility(AbilityType.Swap, 1);
-
-                    _gameManager._stateManager.ChangeState(GameStateType.Default);
-
-                    _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
+                    _gameManager.StartCoroutine(SwapUpdateRoutine(container));
                 }
             }
 
@@ -461,10 +470,41 @@ namespace Managers
             {
             }
 
-            private IEnumerator SwapUpdateRoutine(Vector3Int firstPos, Vector3Int secondPos)
+            private IEnumerator SwapUpdateRoutine(IBlockContainer container)
             {
-                yield return _gameManager.blocksMatcher.UpdateBoardRoutine(firstPos, true);
-                yield return _gameManager.blocksMatcher.UpdateBoardRoutine(secondPos, true);
+                float moveDuration = 0.3f;
+
+                var firstPos = _firstSelectedBlockContainer.GetPosition();
+                firstPos.y = 0;
+                var secondPos = container.GetPosition();
+                var upperFirstPos = firstPos;
+                upperFirstPos.y = 3f;
+                _firstSelectedBlockContainer.MoveTo(upperFirstPos, moveDuration);
+                container.MoveTo(firstPos, moveDuration);
+
+                yield return new WaitForSeconds(moveDuration);
+
+                _firstSelectedBlockContainer.MoveTo(secondPos, moveDuration);
+
+                yield return new WaitForSeconds(moveDuration);
+
+
+                _gameManager._board.AddBlockContainer(_firstSelectedBlockContainer, secondPos);
+                _gameManager._board.AddBlockContainer(container, firstPos);
+
+                _firstSelectedBlockContainer = null;
+
+                _gameManager._abilityRepository.RemoveAbility(AbilityType.Swap, 1);
+
+                _gameManager._stateManager.ChangeState(GameStateType.Default);
+
+                _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
+
+
+                yield return _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(firstPos),
+                    true);
+                yield return _gameManager.blocksMatcher.UpdateBoardRoutine(_gameManager._board.WorldToCell(secondPos),
+                    true);
             }
         }
 

@@ -315,7 +315,7 @@ public class Board
         {
             _cellsDic[keyValuePair.Key].BlockContainer = keyValuePair.Value;
             _cellsDic[keyValuePair.Key].CanPlaceItem = false;
-            keyValuePair.Value.MoveTo(_cellsDic[keyValuePair.Key].GameObj.transform, 0.5f);
+            keyValuePair.Value.MoveTo(_cellsDic[keyValuePair.Key].GameObj.transform, 0.15f);
         }
 
         return 0.5f;
