@@ -43,6 +43,7 @@ namespace Managers
         private IBlockContainer _selectedBlockContainer;
 
         private float _currentScore;
+        private float _previousScore;
 
 
         private StateManager _stateManager;
@@ -100,6 +101,7 @@ namespace Managers
             gameUI.AddWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
             gameUI.AddAbilityCancelClickListener(OnAbilityCancel);
             gameUI.AddBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
+            gameUI.AddBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
         }
 
         private void UnSubscribeToEvents()
@@ -127,6 +129,7 @@ namespace Managers
             gameUI.RemoveWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
             gameUI.RemoveAbilityCancelButtonListener(OnAbilityCancel);
             gameUI.RemoveBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
+            gameUI.RemoveBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
         }
 
 
@@ -157,6 +160,7 @@ namespace Managers
 
             gameUI.ShowBlockToProgressAnimation(data.Position);
 
+            _previousScore = _currentScore;
             _currentScore += data.Count;
             _channel.Rise<ScoreChanged>(new ScoreChanged(_currentScore));
         }
@@ -165,7 +169,8 @@ namespace Managers
         private void OnBlockToProgressAnimationFinished()
         {
             gameUI.SetProgress(_currentScore / _levelRepository.GetLevelData().targetScore);
-            gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
+            gameUI.AnimateProgressText((int)_previousScore, (int)_currentScore,
+                "/" + _levelRepository.GetLevelData().targetScore);
         }
 
         public void OnNextLevel()
@@ -291,6 +296,11 @@ namespace Managers
             _abilityRepository.AddAbility(gameUI.AbilityData.type, 1);
             helpers.UpdateAbilityButtons(gameUI);
             _stateManager.ChangeState(gameUI.AbilityData.type.GameStateType());
+            gameUI.HideBuyingAbilityDialog();
+        }
+
+        private void OnAbilityBuyingCancel()
+        {
             gameUI.HideBuyingAbilityDialog();
         }
 

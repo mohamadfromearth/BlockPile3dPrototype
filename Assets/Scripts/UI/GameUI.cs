@@ -1,5 +1,4 @@
 using System;
-using CoreUI;
 using Data;
 using DG.Tweening;
 using TMPro;
@@ -64,7 +63,9 @@ namespace UI
         [SerializeField] private TargetGoalUI targetGoal;
 
 
-        [SerializeField] private DialogueTypeA buyingAbilityDialog;
+        [SerializeField] private BuyAbilityDialog buyingAbilityDialog;
+
+//private DialogueTypeA buyingAbilityDialog;
         [SerializeField] private TextMeshProUGUI coinText;
         [SerializeField] private Button abilityCancelButton;
         [SerializeField] private TextMeshProUGUI abilityHintText;
@@ -74,6 +75,7 @@ namespace UI
 
         [SerializeField] private float progressFillingDuration = 0.2f;
         [SerializeField] private float blockToProgressDuration = 0.5f;
+        [SerializeField] private float progressTextAnimationDuration = 1f;
         [SerializeField] private Ease blockToProgressEase = Ease.Linear;
 
         public AbilityData AbilityData => _abilityData;
@@ -111,6 +113,12 @@ namespace UI
 
         public void SetProgressText(string text) => progressText.text = text;
 
+        public void AnimateProgressText(int startValue, int endValue, string extraText)
+        {
+            StartCoroutine(progressText.AnimateTextCounter(startValue, endValue, extraText,
+                progressTextAnimationDuration));
+        }
+
         public void SetCoinText(string text) => coinText.text = text;
 
         public void SetPunchCountText(string text) => punchButton.countText.text = text;
@@ -133,17 +141,23 @@ namespace UI
             refreshButton.button.onClick.AddListener(action);
 
         public void AddBuyAbilityClickListener(UnityAction action) =>
-            buyingAbilityDialog.AddButtonAClickListener(action);
+            buyingAbilityDialog.AddBuyClickListener(action);
 
 
         public void AddWatchAdForAbilityClickListener(UnityAction action) =>
-            buyingAbilityDialog.AddButtonBClickListener(action);
+            buyingAbilityDialog.AddWatchAddClickListener(action);
 
         public void RemoveBuyAbilityClickListener(UnityAction action) =>
-            buyingAbilityDialog.RemoveButtonAClickListener(action);
+            buyingAbilityDialog.RemoveWatchAddClickListener(action);
+
+        public void AddBuyingAbilityCancelClickListener(UnityAction action) =>
+            buyingAbilityDialog.AddCancelClickListener(action);
+
+        public void RemoveBuyingAbilityCancelClickListener(UnityAction action) =>
+            buyingAbilityDialog.RemoveCancelClickListener(action);
 
         public void RemoveWatchAdForAbilityClickListener(UnityAction action) =>
-            buyingAbilityDialog.RemoveButtonBClickListener(action);
+            buyingAbilityDialog.RemoveWatchAddClickListener(action);
 
         public void RemoveRefreshButtonClickListener(UnityAction action) =>
             refreshButton.button.onClick.RemoveListener(action);
@@ -170,12 +184,10 @@ namespace UI
         public void ShowBuyingAbilityDialog(AbilityData abilityData)
         {
             _abilityData = abilityData;
-            buyingAbilityDialog.SetTitle(abilityData.name)
-                .SetDescription(abilityData.description)
-                .SetImage(abilityData.image)
-                .SetButtonAText("Buy")
-                .SetButtonBText("Watch Ad")
-                .Show();
+
+            buyingAbilityDialog.Show(abilityData.name.ToString(), abilityData.description.ToString(),
+                abilityData.cost.ToString(), abilityData.image
+            );
         }
 
         public void HideBuyingAbilityDialog() => buyingAbilityDialog.Hide();
@@ -212,7 +224,6 @@ namespace UI
             progressText.gameObject.SetActive(true);
             progressBackgroundImage.gameObject.SetActive(true);
             blocksImageTransform.gameObject.SetActive(true);
-
         }
 
         public void Hide()
