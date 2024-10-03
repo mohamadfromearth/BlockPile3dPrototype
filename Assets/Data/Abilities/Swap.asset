@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 1
   name: 'Swap '
-  image: {fileID: 21300000, guid: 7526a7eb91cb7114f965137272a32c21, type: 3}
+  image: {fileID: 21300000, guid: e7e6335a7f1966c40aaaa6cec5a32dc0, type: 3}
   description: Swap ability
   cost: 5
-  count: 1
+  count: 0
   unLockLevel: 0

@@ -47,8 +47,13 @@ namespace Di
         [SerializeField] private Camera camera;
         [SerializeField] private CameraSizeSetterData cameraSizeSetterData;
 
+        [SerializeField] private SettingsController settingsController;
+
+
         public override void InstallBindings()
         {
+            settingsController.Init();
+
             #region Core
 
             Container.Bind<EventChannel>().AsSingle().NonLazy();

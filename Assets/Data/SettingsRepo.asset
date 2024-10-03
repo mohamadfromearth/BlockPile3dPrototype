@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16c46189ee234e28a962e63c96a7f47a, type: 3}
+  m_Name: SettingsRepo
+  m_EditorClassIdentifier: 
+  soundOnSprite: {fileID: 21300000, guid: 50e54db1ad979844c832f8e4c4fc8e21, type: 3}
+  soundOffSprite: {fileID: 21300000, guid: 1972df2ed0b7d4b449ed45f5d55106ff, type: 3}
+  musicOnSprite: {fileID: 21300000, guid: 2da088cfb6bb35c41a065ae25caae6aa, type: 3}
+  musicOffSprite: {fileID: 21300000, guid: 4af446a13d98d6c42b46dda8d019a53e, type: 3}

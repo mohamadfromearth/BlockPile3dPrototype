@@ -49,6 +49,12 @@ namespace Objects.BlocksContainer
 
         public bool AreBlocksMatching() => _areBlocksMatching;
 
+
+        public void Stop()
+        {
+            StopAllCoroutines();
+        }
+
         private Queue<Vector3Int> _blocksToMatchQueue = new();
 
 

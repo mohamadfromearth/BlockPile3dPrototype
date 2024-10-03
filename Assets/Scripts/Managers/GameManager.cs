@@ -175,6 +175,7 @@ namespace Managers
 
         public void OnNextLevel()
         {
+            blocksMatcher.Stop();
             _board.Clear();
             _selectionBar.Clear();
             winUI.Hide();

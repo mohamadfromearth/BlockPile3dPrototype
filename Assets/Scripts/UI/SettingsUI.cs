@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Utils;
 
 namespace UI
 {
@@ -10,44 +11,55 @@ namespace UI
         [SerializeField] private Button cancelButton;
         [SerializeField] private Button musicButton;
         [SerializeField] private Button soundButton;
-        [SerializeField] private Button vibrationButton;
         [SerializeField] private Image musicImage;
         [SerializeField] private Image soundImage;
-        [SerializeField] private Image vibrationImage;
-        [SerializeField] private Button quitToMenu;
-        [SerializeField] private Button retryButton;
+        [SerializeField] private GameObject panel;
+        [SerializeField] private Transform background;
+        [SerializeField] private Button settingsShowUpButton;
 
 
-        public void AddCancelClickListener(UnityAction action)
+        public void AddCancelClickListener(UnityAction action) => cancelButton.onClick.AddListener(action);
+
+        public void RemoveCancelClickListener(UnityAction action) => cancelButton.onClick.RemoveListener(action);
+
+        public void AddMusicClickListener(UnityAction action) => musicButton.onClick.AddListener(action);
+
+        public void RemoveMusicClickListener(UnityAction action) => musicButton.onClick.RemoveListener(action);
+
+        public void AddSoundClickListener(UnityAction action) => soundButton.onClick.AddListener(action);
+
+        public void RemoveSoundClickListener(UnityAction action) => soundButton.onClick.RemoveListener(action);
+
+
+        public void AddSettingsClickListener(UnityAction action) => settingsShowUpButton.onClick.AddListener(action);
+
+        public void RemoveSettingsClickListener(UnityAction action) =>
+            settingsShowUpButton.onClick.RemoveListener(action);
+
+        public void SetSoundSprite(Sprite soundSprite)
         {
+            soundImage.sprite = soundSprite;
         }
 
-        public void RemoveCancelClickListener(UnityAction action)
+        public void SetMusicSprite(Sprite musicSprite)
         {
+            musicImage.sprite = musicSprite;
         }
 
-        public void AddMusicClickListener(UnityAction action)
+
+        public void Show(Sprite musicSprite, Sprite soundSprite)
         {
+            panel.SetActive(true);
+            musicImage.sprite = musicSprite;
+            soundImage.sprite = soundSprite;
+            background.ShowPopUp();
         }
 
-        public void RemoveMusicClickListener(UnityAction action)
-        {
-        }
 
-        public void AddSoundClickListener(UnityAction action)
+        public void Hide()
         {
-        }
-
-        public void RemoveSoundClickListener(UnityAction action)
-        {
-        }
-
-        public void VibrationClickListener(UnityAction action)
-        {
-        }
-
-        public void RemoveVibrationClickListener(UnityAction action)
-        {
+            panel.SetActive(false);
+            background.localScale = Vector3.zero;
         }
     }
 }
