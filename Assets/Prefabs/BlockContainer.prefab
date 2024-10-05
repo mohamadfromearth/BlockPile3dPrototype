@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   countText: {fileID: 4951231240329038368}
-  height: 0.2
+  height: 0.1
   destroyRate: 0.02
 --- !u!1 &6589509568932263126
 GameObject:

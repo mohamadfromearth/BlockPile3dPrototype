@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Data;
+using DG.Tweening;
 using Event;
 using Objects.BlocksContainer;
 using Objects.Cell;
@@ -24,9 +25,13 @@ namespace Managers
 
         [SerializeField] private GameManagerHelpers helpers;
         [SerializeField] private BlocksMatcher blocksMatcher;
+        [SerializeField] private GameObject hammer;
+        [SerializeField] private Vector3 hammerHitRotation;
+        [SerializeField] private Vector3 hammerInitialRotation;
         [SerializeField] private Grid grid;
 
         [SerializeField] private float backToSelectionBarDuration = 0.3f;
+
 
         [Inject] private Board _board;
         [Inject] private EventChannel _channel;
@@ -398,14 +403,31 @@ namespace Managers
             public void OnContainerPointerUp()
             {
                 var containerBlock = _gameManager._channel.GetData<CellContainerPointerUp>().BlockContainer;
-                _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
-                containerBlock.Destroy(true);
 
-                _gameManager._abilityRepository.RemoveAbility(AbilityType.Punch, 1);
+                _gameManager.hammer.SetActive(true);
+                var hammerPos = containerBlock.GetPosition();
+                hammerPos.y = containerBlock.Peek().GetPosition().y + 1.3f;
+                _gameManager.hammer.transform.position = hammerPos;
+                _gameManager.hammer.transform.rotation = Quaternion.Euler(_gameManager.hammerInitialRotation);
+                _gameManager.hammer.transform.DORotate(_gameManager.hammerHitRotation, 0.6f).SetEase(Ease.InBack)
+                    .onComplete = () =>
+                {
+                    _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
 
-                _gameManager._stateManager.ChangeState(GameStateType.Default);
+                    _gameManager.StartCoroutine(DeActiveHammerWithDelay(containerBlock.DestroyAll()));
 
-                _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
+                    _gameManager._abilityRepository.RemoveAbility(AbilityType.Punch, 1);
+
+                    _gameManager._stateManager.ChangeState(GameStateType.Default);
+
+                    _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
+                };
+            }
+
+            private IEnumerator DeActiveHammerWithDelay(float delay)
+            {
+                yield return new WaitForSeconds(delay);
+                _gameManager.hammer.SetActive(false);
             }
 
             public void Shuffle()

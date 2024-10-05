@@ -226,9 +226,10 @@ namespace Objects.BlocksContainer
 
         private List<KeyValuePair<int, IBlockContainer>> GetMatchedContainers(Vector3Int boardPosition)
         {
-            var recentPlacedContainer = _board.GetCell(boardPosition).BlockContainer;
+            var recentPlacedContainer = _board.GetCell(boardPosition)?.BlockContainer;
 
             List<KeyValuePair<int, IBlockContainer>> containers = new();
+
 
             if (recentPlacedContainer == null) return containers;
 

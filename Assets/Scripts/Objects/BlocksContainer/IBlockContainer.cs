@@ -36,5 +36,7 @@ namespace Objects.BlocksContainer
         public bool IsPlaced { set; get; }
 
         public float Destroy(bool destroyImmediately = false);
+
+        public float DestroyAll();
     }
 }

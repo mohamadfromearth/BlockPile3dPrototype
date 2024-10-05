@@ -87,6 +87,19 @@ namespace Objects.BlocksContainer
             return blocksBuffers.Count * destroyRate + 0.5f;
         }
 
+        public float DestroyAll()
+        {
+            var blocksBuffers = blocks.ToList();
+
+            Colors.Clear();
+            _hasBeenDestroyed = true;
+
+
+            StartCoroutine(DestroyAnimationRoutine(blocksBuffers, true));
+
+            return blocksBuffers.Count * destroyRate + 0.5f;
+        }
+
         public void SetParent(Transform parent) => transform.SetParent(parent);
 
         private void KillTweens()
@@ -103,6 +116,7 @@ namespace Objects.BlocksContainer
 
             foreach (var block in blocksBuffer)
             {
+                Debug.Log("Block is destroying!!");
                 block.Destroy();
                 yield return _destroyRateWaitForSeconds;
                 count++;
