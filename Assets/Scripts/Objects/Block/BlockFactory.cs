@@ -1,18 +1,18 @@
-using Object = UnityEngine.Object;
+using UnityEngine;
 
 namespace Objects.Block
 {
     public class BlockFactory : IBlockFactory
     {
-        private Block _blockPrefab;
+        private Block[] _blockPrefabs;
 
 
-        public BlockFactory(Block blockPrefab)
+        public BlockFactory(Block[] blockPrefabs)
         {
-            _blockPrefab = blockPrefab;
+            _blockPrefabs = blockPrefabs;
         }
 
 
-        public IBlock Create() => Object.Instantiate(_blockPrefab);
+        public IBlock Create(int index) => Object.Instantiate(_blockPrefabs[index]);
     }
 }

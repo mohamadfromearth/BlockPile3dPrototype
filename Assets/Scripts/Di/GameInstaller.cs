@@ -18,6 +18,7 @@ namespace Di
         #region Prefabs
 
         [Header("Prefabs")] [SerializeField] private Block blockPrefab;
+        [SerializeField] private Block[] blockPrefabs;
         [SerializeField] private BlockContainer blockContainerPrefab;
 
         [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField]
@@ -62,7 +63,7 @@ namespace Di
 
             #region Factories
 
-            Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefab);
+            Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefabs);
 
             Container.Bind<ICellFactory>().To<CellFactory>().AsSingle()
                 .WithArguments(defaultCellPrefab, grid.transform).NonLazy();

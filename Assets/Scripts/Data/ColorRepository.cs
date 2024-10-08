@@ -5,6 +5,19 @@ using UnityEngine;
 
 namespace Data
 {
+    public static class Colors
+    {
+        public static string Red = "Red";
+        public static string Blue = "Blue";
+        public static string Yellow = "Yellow";
+        public static string LightBlue = "Light Blue";
+        public static string Green = "Green";
+        public static string LightPink = "Light pink";
+        public static string Black = "Black";
+        public static string Orange = "Orange";
+    }
+
+
     [Serializable]
     public struct ColorData
     {

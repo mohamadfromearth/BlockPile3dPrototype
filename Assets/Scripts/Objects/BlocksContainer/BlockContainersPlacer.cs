@@ -1,6 +1,7 @@
 ﻿using Data;
 using Objects.Block;
 using UnityEngine;
+using Utils;
 using Zenject;
 
 namespace Objects.BlocksContainer
@@ -31,7 +32,7 @@ namespace Objects.BlocksContainer
 
                 foreach (var color in containerData.color)
                 {
-                    var block = _blockFactory.Create();
+                    var block = _blockFactory.Create(color.ToColorIndex());
                     block.Color = _colorRepository.GetColor(color);
 
                     container.Push(block);

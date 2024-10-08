@@ -5,9 +5,6 @@ namespace Objects.Block
 {
     public class Block : MonoBehaviour, IBlock
     {
-        [SerializeField] private new MeshRenderer renderer;
-
-
         private Tween _scaleTween;
 
 
@@ -30,16 +27,7 @@ namespace Objects.Block
 
         public Color Color
         {
-            set
-            {
-                foreach (var material in renderer.materials)
-                {
-                    material.color = value;
-                }
-
-
-                color = value;
-            }
+            set { color = value; }
             get { return color; }
         }
 

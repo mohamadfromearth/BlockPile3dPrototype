@@ -2,6 +2,6 @@ namespace Objects.Block
 {
     public interface IBlockFactory
     {
-        public IBlock Create();
+        public IBlock Create(int index);
     }
 }

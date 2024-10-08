@@ -5,6 +5,7 @@ using DG.Tweening;
 using Objects.Block;
 using Objects.BlocksContainer;
 using UnityEngine;
+using Utils;
 using Zenject;
 using Random = UnityEngine.Random;
 
@@ -111,7 +112,8 @@ public class BlockContainerSelectionBar
 
                 for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
                 {
-                    var block = _blockFactory.Create();
+                    var block = _blockFactory.Create(colors[colorIndex].ToColorIndex());
+
 
                     block.Color = _colorRepository.GetColor(colors[colorIndex]);
 
