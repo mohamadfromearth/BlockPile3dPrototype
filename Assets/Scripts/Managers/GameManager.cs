@@ -331,6 +331,8 @@ namespace Managers
                     (float)_progressRewardsRepository.SpinLevelTarget
                 );
 
+                _channel.Rise<Won>(new Won());
+
                 _levelRepository.NextLevel();
                 _currentScore = 0;
 
@@ -350,6 +352,9 @@ namespace Managers
             {
                 loseUI.Show("Level: " + (_levelRepository.LevelIndex + 1),
                     (_levelRepository.GetLevelData().targetScore - _currentScore).ToString());
+
+                _channel.Rise<Lose>(new Lose());
+
                 return true;
             }
 
@@ -707,6 +712,8 @@ namespace Managers
                     _gameManager.blocksMatcher.AreBlocksMatching() || _gameManager._board.IsRotationSnapping) return;
 
                 _gameManager.helpers.ShuffleBoard();
+                _gameManager._shuffleController.Hide();
+                _gameManager._channel.Rise<Shuffle>(new Shuffle());
             }
         }
 

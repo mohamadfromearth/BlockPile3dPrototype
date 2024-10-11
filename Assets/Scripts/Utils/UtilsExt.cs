@@ -20,6 +20,11 @@ namespace Utils
             transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
         }
 
+        public static void HidePopUp(this Transform transform)
+        {
+            transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+        }
+
 
         public static IEnumerator AnimateTextCounter(this TextMeshProUGUI text, int startValue, int endValue,
             float duration)
