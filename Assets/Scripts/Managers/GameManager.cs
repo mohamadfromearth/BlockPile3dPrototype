@@ -42,6 +42,7 @@ namespace Managers
         [Inject] private BlockContainerSelectionBar _selectionBar;
         [Inject] private Placer _placer;
         [Inject] private CameraSizeSetter _cameraSizeSetter;
+        [Inject] private ShuffleController _shuffleController;
 
 
         private int _selectionBarSelectedIndex;

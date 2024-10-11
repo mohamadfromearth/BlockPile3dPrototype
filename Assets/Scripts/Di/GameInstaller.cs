@@ -50,6 +50,8 @@ namespace Di
 
         [SerializeField] private SettingsController settingsController;
 
+        [SerializeField] private Transform shuffleButtonTransform;
+
 
         public override void InstallBindings()
         {
@@ -116,6 +118,8 @@ namespace Di
             #region Helpers
 
             Container.Bind<CameraSizeSetter>().AsTransient().WithArguments(cameraSizeSetterData);
+
+            Container.Bind<ShuffleController>().AsSingle().WithArguments(shuffleButtonTransform).NonLazy();
 
             #endregion
         }

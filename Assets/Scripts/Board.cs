@@ -29,13 +29,17 @@ public class Board
     private ShuffleHandler _shuffleHandler = new ShuffleHandler();
 
 
-    private int _cellItemsCount;
+    private int _filledCellItemsCount;
 
     private bool _isRotationSnapping = false;
 
     public bool IsRotationSnapping => _isRotationSnapping;
 
-    public bool IsFilled => _cellItemsCount >= _cellsDic.Count;
+    public bool IsFilled => _filledCellItemsCount >= _cellsDic.Count;
+
+    public int FilledCellItemsCount => _filledCellItemsCount;
+
+    public int CellsItemCount => _cellsDic.Count;
 
     public Board(int width, int height, Grid grid, Transform pivot)
     {
@@ -93,7 +97,7 @@ public class Board
 
         if (_cellsDic.TryGetValue(gridPos, out var cell))
         {
-            _cellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
+            _filledCellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
             cell.CanPlaceItem = blockContainer == null;
             cell.BlockContainer = blockContainer;
 
@@ -106,7 +110,7 @@ public class Board
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
-            _cellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
+            _filledCellItemsCount += BoardHelpers.GetItemsCountModifier(blockContainer, cell);
 
             cell.CanPlaceItem = blockContainer == null;
             cell.BlockContainer = blockContainer;
@@ -120,7 +124,7 @@ public class Board
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
-            _cellItemsCount += BoardHelpers.GetItemsCountModifier(advertiseBlock, cell);
+            _filledCellItemsCount += BoardHelpers.GetItemsCountModifier(advertiseBlock, cell);
 
             cell.CanPlaceItem = advertiseBlock == null;
 
@@ -148,7 +152,7 @@ public class Board
     {
         if (_cellsDic.TryGetValue(gridPosition, out var cell))
         {
-            _cellItemsCount += BoardHelpers.GetItemsCountModifier(lockBlock, cell);
+            _filledCellItemsCount += BoardHelpers.GetItemsCountModifier(lockBlock, cell);
 
             cell.LockBlock = lockBlock;
             cell.CanPlaceItem = lockBlock == null;
@@ -233,7 +237,7 @@ public class Board
 
     public void Clear()
     {
-        _cellItemsCount = 0;
+        _filledCellItemsCount = 0;
 
         for (int x = 0; x < Width; x++)
         {
