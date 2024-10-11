@@ -410,31 +410,21 @@ namespace Managers
             {
                 var containerBlock = _gameManager._channel.GetData<CellContainerPointerUp>().BlockContainer;
 
-                _gameManager.hammer.SetActive(true);
-                var hammerPos = containerBlock.GetPosition();
-                hammerPos.y = containerBlock.Peek().GetPosition().y + 1.3f;
-                _gameManager.hammer.transform.position = hammerPos;
-                _gameManager.hammer.transform.rotation = Quaternion.Euler(_gameManager.hammerInitialRotation);
-                _gameManager.hammer.transform.DORotate(_gameManager.hammerHitRotation, 0.6f).SetEase(Ease.InBack)
-                    .onComplete = () =>
+                _gameManager.helpers.ShowHammerAnimation(containerBlock, () =>
                 {
                     _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
 
-                    _gameManager.StartCoroutine(DeActiveHammerWithDelay(containerBlock.DestroyAll()));
+                    _gameManager.StartCoroutine(
+                        _gameManager.hammer.DeActiveObjectWithDelay(containerBlock.DestroyAll()));
 
                     _gameManager._abilityRepository.RemoveAbility(AbilityType.Punch, 1);
 
                     _gameManager._stateManager.ChangeState(GameStateType.Default);
 
                     _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
-                };
+                });
             }
 
-            private IEnumerator DeActiveHammerWithDelay(float delay)
-            {
-                yield return new WaitForSeconds(delay);
-                _gameManager.hammer.SetActive(false);
-            }
 
             public void Shuffle()
             {
@@ -750,17 +740,28 @@ namespace Managers
 
                 var blockContainers = _gameManager.helpers.GetAnotherChanceBlocks(_gameManager._board, gridPos);
 
-                foreach (var blockContainer in blockContainers)
-                {
-                    _gameManager._board.AddBlockContainer(null, blockContainer.GetPosition());
-                    blockContainer.Destroy(true);
-                }
 
-                _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
-                containerBlock.Destroy(true);
+                _gameManager.helpers.ShowHammerAnimation(containerBlock, () =>
+                {
+                    _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+
+                    _gameManager.StartCoroutine(
+                        _gameManager.hammer.DeActiveObjectWithDelay(containerBlock.DestroyAll()));
+
+                    foreach (var blockContainer in blockContainers)
+                    {
+                        _gameManager._board.AddBlockContainer(null, blockContainer.GetPosition());
+                        blockContainer.DestroyAll();
+                    }
+
+                    _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+
+                    _gameManager._stateManager.ChangeState(GameStateType.Default);
+                });
 
                 _gameManager._stateManager.ChangeState(GameStateType.Default);
             }
+
 
             public void Shuffle()
             {

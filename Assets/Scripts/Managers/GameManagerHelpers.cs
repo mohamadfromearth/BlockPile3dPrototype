@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Data;
@@ -7,6 +8,7 @@ using UI;
 using UnityEngine;
 using Utils;
 using Zenject;
+using Random = UnityEngine.Random;
 
 public class GameManagerHelpers : MonoBehaviour
 {
@@ -18,6 +20,7 @@ public class GameManagerHelpers : MonoBehaviour
     [SerializeField] private BlocksMatcher blockMatcher;
     [SerializeField] private Transform blockToProgressImage;
     [SerializeField] private Transform progressImageTransform;
+    [SerializeField] private GameObject hammer;
     [SerializeField] private Camera camera;
     [SerializeField] private Vector3 abilityModeCameraRotation;
 
@@ -25,6 +28,10 @@ public class GameManagerHelpers : MonoBehaviour
 
     [SerializeField] private LayerMask layer;
     [SerializeField] private Transform gridPivot;
+
+    [SerializeField] private Vector3 hammerInitialRotation;
+    [SerializeField] private Vector3 hammerHitRotation;
+
     private Vector3 _progressImagePosition;
 
     private Vector3 _cameraDefaultRotation;
@@ -165,6 +172,17 @@ public class GameManagerHelpers : MonoBehaviour
     public void ChangeCameraToDefaultState()
     {
         camera.transform.DORotate(_cameraDefaultRotation, cameraRotationDuration);
+    }
+
+
+    public void ShowHammerAnimation(IBlockContainer containerBlock, TweenCallback action)
+    {
+        hammer.SetActive(true);
+        var hammerPos = containerBlock.GetPosition();
+        hammerPos.y = containerBlock.Peek().GetPosition().y + 1.3f;
+        hammer.transform.position = hammerPos;
+        hammer.transform.rotation = Quaternion.Euler(hammerInitialRotation);
+        hammer.transform.DORotate(hammerHitRotation, 0.6f).SetEase(Ease.InBack).onComplete = action;
     }
 
     private IEnumerator ShuffleBoardRoutine()

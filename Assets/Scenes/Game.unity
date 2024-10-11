@@ -2336,6 +2336,7 @@ MonoBehaviour:
   blockMatcher: {fileID: 453200292}
   blockToProgressImage: {fileID: 215452116}
   progressImageTransform: {fileID: 2103084009}
+  hammer: {fileID: 151404624}
   camera: {fileID: 963194227}
   abilityModeCameraRotation: {x: 55, y: 45, z: 0}
   cameraRotationDuration: 0.6
@@ -2343,6 +2344,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   gridPivot: {fileID: 419056786}
+  hammerInitialRotation: {x: -34, y: 45, z: 90}
+  hammerHitRotation: {x: 17.3, y: 45, z: 90}
 --- !u!114 &453200292
 MonoBehaviour:
   m_ObjectHideFlags: 0

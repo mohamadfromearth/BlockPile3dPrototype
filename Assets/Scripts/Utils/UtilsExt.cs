@@ -12,6 +12,13 @@ namespace Utils
             obj.SetParent(parent);
         }
 
+
+        public static IEnumerator DeActiveObjectWithDelay(this GameObject obj, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            obj.SetActive(false);
+        }
+
         public static Transform Parent(this GameObject obj) => obj.transform.parent;
 
 
