@@ -18,4 +18,5 @@ MonoBehaviour:
   description: Swap ability
   cost: 5
   count: 0
-  unLockLevel: 0
+  unLockLevel: 4
+  isUnlocked: 0

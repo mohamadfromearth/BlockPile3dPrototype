@@ -20,5 +20,6 @@ namespace Data
         public int cost;
         public int count;
         public int unLockLevel;
+        public bool isUnlocked;
     }
 }

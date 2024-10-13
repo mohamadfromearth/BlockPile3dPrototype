@@ -32,6 +32,11 @@ namespace Utils
             transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
         }
 
+        public static void HidePopUp(this GameObject obj)
+        {
+            obj.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack).onComplete = () => { obj.SetActive(false); };
+        }
+
 
         public static IEnumerator AnimateTextCounter(this TextMeshProUGUI text, int startValue, int endValue,
             float duration)

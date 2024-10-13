@@ -17,5 +17,6 @@ MonoBehaviour:
   image: {fileID: 21300000, guid: 1dc36cc7eebbba941a6f22071e6482fc, type: 3}
   description: Punch Ability
   cost: 5
-  count: 0
-  unLockLevel: 0
+  count: 1
+  unLockLevel: 3
+  isUnlocked: 1

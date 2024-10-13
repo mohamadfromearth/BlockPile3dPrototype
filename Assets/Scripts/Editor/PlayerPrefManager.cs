@@ -20,7 +20,7 @@ namespace Editor
         private void OnGUI()
         {
             keyToDelete = EditorGUILayout.TextField("Key to Delete", keyToDelete);
-            
+
             if (GUILayout.Button("Delete PlayerPref"))
             {
                 if (PlayerPrefs.HasKey(keyToDelete))
@@ -33,6 +33,12 @@ namespace Editor
                 {
                     Debug.LogWarning($"PlayerPref with key '{keyToDelete}' does not exist.");
                 }
+            }
+
+
+            if (GUILayout.Button("Delete All pref"))
+            {
+                PlayerPrefs.DeleteAll();
             }
         }
     }

@@ -17,5 +17,6 @@ MonoBehaviour:
   image: {fileID: 21300000, guid: e7e6335a7f1966c40aaaa6cec5a32dc0, type: 3}
   description: Refresh ability
   cost: 5
-  count: 1
+  count: 0
   unLockLevel: 5
+  isUnlocked: 0

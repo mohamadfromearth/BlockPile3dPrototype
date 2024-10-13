@@ -31,6 +31,9 @@ namespace UI
         private Vector3 _initPos;
 
 
+        private Action _animationCompleted;
+
+
         public IEnumerator Show(string level, string goal)
         {
             panel.gameObject.SetActive(true);
@@ -74,6 +77,12 @@ namespace UI
 
 
             panel.gameObject.SetActive(false);
+
+            _animationCompleted?.Invoke();
         }
+
+        public void AddAnimationCompletedListener(Action action) => _animationCompleted += action;
+
+        public void RemoveAnimationCompletedListener(Action action) => _animationCompleted -= action;
     }
 }

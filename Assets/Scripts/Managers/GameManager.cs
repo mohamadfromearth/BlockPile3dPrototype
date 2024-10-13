@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Data;
-using DG.Tweening;
 using Event;
 using Objects.BlocksContainer;
 using Objects.Cell;
@@ -20,6 +19,7 @@ namespace Managers
         [Header("UI")] [SerializeField] private GameUI gameUI;
         [SerializeField] private WinUI winUI;
         [SerializeField] private LoseUI loseUI;
+        [SerializeField] private BoosterInfoUI boosterInfoUI;
 
         [SerializeField] private LayerMask groundLayerMask;
 
@@ -108,6 +108,9 @@ namespace Managers
             gameUI.AddAbilityCancelClickListener(OnAbilityCancel);
             gameUI.AddBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
             gameUI.AddBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
+            gameUI.AddTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
+
+            boosterInfoUI.AddClaimClickListener(OnClaimBooster);
         }
 
         private void UnSubscribeToEvents()
@@ -136,6 +139,10 @@ namespace Managers
             gameUI.RemoveAbilityCancelButtonListener(OnAbilityCancel);
             gameUI.RemoveBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
             gameUI.RemoveBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
+            gameUI.RemoveTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
+
+
+            boosterInfoUI.RemoveClaimClickListener(OnClaimBooster);
         }
 
 
@@ -312,6 +319,26 @@ namespace Managers
         }
 
         public void OnShuffle() => _stateManager.Shuffle();
+
+
+        private void OnTargetGoalUIAnimationCompleted()
+        {
+            var abilityData = _abilityRepository.GetAbilityData(_levelRepository.LevelIndex);
+            if (abilityData != null)
+            {
+                boosterInfoUI.Show(abilityData);
+            }
+        }
+
+
+        private void OnClaimBooster()
+        {
+            boosterInfoUI.Hide();
+            var abilityData = _abilityRepository.GetAbilityData(_levelRepository.LevelIndex);
+            _abilityRepository.UnLockAbility(abilityData);
+            _abilityRepository.AddAbility(abilityData.type, 1);
+            helpers.UpdateAbilityButtons(gameUI);
+        }
 
         #endregion
 

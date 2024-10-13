@@ -13,14 +13,21 @@ namespace UI
     public class AbilityButton
     {
         public Button button;
+        public Image buttonImage;
         public Image countBackground;
+        public Image abilityImage;
         public TextMeshProUGUI countText;
         public Image lockImage;
         public TextMeshProUGUI unLockLevelText;
+        public Color deactivatedColor;
 
         public void SetIntractable(bool isIntractable)
         {
+            var color = isIntractable ? Color.white : deactivatedColor;
+
             button.enabled = isIntractable;
+            buttonImage.color = color;
+            abilityImage.color = color;
             countBackground.gameObject.SetActive(isIntractable);
             countText.gameObject.SetActive(isIntractable);
             lockImage.gameObject.SetActive(!isIntractable);
@@ -56,6 +63,7 @@ namespace UI
         [SerializeField] private Transform horizontalY;
 
         [SerializeField] private Button settingButton;
+        [SerializeField] private Button backToMenuButton;
         [SerializeField] private Transform coinTransform;
         [SerializeField] private Transform progressTransform;
         [SerializeField] private Transform blocksImageTransform;
@@ -93,6 +101,9 @@ namespace UI
             coinTransform.position = new Vector3(coinTransform.position.x, y, coinTransform.position.z);
             settingButton.transform.position =
                 new Vector3(settingButton.transform.position.x, y, settingButton.transform.position.z);
+            backToMenuButton.transform.position = new Vector3(
+                backToMenuButton.transform.position.x, y, backToMenuButton.transform.position.z
+            );
 
             var abilityButtonsParent = isLandScape ? abilitiesVl.transform : abilitiesHl.transform;
             punchButton.button.transform.SetParent(abilityButtonsParent);
@@ -127,6 +138,14 @@ namespace UI
 
         public void SetRefreshCountText(string text) => refreshButton.countText.text = text;
 
+
+        public void AddTargetGoalAnimationCompleted(Action action) => targetGoal.AddAnimationCompletedListener(action);
+
+        public void RemoveTargetGoalAnimationCompleted(Action action) =>
+            targetGoal.RemoveAnimationCompletedListener(action);
+
+
+        #region Clicks
 
         public void AddPunchClickListener(UnityAction action) =>
             punchButton.button.onClick.AddListener(action);
@@ -167,6 +186,8 @@ namespace UI
 
         public void RemoveAbilityCancelButtonListener(UnityAction action) =>
             abilityCancelButton.onClick.AddListener(action);
+
+        #endregion
 
 
         public void SetRefreshIntractable(bool isIntractable) => refreshButton.SetIntractable(isIntractable);
