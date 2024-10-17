@@ -18,6 +18,7 @@ namespace Objects.AdvertiseBlock
             foreach (var position in advertiseBlocksPositions)
             {
                 var worldPosition = _board.CellToWorld(position);
+                worldPosition.y += 0.1f;
                 var cell = _board.GetCell(position);
                 var advertiseBlock = _advertiseBlockFactory.Create();
                 advertiseBlock.SetPosition(worldPosition);

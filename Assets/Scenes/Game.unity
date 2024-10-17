@@ -6975,7 +6975,7 @@ MonoBehaviour:
   blockContainerPrefab: {fileID: 6330068114331806170, guid: 4484d8ccb9d44ad44ba3729d86055d82, type: 3}
   defaultCellPrefab: {fileID: 7998414728364303778, guid: f7716b26ad3a7f94f87c9053f1311564, type: 3}
   lockBlockPrefab: {fileID: 4833048417843813151, guid: c092c448d1ac25040bdbf1337f6702bb, type: 3}
-  advertiseBlockPrefab: {fileID: 1664345079107195230, guid: 8e60abcbe704a524682e05e9fcd3afc7, type: 3}
+  advertiseBlockPrefab: {fileID: -43681498816550674, guid: 0366062edb3b31a46846f5cbf16052c2, type: 3}
   levelRepository: {fileID: 11400000, guid: 906d165bdd9d1a04395a18a20cd3bf3b, type: 2}
   colorRepository: {fileID: 11400000, guid: d4be1912187f8c14da21e56ab232041a, type: 2}
   boardData: {fileID: 11400000, guid: 30886e6d6a303624297469f37c0a6b3e, type: 2}
