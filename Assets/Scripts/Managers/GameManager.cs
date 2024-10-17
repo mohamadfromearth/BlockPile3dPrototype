@@ -20,6 +20,7 @@ namespace Managers
         [SerializeField] private WinUI winUI;
         [SerializeField] private LoseUI loseUI;
         [SerializeField] private BoosterInfoUI boosterInfoUI;
+        [SerializeField] private BoosterIntroductionUI boosterIntroductionUI;
 
         [SerializeField] private LayerMask groundLayerMask;
 
@@ -47,6 +48,7 @@ namespace Managers
 
         private int _selectionBarSelectedIndex;
         private IBlockContainer _selectedBlockContainer;
+        private ICell _cellToDrop = null;
 
         private float _currentScore;
         private float _previousScore;
@@ -111,6 +113,8 @@ namespace Managers
             gameUI.AddTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
 
             boosterInfoUI.AddClaimClickListener(OnClaimBooster);
+
+            boosterIntroductionUI.AddMovingCompletedListener(OnBoosterIntroductionMovingCompleted);
         }
 
         private void UnSubscribeToEvents()
@@ -143,6 +147,8 @@ namespace Managers
 
 
             boosterInfoUI.RemoveClaimClickListener(OnClaimBooster);
+
+            boosterIntroductionUI.RemoveMovingCompletedListener(OnBoosterIntroductionMovingCompleted);
         }
 
 
@@ -188,10 +194,8 @@ namespace Managers
 
         public void OnNextLevel()
         {
-            blocksMatcher.Stop();
-            _board.Clear();
-            _selectionBar.Clear();
             winUI.Hide();
+            gameUI.Show();
             StartLevel();
             helpers.UpdateAbilityButtons(gameUI);
         }
@@ -326,8 +330,15 @@ namespace Managers
             var abilityData = _abilityRepository.GetAbilityData(_levelRepository.LevelIndex);
             if (abilityData != null)
             {
-                boosterInfoUI.Show(abilityData);
+                boosterIntroductionUI.StartMoving(abilityData.image, gameUI.GetBoosterButtonPosition(abilityData.type));
             }
+        }
+
+
+        private void OnBoosterIntroductionMovingCompleted()
+        {
+            var abilityData = _abilityRepository.GetAbilityData(_levelRepository.LevelIndex);
+            boosterInfoUI.Show(abilityData);
         }
 
 
@@ -349,6 +360,12 @@ namespace Managers
 
             if (_currentScore >= levelData.targetScore)
             {
+                _selectedBlockContainer = null;
+                _cellToDrop = null;
+                blocksMatcher.Stop();
+                _board.Clear();
+                _selectionBar.Clear();
+
                 _progressRewardsRepository.IncreaseIndex();
 
                 winUI.Show("Level: " + (_levelRepository.LevelIndex + 1), _currentScore.ToString(),
@@ -357,6 +374,8 @@ namespace Managers
                     _progressRewardsRepository.SpinLevelIndex /
                     (float)_progressRewardsRepository.SpinLevelTarget
                 );
+
+                gameUI.Hide();
 
                 _channel.Rise<Won>(new Won());
 
@@ -572,10 +591,6 @@ namespace Managers
 
             private bool _isRotating = false;
 
-            private ICell _currentCell;
-
-            private ICell _cellToDrop = null;
-
 
             public DefaultState(GameManager gameManager)
             {
@@ -651,12 +666,12 @@ namespace Managers
                     var cell = _gameManager._board.GetCell(_gameManager.helpers
                         .ModifyBlockContainerPositionForRotatedGrid(pos));
 
-                    _cellToDrop?.SetSelected(false);
+                    _gameManager._cellToDrop?.SetSelected(false);
 
                     if (cell != null)
                     {
                         cell.SetSelected(true);
-                        _cellToDrop = cell;
+                        _gameManager._cellToDrop = cell;
                     }
                 }
             }
@@ -664,8 +679,8 @@ namespace Managers
             private void OnPointerUp()
             {
                 _previousX = float.NaN;
-                _cellToDrop?.SetSelected(false);
-                _cellToDrop = null;
+                _gameManager._cellToDrop?.SetSelected(false);
+                _gameManager._cellToDrop = null;
 
                 if (_gameManager._selectedBlockContainer == null &&
                     _gameManager.blocksMatcher.AreBlocksMatching() == false &&

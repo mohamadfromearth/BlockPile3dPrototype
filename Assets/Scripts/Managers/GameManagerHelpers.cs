@@ -17,6 +17,7 @@ public class GameManagerHelpers : MonoBehaviour
     [Inject] private AbilityRepository _abilityRepository;
     [Inject] private CurrencyRepository _currencyRepository;
     [Inject] private Board _board;
+    [Inject] private BlockContainerSelectionBar _selectionBar;
     [SerializeField] private BlocksMatcher blockMatcher;
     [SerializeField] private Transform blockToProgressImage;
     [SerializeField] private Transform progressImageTransform;

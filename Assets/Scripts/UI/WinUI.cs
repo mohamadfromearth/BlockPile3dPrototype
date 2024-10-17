@@ -1,4 +1,5 @@
 ﻿using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -17,6 +18,7 @@ namespace UI
         [SerializeField] private TextMeshProUGUI buildingItemRewardText;
         [SerializeField] private Image fortuneWheelProgressImage;
         [SerializeField] private Button advertiseRewardButton;
+        [SerializeField] private ParticleSystem confettiParticleSystem;
 
 
         public void AddNextLevelClickListener(UnityAction action) => nextLevelButton.onClick.AddListener(action);
@@ -29,6 +31,7 @@ namespace UI
         public void RemoveAdvertiseRewardClickListener(UnityAction action) =>
             advertiseRewardButton.onClick.RemoveListener(action);
 
+
         public void Show(
             string level,
             string collectedText,
@@ -37,6 +40,8 @@ namespace UI
             float fortuneWheelProgress
         )
         {
+            confettiParticleSystem.GameObject().SetActive(true);
+            confettiParticleSystem.Play();
             panel.SetActive(true);
             background.ShowPopUp();
             levelText.text = level;
@@ -44,6 +49,7 @@ namespace UI
             starRewardText.text = starReward;
             buildingItemRewardText.text = buildingItemReward;
             fortuneWheelProgressImage.fillAmount = fortuneWheelProgress;
+            confettiParticleSystem.Play();
         }
 
         public void Hide()

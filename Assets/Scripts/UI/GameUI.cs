@@ -81,6 +81,8 @@ namespace UI
         [SerializeField] private GameObject abilityHint;
         private AbilityData _abilityData;
 
+        [SerializeField] private GameUIHelpers helpers;
+
         [SerializeField] private float progressFillingDuration = 0.2f;
         [SerializeField] private float blockToProgressDuration = 0.5f;
         [SerializeField] private float progressTextAnimationDuration = 1f;
@@ -270,5 +272,7 @@ namespace UI
             abilityHint.SetActive(false);
             abilityHint.transform.localScale = Vector3.zero;
         }
+
+        public Vector3 GetBoosterButtonPosition(AbilityType type) => helpers.GetBoosterButtonPosition(type);
     }
 }
