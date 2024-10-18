@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using DG.Tweening;
+using Event;
 using Objects.AdvertiseBlock;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
+using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
@@ -16,6 +18,8 @@ public class Board
     public int Width { get; private set; }
     public int Height { get; private set; }
 
+    public Transform Center => _pivot;
+
 
     private ICellFactory _cellFactory;
 
@@ -25,14 +29,14 @@ public class Board
 
     public Dictionary<Vector3Int, ICell> Cells => _cellsDic;
 
+    private EventChannel _channel;
+
 
     private ShuffleHandler _shuffleHandler = new ShuffleHandler();
 
 
     private int _filledCellItemsCount;
 
-
-    public int FilledCellITemCount => _filledCellItemsCount;
 
     private bool _isRotationSnapping = false;
 
@@ -51,9 +55,10 @@ public class Board
     }
 
     [Inject]
-    private void Construct(ICellFactory cellFactory)
+    private void Construct(ICellFactory cellFactory, EventChannel channel)
     {
         _cellFactory = cellFactory;
+        _channel = channel;
     }
 
 
@@ -204,10 +209,11 @@ public class Board
             }
         }
 
-        _pivot.transform.DORotate(new Vector3(0, closestAngle, 0), 0.5f).onComplete = () =>
-        {
-            _isRotationSnapping = false;
-        };
+        var rotationTween = _pivot.transform.DORotate(new Vector3(0, closestAngle, 0), 0.5f);
+
+        rotationTween.onUpdate = () => { _channel.Rise<GridRotate>(new GridRotate(_pivot.transform.rotation)); };
+
+        rotationTween.onComplete = () => { _isRotationSnapping = false; };
     }
 
 

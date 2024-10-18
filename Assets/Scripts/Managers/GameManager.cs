@@ -77,11 +77,6 @@ namespace Managers
         }
 
 
-        private void Update()
-        {
-            Debug.Log("the count is: " + _board.FilledCellITemCount);
-        }
-
         private void OnEnable()
         {
             SubscribeToEvents();
@@ -652,6 +647,8 @@ namespace Managers
                 _isRotating = true;
                 _gameManager._board.Rotate((position.x - _previousX) / 5f);
                 _previousX = position.x;
+
+                _gameManager._channel.Rise<GridRotate>(new GridRotate(_gameManager._board.Center.rotation));
             }
 
             private void MoveSelectedContainer(Vector3 position)

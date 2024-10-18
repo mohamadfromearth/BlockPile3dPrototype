@@ -39,6 +39,7 @@ namespace Objects.BlocksContainer
         private void Start()
         {
             _destroyRateWaitForSeconds = new WaitForSeconds(destroyRate);
+            Channel.Subscribe<GridRotate>(OnGridRotate);
         }
 
         public float Destroy(bool destroyImmediately)
@@ -343,6 +344,7 @@ namespace Objects.BlocksContainer
 
             block.GameObj.transform.rotation = Quaternion.identity;
             transform.rotation = Quaternion.identity;
+            countText.transform.rotation = Quaternion.Euler(90, 45f, 0f);
             var rotation = block.GameObj.transform.rotation.eulerAngles;
             rotation = rotation + GetTargetRotation(currentBlockPosition, targetBlockPosition);
             _pathTween = block.GameObj.transform.DOPath(points, duration, PathType.CatmullRom);
@@ -427,5 +429,13 @@ namespace Objects.BlocksContainer
 
 
         public Stack<IBlock> GetBlocks() => blocks;
+
+
+        private void OnGridRotate()
+        {
+            if (_hasBeenDestroyed) return;
+            var rotation = Quaternion.Inverse(Channel.GetData<GridRotate>().Rotation);
+            countText.transform.rotation = Quaternion.Euler(90f, rotation.y + 45, 0);
+        }
     }
 }
