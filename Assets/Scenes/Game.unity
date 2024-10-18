@@ -6974,7 +6974,7 @@ MonoBehaviour:
   - {fileID: 4803256460400165517, guid: d9cf735c41c98ca4faa8437a2eb340f3, type: 3}
   blockContainerPrefab: {fileID: 6330068114331806170, guid: 4484d8ccb9d44ad44ba3729d86055d82, type: 3}
   defaultCellPrefab: {fileID: 7998414728364303778, guid: f7716b26ad3a7f94f87c9053f1311564, type: 3}
-  lockBlockPrefab: {fileID: 4833048417843813151, guid: c092c448d1ac25040bdbf1337f6702bb, type: 3}
+  lockBlockPrefab: {fileID: 7585561644665505736, guid: 1e272da278ccfc244859aca21a608149, type: 3}
   advertiseBlockPrefab: {fileID: -43681498816550674, guid: 0366062edb3b31a46846f5cbf16052c2, type: 3}
   levelRepository: {fileID: 11400000, guid: 906d165bdd9d1a04395a18a20cd3bf3b, type: 2}
   colorRepository: {fileID: 11400000, guid: d4be1912187f8c14da21e56ab232041a, type: 2}
@@ -13402,7 +13402,7 @@ Grid:
   m_GameObject: {fileID: 1654743539}
   m_Enabled: 1
   m_CellSize: {x: 1, y: 1, z: 1}
-  m_CellGap: {x: 0, y: 0, z: 0}
+  m_CellGap: {x: 0.05, y: 0, z: 0.05}
   m_CellLayout: 0
   m_CellSwizzle: 0
 --- !u!4 &1654743541

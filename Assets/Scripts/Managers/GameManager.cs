@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Data;
@@ -73,6 +74,12 @@ namespace Managers
 
 
             helpers.UpdateAbilityButtons(gameUI);
+        }
+
+
+        private void Update()
+        {
+            Debug.Log("the count is: " + _board.FilledCellITemCount);
         }
 
         private void OnEnable()
@@ -796,7 +803,7 @@ namespace Managers
                         blockContainer.DestroyAll();
                     }
 
-                    _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+                    //_gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
 
                     _gameManager._stateManager.ChangeState(GameStateType.Default);
                 });

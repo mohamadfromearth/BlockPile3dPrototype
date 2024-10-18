@@ -18,7 +18,9 @@ namespace Objects.LockBlock
             {
                 var cell = _board.GetCell(lockBlockData.position);
                 var lockBlock = _lockBlockFactory.Create();
-                lockBlock.SetPosition(cell.GetPosition());
+                var pos = cell.GetPosition();
+                pos.y += 0.1f;
+                lockBlock.SetPosition(pos);
                 lockBlock.GameObj.transform.SetParent(cell.GameObj.transform.parent);
                 lockBlock.Count = lockBlockData.count;
                 _board.AddLockBlock(lockBlock, lockBlockData.position);

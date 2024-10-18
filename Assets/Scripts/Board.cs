@@ -31,6 +31,9 @@ public class Board
 
     private int _filledCellItemsCount;
 
+
+    public int FilledCellITemCount => _filledCellItemsCount;
+
     private bool _isRotationSnapping = false;
 
     public bool IsRotationSnapping => _isRotationSnapping;
