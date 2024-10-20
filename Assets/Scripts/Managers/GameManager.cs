@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Data;
@@ -423,7 +422,7 @@ namespace Managers
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
             _cameraSizeSetter.RefreshSize();
-            _selectionBar.Spawn(levelData.colors, _board.WorldToCell(new Vector3Int(0, 0, 0)));
+            _selectionBar.SpawnRandom(levelData.colors, _board.WorldToCell(new Vector3Int(0, 0, 0)));
         }
 
         #region States
@@ -731,7 +730,7 @@ namespace Managers
                         _gameManager._selectionBar.Decrease();
 
                         if (_gameManager._selectionBar.Count == 0)
-                            _gameManager._selectionBar.Spawn(_gameManager._levelRepository.GetLevelData().colors);
+                            _gameManager._selectionBar.SpawnRandom(_gameManager._levelRepository.GetLevelData().colors);
                     }
                     else
                     {

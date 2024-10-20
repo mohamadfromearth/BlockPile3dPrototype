@@ -40,12 +40,12 @@ public class BlockContainerSelectionBar
     }
 
 
-    public void Spawn(List<string> colors)
+    public void SpawnRandom(List<string> colors)
     {
-        Spawn(colors, _data.blockSelectionBarTransform.position);
+        SpawnRandom(colors, _data.blockSelectionBarTransform.position);
     }
 
-    public void Spawn(List<string> colors, Vector3 parentPos)
+    public void SpawnRandom(List<string> colors, Vector3 parentPos)
     {
         _data.blockSelectionBarTransform.position = parentPos;
         Count = _data.count;
@@ -128,6 +128,32 @@ public class BlockContainerSelectionBar
     }
 
 
+    public void Spawn(List<string> colors, List<int> counts, Vector3 parentPos)
+    {
+        _data.blockSelectionBarTransform.position = parentPos;
+        Count = _data.count;
+
+        for (int i = 0; i < colors.Count; i++)
+        {
+            var pos = _data.containersSpawningPositionList[i].position;
+            var targetPos = _data.containersPositionList[i].position;
+
+            var container = _blockContainerFactory.Create();
+            container.SetPosition(pos);
+            container.MoveTo(targetPos, _data.movingDuration, _data.movingEase);
+
+
+            for (int j = 0; j < counts[i]; j++)
+            {
+                var block = _blockFactory.Create(colors[i].ToColorIndex());
+                container.Push(block);
+            }
+
+            container.SetCountText(container.Count.ToString(), 0);
+        }
+    }
+
+
     public void BackToInitialPosition(IBlockContainer blockContainer, float duration)
     {
         for (int i = 0; i < _blockContainers.Length; i++)
@@ -157,7 +183,7 @@ public class BlockContainerSelectionBar
     public void Refresh(List<string> colors)
     {
         Clear();
-        Spawn(colors, _data.blockSelectionBarTransform.position);
+        SpawnRandom(colors, _data.blockSelectionBarTransform.position);
     }
 
     public void Decrease() => Count--;
