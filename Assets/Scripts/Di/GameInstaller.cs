@@ -6,6 +6,8 @@ using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
+using Objects.NoneValueLockBlock;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;
@@ -26,6 +28,7 @@ namespace Di
 
         [SerializeField] private LockBlock lockBlockPrefab;
         [SerializeField] private AdvertiseBlock advertiseBlockPrefab;
+        [SerializeField] private NoneValueLockBlock noneValueLockBlockPrefab;
 
         #endregion
 
@@ -51,6 +54,16 @@ namespace Di
         [SerializeField] private SettingsController settingsController;
 
         [SerializeField] private Transform shuffleButtonTransform;
+
+
+        #region Tutorial
+
+        [SerializeField] private GameObject tutorialIndicator;
+        [SerializeField] private GameObject tutorialArrow;
+        [SerializeField] private TextMeshProUGUI tutorialHintText;
+        [SerializeField] private TutorialRepository tutorialRepository;
+
+        #endregion
 
 
         public override void InstallBindings()
@@ -79,6 +92,12 @@ namespace Di
             Container.Bind<IAdvertiseBlockFactory>().To<AdvertiseBlockFactory>().AsSingle()
                 .WithArguments(advertiseBlockPrefab);
 
+            Container.Bind<INoneValueLockBlockFactory>().To<NoneValueLockBlockFactory>().AsSingle()
+                .WithArguments(noneValueLockBlockPrefab);
+
+            Container.Bind<TutorialCommand1Factory>().AsSingle()
+                .WithArguments(tutorialRepository, tutorialIndicator, tutorialArrow, tutorialHintText);
+
             #endregion
 
             #region Repositories
@@ -103,7 +122,7 @@ namespace Di
             var levelData = levelRepository.GetLevelData();
             Container.Bind<Board>().AsSingle().WithArguments(levelData.size, levelData.size, grid, gridPivot);
 
-            Container.Bind<BlockContainerSelectionBar>().AsTransient()
+            Container.Bind<BlockContainerSelectionBar>().AsSingle()
                 .WithArguments(blockContainerSelectionBarData);
 
             #region Placers

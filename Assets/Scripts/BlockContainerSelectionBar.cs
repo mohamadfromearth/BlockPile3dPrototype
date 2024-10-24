@@ -32,6 +32,11 @@ public class BlockContainerSelectionBar
     private BlockContainerSelectionBarData _data;
 
 
+    public IBlockContainer[] BlockContainers => _blockContainers;
+
+    public List<Transform> ContainerPositionsList => _data.containersPositionList;
+
+
     public int Count { get; private set; }
 
     public BlockContainerSelectionBar(BlockContainerSelectionBarData data)

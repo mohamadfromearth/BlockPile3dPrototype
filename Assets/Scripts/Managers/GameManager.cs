@@ -30,6 +30,7 @@ namespace Managers
         [SerializeField] private Vector3 hammerHitRotation;
         [SerializeField] private Vector3 hammerInitialRotation;
         [SerializeField] private Grid grid;
+        [SerializeField] private TutorialManager tutorialManager;
 
         [SerializeField] private float backToSelectionBarDuration = 0.3f;
 
@@ -422,7 +423,9 @@ namespace Managers
             gameUI.SetProgressText(helpers.GetTargetScoreString(_currentScore));
             gameUI.SetProgress(0);
             _cameraSizeSetter.RefreshSize();
-            _selectionBar.SpawnRandom(levelData.colors, _board.WorldToCell(new Vector3Int(0, 0, 0)));
+            var firstCellPos = _board.WorldToCell(new Vector3Int(0, 0, 0));
+            _selectionBar.SpawnRandom(levelData.colors, firstCellPos);
+            tutorialManager.OnStartLevel();
         }
 
         #region States
