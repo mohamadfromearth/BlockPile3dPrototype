@@ -5,6 +5,7 @@ using Objects.AdvertiseBlock;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
+using Objects.NoneValueLockBlock;
 using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
@@ -167,6 +168,16 @@ public class Board
 
             if (cell.CanPlaceItem) _shuffleHandler.Add(gridPosition);
             else _shuffleHandler.Remove(gridPosition);
+        }
+    }
+
+
+    public void AddNonValueLockBlock(INoneValueLockBlock lockBlock, Vector3Int gridPosition)
+    {
+        if (_cellsDic.TryGetValue(gridPosition, out var cell))
+        {
+            cell.NoneValueLockBlock = lockBlock;
+            cell.CanPlaceItem = lockBlock == null;
         }
     }
 

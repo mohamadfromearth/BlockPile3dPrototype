@@ -6,7 +6,6 @@ using Event;
 using Objects.NoneValueLockBlock;
 using TMPro;
 using UnityEngine;
-using Zenject;
 
 public class TutorialCommand1 : ICommand
 {
@@ -61,6 +60,7 @@ public class TutorialCommand1 : ICommand
             var lockBlock = _lockBlockFactory.Create();
             lockBlock.SetPosition(worldPosition);
             lockBlocks.Add(lockBlock);
+            _board.AddNonValueLockBlock(lockBlock, pos);
         }
 
         _lockBlockInitializationCompleted?.Invoke(lockBlocks);

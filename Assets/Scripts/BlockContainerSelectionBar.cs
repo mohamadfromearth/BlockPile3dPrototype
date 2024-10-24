@@ -45,6 +45,20 @@ public class BlockContainerSelectionBar
     }
 
 
+    public int GetIndex(IBlockContainer blockContainer)
+    {
+        for (int i = 0; i < _blockContainers.Length; i++)
+        {
+            if (blockContainer == _blockContainers[i])
+            {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+
     public void SpawnRandom(List<string> colors)
     {
         SpawnRandom(colors, _data.blockSelectionBarTransform.position);

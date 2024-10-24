@@ -2,6 +2,7 @@ using Core;
 using Objects.AdvertiseBlock;
 using Objects.BlocksContainer;
 using Objects.LockBlock;
+using Objects.NoneValueLockBlock;
 using UnityEngine;
 
 namespace Objects.Cell
@@ -12,6 +13,8 @@ namespace Objects.Cell
         public IBlockContainer BlockContainer { get; set; }
         public IAdvertiseBlock AdvertiseBlock { get; set; }
         public ILockBlock LockBlock { get; set; }
+
+        public INoneValueLockBlock NoneValueLockBlock { get; set; }
 
         public void SetSelected(bool isSelected);
         public void Destroy();

@@ -630,13 +630,16 @@ namespace Managers
                 if (container.IsPlaced) return;
 
                 _gameManager._selectedBlockContainer = container;
+                _gameManager.tutorialManager.OnBlockContainerPointerDown(
+                    _gameManager._selectionBar.GetIndex(container));
             }
 
 
             private void RotateBoard(Vector3 position)
             {
                 if (_gameManager.blocksMatcher.AreBlocksMatching() || _gameManager.helpers.IsShuffling ||
-                    _gameManager._board.IsRotationSnapping) return;
+                    _gameManager._board.IsRotationSnapping ||
+                    _gameManager.tutorialManager.Index < (int)TutorialCommandType.Command3) return;
 
                 if (float.IsNaN(_previousX))
                 {
@@ -734,12 +737,16 @@ namespace Managers
 
                         if (_gameManager._selectionBar.Count == 0)
                             _gameManager._selectionBar.SpawnRandom(_gameManager._levelRepository.GetLevelData().colors);
+
+                        _gameManager.tutorialManager.OnPlacedBlockContainer();
                     }
                     else
                     {
                         _gameManager._selectionBar.BackToInitialPosition(_gameManager._selectedBlockContainer,
                             _gameManager.backToSelectionBarDuration);
                         _gameManager._selectedBlockContainer = null;
+
+                        _gameManager.tutorialManager.OnBlockContainerPointerUp();
                     }
                 }
             }

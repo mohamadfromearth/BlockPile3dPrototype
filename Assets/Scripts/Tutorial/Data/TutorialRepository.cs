@@ -4,6 +4,8 @@
 public class TutorialRepository : ScriptableObject
 {
     private const string TutorialIndexKey = "TUTORIAL_INDEX_KEY";
+    private const string IsTutorialAvailableKey = "IS_TUTORIAL_AVAILABLE";
+    private const int TutorialAvailableValue = 1;
 
     private int _tutorialIndex = 0;
 
@@ -13,8 +15,15 @@ public class TutorialRepository : ScriptableObject
     [SerializeField] private Vector3Int[] noneValueLockBlocksPositions;
     [SerializeField] private string[] tutorialHintTexts;
 
+    private bool _isTutorialAvailable;
 
-    private void OnEnable() => _tutorialIndex = PlayerPrefs.GetInt(TutorialIndexKey, 0);
+
+    private void OnEnable()
+    {
+        _tutorialIndex = PlayerPrefs.GetInt(TutorialIndexKey, 0);
+        _isTutorialAvailable =
+            PlayerPrefs.GetInt(IsTutorialAvailableKey, TutorialAvailableValue) == TutorialAvailableValue;
+    }
 
 
     public int TutorialIndex => _tutorialIndex;
@@ -23,6 +32,23 @@ public class TutorialRepository : ScriptableObject
     public Vector3Int SecondAvailablePos => secondAvailablePos;
 
     public Vector3Int[] NoneValueLockBlockPositions => noneValueLockBlocksPositions;
+
+    public void IncreaseIndex()
+    {
+        _tutorialIndex += 1;
+    }
+
+
+    public bool IsTutorialAvailable
+    {
+        get => _isTutorialAvailable;
+        set
+        {
+            _isTutorialAvailable = value;
+            var tutorialAvailableValue = _isTutorialAvailable ? TutorialAvailableValue : 0;
+            PlayerPrefs.SetInt(IsTutorialAvailableKey, tutorialAvailableValue);
+        }
+    }
 
     public string GetHint(int index) => tutorialHintTexts[index];
 }
