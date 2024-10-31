@@ -4,6 +4,8 @@ using Data;
 using Event;
 using Objects.NoneValueLockBlock;
 using TMPro;
+using Tutorial.Data;
+using UI;
 using UnityEngine;
 using Zenject;
 
@@ -12,37 +14,8 @@ public enum TutorialCommandType
 {
     Command1,
     Command2,
-    Command3
-}
-
-
-public class TutorialCommand3 : ICommand
-{
-    private Board _board;
-    private TextMeshProUGUI _hintText;
-
-    public TutorialCommand3(Board board, TextMeshProUGUI hintText, int id)
-    {
-        _board = board;
-        _hintText = hintText;
-        Id = id;
-    }
-
-    public int Id { get; set; }
-
-    public void Execute()
-    {
-        foreach (var keyValuePair in _board.Cells)
-        {
-            var lockBlock = keyValuePair.Value.NoneValueLockBlock;
-
-            if (lockBlock != null)
-            {
-                _board.AddNonValueLockBlock(null, _board.WorldToCell(lockBlock.GetPosition()));
-                lockBlock.Destroy();
-            }
-        }
-    }
+    Command3,
+    Command4
 }
 
 
@@ -55,6 +28,7 @@ public class TutorialManager : MonoBehaviour
     private TutorialCommand1 _command1;
     private TutorialCommand2 _command2;
     private TutorialCommand3 _command3;
+    private TutorialCommand4 _command4;
     private TutorialCommand1Factory _command1Factory;
     private BlockContainerSelectionBar _selectionBar;
 
@@ -64,6 +38,7 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private GameObject arrow;
     [SerializeField] private Camera camera;
     [SerializeField] private TextMeshProUGUI hintText;
+    [SerializeField] private GameUI gameUI;
 
     public int Index => tutorialRepository.TutorialIndex;
 
@@ -103,15 +78,19 @@ public class TutorialManager : MonoBehaviour
         _command3 = new TutorialCommand3(
             _board,
             hintText,
+            tutorialRepository,
             (int)TutorialCommandType.Command3
         );
+
+        _command4 = new TutorialCommand4(hintText.gameObject, gameUI, (int)TutorialCommandType.Command4);
 
 
         _tutorialCommands = new List<ICommand>()
         {
             _command1,
             _command2,
-            _command3
+            _command3,
+            _command4
         };
     }
 
@@ -122,6 +101,7 @@ public class TutorialManager : MonoBehaviour
 
         if (levelIndex == 0)
         {
+            gameUI.Hide();
             var indicatorStartPos = camera.WorldToScreenPoint(_selectionBar.ContainerPositionsList[2].position);
             indicator.transform.position = indicatorStartPos;
             _tutorialCommands[tutorialRepository.TutorialIndex].Execute();
@@ -130,6 +110,7 @@ public class TutorialManager : MonoBehaviour
 
     public void OnBlockContainerPointerDown(int index)
     {
+        Debug.Log("Container index is : " + index);
         _latestSelectionBarIndex = index;
         indicator.SetActive(false);
         arrow.SetActive(false);
@@ -138,15 +119,19 @@ public class TutorialManager : MonoBehaviour
 
     public void OnBlockContainerPointerUp()
     {
-        indicator.SetActive(true);
-        arrow.SetActive(true);
+        if (tutorialRepository.TutorialIndex < (int)TutorialCommandType.Command3)
+        {
+            indicator.SetActive(true);
+            arrow.SetActive(true);
+        }
     }
 
 
     public void OnPlacedBlockContainer()
     {
-        if (tutorialRepository.TutorialIndex == (int)TutorialCommandType.Command3)
+        if (tutorialRepository.TutorialIndex == (int)TutorialCommandType.Command4)
         {
+            tutorialRepository.IsTutorialAvailable = false;
             return;
         }
 

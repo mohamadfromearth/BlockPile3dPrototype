@@ -158,6 +158,7 @@ public class BlockContainerSelectionBar
             var targetPos = _data.containersPositionList[i].position;
 
             var container = _blockContainerFactory.Create();
+            _blockContainers[i] = container;
             container.SetPosition(pos);
             container.MoveTo(targetPos, _data.movingDuration, _data.movingEase);
 

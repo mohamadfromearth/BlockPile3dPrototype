@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Event;
 using Objects.NoneValueLockBlock;
 using TMPro;
+using Tutorial.Data;
 using UnityEngine;
 using Zenject;
 

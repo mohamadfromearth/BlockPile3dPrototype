@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Data;
 using Event;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Scrips.Event;
+using Tutorial.Data;
 using UI;
 using UnityEngine;
 using Utils;
@@ -27,10 +29,9 @@ namespace Managers
         [SerializeField] private GameManagerHelpers helpers;
         [SerializeField] private BlocksMatcher blocksMatcher;
         [SerializeField] private GameObject hammer;
-        [SerializeField] private Vector3 hammerHitRotation;
-        [SerializeField] private Vector3 hammerInitialRotation;
         [SerializeField] private Grid grid;
         [SerializeField] private TutorialManager tutorialManager;
+        [SerializeField] private TutorialRepository tutorialRepository;
 
         [SerializeField] private float backToSelectionBarDuration = 0.3f;
 
@@ -41,6 +42,7 @@ namespace Managers
         [Inject] private AbilityRepository _abilityRepository;
         [Inject] private CurrencyRepository _currencyRepository;
         [Inject] private IProgressRewardsRepository _progressRewardsRepository;
+        [SerializeField] private FortuneWheelRepository fortuneWheelRepository;
         [Inject] private BlockContainerSelectionBar _selectionBar;
         [Inject] private Placer _placer;
         [Inject] private CameraSizeSetter _cameraSizeSetter;
@@ -368,13 +370,14 @@ namespace Managers
                 _board.Clear();
                 _selectionBar.Clear();
 
-                _progressRewardsRepository.IncreaseIndex();
+                fortuneWheelRepository.IncreaseProgressIndex();
 
-                winUI.Show("Level: " + (_levelRepository.LevelIndex + 1), _currentScore.ToString(),
+                winUI.Show("Level: " + (_levelRepository.LevelIndex + 1),
+                    _currentScore.ToString(CultureInfo.InvariantCulture),
                     _levelRepository.GetLevelData().coinReward.ToString(),
                     _levelRepository.GetLevelData().buildingItemReward.ToString(),
-                    _progressRewardsRepository.SpinLevelIndex /
-                    (float)_progressRewardsRepository.SpinLevelTarget
+                    fortuneWheelRepository.GetProgress(),
+                    fortuneWheelRepository.GetProgressIndex() + "/" + fortuneWheelRepository.GetProgressTarget()
                 );
 
                 gameUI.Hide();
@@ -413,10 +416,14 @@ namespace Managers
         {
             var levelData = _levelRepository.GetLevelData();
 
-            gameUI.ShowTargetGoal(
-                "Level: " + (_levelRepository.LevelIndex + 1),
-                levelData.targetScore.ToString()
-            );
+            if (_levelRepository.LevelIndex != 0)
+            {
+                gameUI.ShowTargetGoal(
+                    "Level: " + (_levelRepository.LevelIndex + 1),
+                    levelData.targetScore.ToString()
+                );
+            }
+
 
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);
             _placer.Place();
@@ -424,7 +431,16 @@ namespace Managers
             gameUI.SetProgress(0);
             _cameraSizeSetter.RefreshSize();
             var firstCellPos = _board.WorldToCell(new Vector3Int(0, 0, 0));
-            _selectionBar.SpawnRandom(levelData.colors, firstCellPos);
+
+            if (_levelRepository.LevelIndex == 0)
+            {
+                _selectionBar.Spawn(tutorialRepository.BlocksColors, tutorialRepository.BlocksCount, firstCellPos);
+            }
+            else
+            {
+                _selectionBar.SpawnRandom(levelData.colors, firstCellPos);
+            }
+
             tutorialManager.OnStartLevel();
         }
 

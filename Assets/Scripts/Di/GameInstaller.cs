@@ -8,6 +8,7 @@ using Objects.Cell;
 using Objects.LockBlock;
 using Objects.NoneValueLockBlock;
 using TMPro;
+using Tutorial.Data;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Zenject;

@@ -1,6 +1,7 @@
 ﻿using Core;
 using DG.Tweening;
 using TMPro;
+using Tutorial.Data;
 using UnityEngine;
 
 public class TutorialCommand2 : ICommand

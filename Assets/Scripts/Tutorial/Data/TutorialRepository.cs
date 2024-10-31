@@ -1,54 +1,66 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-[CreateAssetMenu(menuName = "so/TutorialRepository", fileName = "TutorialRepository")]
-public class TutorialRepository : ScriptableObject
+namespace Tutorial.Data
 {
-    private const string TutorialIndexKey = "TUTORIAL_INDEX_KEY";
-    private const string IsTutorialAvailableKey = "IS_TUTORIAL_AVAILABLE";
-    private const int TutorialAvailableValue = 1;
-
-    private int _tutorialIndex = 0;
-
-    [SerializeField] private Vector3Int firstAvailablePos;
-    [SerializeField] private Vector3Int secondAvailablePos;
-
-    [SerializeField] private Vector3Int[] noneValueLockBlocksPositions;
-    [SerializeField] private string[] tutorialHintTexts;
-
-    private bool _isTutorialAvailable;
-
-
-    private void OnEnable()
+    [CreateAssetMenu(menuName = "so/TutorialRepository", fileName = "TutorialRepository")]
+    public class TutorialRepository : ScriptableObject
     {
-        _tutorialIndex = PlayerPrefs.GetInt(TutorialIndexKey, 0);
-        _isTutorialAvailable =
-            PlayerPrefs.GetInt(IsTutorialAvailableKey, TutorialAvailableValue) == TutorialAvailableValue;
-    }
+        private const string TutorialIndexKey = "TUTORIAL_INDEX_KEY";
+        private const string IsTutorialAvailableKey = "IS_TUTORIAL_AVAILABLE";
+        private const int TutorialAvailableValue = 1;
+
+        private int _tutorialIndex = 0;
 
 
-    public int TutorialIndex => _tutorialIndex;
+        [SerializeField] private Vector3Int firstAvailablePos;
+        [SerializeField] private Vector3Int secondAvailablePos;
 
-    public Vector3Int FirstAvailablePos => firstAvailablePos;
-    public Vector3Int SecondAvailablePos => secondAvailablePos;
+        [SerializeField] private Vector3Int[] noneValueLockBlocksPositions;
+        [SerializeField] private string[] tutorialHintTexts;
+        [SerializeField] private List<string> blocksColors;
+        [SerializeField] private List<int> blocksCount;
 
-    public Vector3Int[] NoneValueLockBlockPositions => noneValueLockBlocksPositions;
-
-    public void IncreaseIndex()
-    {
-        _tutorialIndex += 1;
-    }
+        private bool _isTutorialAvailable = true;
 
 
-    public bool IsTutorialAvailable
-    {
-        get => _isTutorialAvailable;
-        set
+        private void OnEnable()
         {
-            _isTutorialAvailable = value;
-            var tutorialAvailableValue = _isTutorialAvailable ? TutorialAvailableValue : 0;
-            PlayerPrefs.SetInt(IsTutorialAvailableKey, tutorialAvailableValue);
+            _tutorialIndex = PlayerPrefs.GetInt(TutorialIndexKey, 0);
+            // _isTutorialAvailable =
+            //     PlayerPrefs.GetInt(IsTutorialAvailableKey, TutorialAvailableValue) == TutorialAvailableValue;
         }
-    }
 
-    public string GetHint(int index) => tutorialHintTexts[index];
+
+        public int TutorialIndex => _tutorialIndex;
+
+        public Vector3Int FirstAvailablePos => firstAvailablePos;
+        public Vector3Int SecondAvailablePos => secondAvailablePos;
+
+        public Vector3Int[] NoneValueLockBlockPositions => noneValueLockBlocksPositions;
+
+        public void IncreaseIndex()
+        {
+            _tutorialIndex += 1;
+        }
+
+
+        public bool IsTutorialAvailable
+        {
+            get => _isTutorialAvailable;
+            set
+            {
+                _isTutorialAvailable = value;
+                var tutorialAvailableValue = _isTutorialAvailable ? TutorialAvailableValue : 0;
+                PlayerPrefs.SetInt(IsTutorialAvailableKey, tutorialAvailableValue);
+            }
+        }
+
+        public string GetHint(int index) => tutorialHintTexts[index];
+
+
+        public List<string> BlocksColors => blocksColors;
+
+        public List<int> BlocksCount => blocksCount;
+    }
 }

@@ -16,6 +16,7 @@ namespace UI
         [SerializeField] private TextMeshProUGUI collectedBlocksText;
         [SerializeField] private TextMeshProUGUI starRewardText;
         [SerializeField] private TextMeshProUGUI buildingItemRewardText;
+        [SerializeField] private TextMeshProUGUI fortuneWheelProgressHintText;
         [SerializeField] private Image fortuneWheelProgressImage;
         [SerializeField] private Button advertiseRewardButton;
         [SerializeField] private ParticleSystem confettiParticleSystem;
@@ -37,7 +38,8 @@ namespace UI
             string collectedText,
             string starReward,
             string buildingItemReward,
-            float fortuneWheelProgress
+            float fortuneWheelProgress,
+            string fortuneWheelProgressHint
         )
         {
             confettiParticleSystem.GameObject().SetActive(true);
@@ -49,6 +51,7 @@ namespace UI
             starRewardText.text = starReward;
             buildingItemRewardText.text = buildingItemReward;
             fortuneWheelProgressImage.fillAmount = fortuneWheelProgress;
+            fortuneWheelProgressHintText.text = fortuneWheelProgressHint;
             confettiParticleSystem.Play();
         }
 
