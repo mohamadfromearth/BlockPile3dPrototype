@@ -100,7 +100,7 @@ namespace Managers
             _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
             _channel.Subscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
 
-            winUI.AddNextLevelClickListener(OnNextLevel);
+            winUI.AddClaimClickListener(OnNextLevel);
             winUI.AddAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.AddRetryClickListener(OnRetry);
             loseUI.AddCoinReviveClickListener(OnLosingCoinRevive);
@@ -132,7 +132,7 @@ namespace Managers
             _channel.UnSubscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
 
 
-            winUI.RemoveNextLevelClickListener(OnNextLevel);
+            winUI.RemoveClaimClickListener(OnNextLevel);
             winUI.RemoveAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.RemoveRetryClickListener(OnRetry);
             loseUI.RemoveCoinReviveClickListener(OnLosingCoinRevive);
@@ -194,6 +194,12 @@ namespace Managers
             gameUI.SetProgress(_currentScore / _levelRepository.GetLevelData().targetScore);
             gameUI.AnimateProgressText((int)_previousScore, (int)_currentScore,
                 "/" + _levelRepository.GetLevelData().targetScore);
+        }
+
+
+        private void OnWinClaimClickListener()
+        {
+            
         }
 
         public void OnNextLevel()

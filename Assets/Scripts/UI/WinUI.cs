@@ -10,7 +10,7 @@ namespace UI
     public class WinUI : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI levelText;
-        [SerializeField] private Button nextLevelButton;
+        [SerializeField] private Button claimButton;
         [SerializeField] private GameObject panel;
         [SerializeField] private Transform background;
         [SerializeField] private TextMeshProUGUI collectedBlocksText;
@@ -22,9 +22,9 @@ namespace UI
         [SerializeField] private ParticleSystem confettiParticleSystem;
 
 
-        public void AddNextLevelClickListener(UnityAction action) => nextLevelButton.onClick.AddListener(action);
+        public void AddClaimClickListener(UnityAction action) => claimButton.onClick.AddListener(action);
 
-        public void RemoveNextLevelClickListener(UnityAction action) => nextLevelButton.onClick.RemoveListener(action);
+        public void RemoveClaimClickListener(UnityAction action) => claimButton.onClick.RemoveListener(action);
 
         public void AddAdvertiseRewardClickListener(UnityAction action) =>
             advertiseRewardButton.onClick.AddListener(action);
