@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using DG.Tweening;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 
@@ -27,9 +28,17 @@ namespace Utils
             transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack);
         }
 
-        public static void HidePopUp(this Transform transform)
+        public static void HidePopUp(this Transform transform, TweenCallback onComplete = null)
         {
-            transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack);
+            transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack)
+                .onComplete = onComplete;
+        }
+
+        public static void HidePopUp(this Transform transform, Transform panel, TweenCallback onComplete = null)
+        {
+            onComplete += () => { panel.gameObject.SetActive(false); };
+            transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack)
+                .onComplete = onComplete;
         }
 
         public static void HidePopUp(this GameObject obj)

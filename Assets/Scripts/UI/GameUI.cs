@@ -79,6 +79,7 @@ namespace UI
         [SerializeField] private TextMeshProUGUI abilityHintText;
         [SerializeField] private Image abilityHintImage;
         [SerializeField] private GameObject abilityHint;
+        [SerializeField] private CurveMover coinsCollectionCurveMover;
         private AbilityData _abilityData;
 
         [SerializeField] private GameUIHelpers helpers;
@@ -240,6 +241,20 @@ namespace UI
             blockToProgressAnimationFinished -= action;
 
 
+        public void AddFirstCoinCollectionCompleteAnimationListener(TweenCallback callback) =>
+            coinsCollectionCurveMover.AddFirstMovingCompleteAnimationListener(callback);
+
+
+        public void AddSecondCoinCollectionCompleteAnimationListener(TweenCallback callback) =>
+            coinsCollectionCurveMover.AddLastMovingCompleteAnimationListener(callback);
+
+        public void ShowCoinCollection()
+        {
+            coinsCollectionCurveMover.CalculateWayPoints();
+            coinsCollectionCurveMover.Move();
+        }
+
+
         public void Show()
         {
             panel.SetActive(true);
@@ -258,6 +273,7 @@ namespace UI
             blocksImageTransform.gameObject.SetActive(false);
         }
 
+
         public void ShowAbilityHintButton(AbilityData abilityData)
         {
             abilityHint.SetActive(true);
@@ -274,5 +290,10 @@ namespace UI
         }
 
         public Vector3 GetBoosterButtonPosition(AbilityType type) => helpers.GetBoosterButtonPosition(type);
+
+        public void LerpCoinText(int previousCoin, int currentCoin)
+        {
+            StartCoroutine(coinText.AnimateTextCounter(previousCoin, currentCoin, 1f));
+        }
     }
 }

@@ -83,5 +83,13 @@ namespace Data
             PlayerPrefs.SetInt(IndexPrefKey, _index);
             PlayerPrefs.SetInt(ProgressIndexPrefKey, _progressIndex);
         }
+
+
+        public FortuneWheelItemData GetFortuneWheelItemData(Quaternion rotation)
+        {
+            int index = Mathf.RoundToInt(rotation.eulerAngles.z )/ 45;
+            Debug.Log("Index is " + index);
+            return itemsData[_progressIndex].fortuneWheelItemsDataList[index];
+        }
     }
 }

@@ -23,6 +23,7 @@ namespace Managers
         [SerializeField] private LoseUI loseUI;
         [SerializeField] private BoosterInfoUI boosterInfoUI;
         [SerializeField] private BoosterIntroductionUI boosterIntroductionUI;
+        [SerializeField] private FortuneWheelUI fortuneWheelUI;
 
         [SerializeField] private LayerMask groundLayerMask;
 
@@ -100,7 +101,7 @@ namespace Managers
             _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
             _channel.Subscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
 
-            winUI.AddClaimClickListener(OnNextLevel);
+            winUI.AddClaimClickListener(OnLevelClaim);
             winUI.AddAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.AddRetryClickListener(OnRetry);
             loseUI.AddCoinReviveClickListener(OnLosingCoinRevive);
@@ -115,6 +116,14 @@ namespace Managers
             gameUI.AddBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
             gameUI.AddBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
             gameUI.AddTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
+            gameUI.AddFirstCoinCollectionCompleteAnimationListener(OnFirstCoinCollectionAnimationCompleted);
+            gameUI.AddSecondCoinCollectionCompleteAnimationListener(OnSecondCoinCollectionAnimationCompleted);
+
+            fortuneWheelUI.AddSpinClickListener(OnSpinFortuneWheelClick);
+            fortuneWheelUI.AddRotationCompletionListener(FortuneWheelSpinningCompleted);
+
+            winUI.AddHidingCompleteListener(OnWinUIHideCompleted);
+
 
             boosterInfoUI.AddClaimClickListener(OnClaimBooster);
 
@@ -132,7 +141,7 @@ namespace Managers
             _channel.UnSubscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
 
 
-            winUI.RemoveClaimClickListener(OnNextLevel);
+            winUI.RemoveClaimClickListener(OnLevelClaim);
             winUI.RemoveAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
             loseUI.RemoveRetryClickListener(OnRetry);
             loseUI.RemoveCoinReviveClickListener(OnLosingCoinRevive);
@@ -148,6 +157,11 @@ namespace Managers
             gameUI.RemoveBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
             gameUI.RemoveBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
             gameUI.RemoveTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
+
+            fortuneWheelUI.RemoveSpinClickListener(OnSpinFortuneWheelClick);
+            fortuneWheelUI.RemoveRotationCompletionListener(FortuneWheelSpinningCompleted);
+
+            winUI.RemoveHidingCompleteListener(OnWinUIHideCompleted);
 
 
             boosterInfoUI.RemoveClaimClickListener(OnClaimBooster);
@@ -199,15 +213,46 @@ namespace Managers
 
         private void OnWinClaimClickListener()
         {
-            
         }
 
-        public void OnNextLevel()
+        private void OnFirstCoinCollectionAnimationCompleted() =>
+            gameUI.LerpCoinText(_currencyRepository.PreviousCoin(), _currencyRepository.GetCoin());
+
+
+        private void OnSecondCoinCollectionAnimationCompleted()
+        {
+            if (_levelRepository.LevelIndex != 0)
+            {
+                var levelData = _levelRepository.GetLevelData();
+                gameUI.ShowTargetGoal(
+                    "Level: " + (_levelRepository.LevelIndex + 1),
+                    levelData.targetScore.ToString()
+                );
+            }
+        }
+
+
+        private void OnLevelClaim()
         {
             winUI.Hide();
+            gameUI.ShowCoinCollection();
+        }
+
+
+        private void OnWinUIHideCompleted()
+        {
             gameUI.Show();
-            StartLevel();
-            helpers.UpdateAbilityButtons(gameUI);
+
+            if (fortuneWheelRepository.CanClaimWheel())
+            {
+                fortuneWheelUI.SetData(fortuneWheelRepository.GetData());
+                fortuneWheelUI.Show();
+            }
+            else
+            {
+                StartLevel();
+                helpers.UpdateAbilityButtons(gameUI);
+            }
         }
 
 
@@ -361,6 +406,15 @@ namespace Managers
             helpers.UpdateAbilityButtons(gameUI);
         }
 
+
+        private void OnSpinFortuneWheelClick() => fortuneWheelUI.Rotate();
+
+
+        private void FortuneWheelSpinningCompleted()
+        {
+            var fortuneWheelItem = fortuneWheelRepository.GetFortuneWheelItemData(fortuneWheelUI.GetRotation());
+        }
+
         #endregion
 
 
@@ -421,14 +475,6 @@ namespace Managers
         private void StartLevel()
         {
             var levelData = _levelRepository.GetLevelData();
-
-            if (_levelRepository.LevelIndex != 0)
-            {
-                gameUI.ShowTargetGoal(
-                    "Level: " + (_levelRepository.LevelIndex + 1),
-                    levelData.targetScore.ToString()
-                );
-            }
 
 
             _board.SpawnCells(levelData.emptyHoldersPosList, levelData.size, levelData.size);

@@ -25,5 +25,11 @@ namespace UI
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
+
+
+        public void ShowFortuneWheelCollectionAnimation(FortuneWheelItemData itemData)
+        {
+            
+        }
     }
 }

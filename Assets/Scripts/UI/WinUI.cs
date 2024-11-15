@@ -1,4 +1,6 @@
-﻿using TMPro;
+﻿using System;
+using DG.Tweening;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,6 +24,20 @@ namespace UI
         [SerializeField] private ParticleSystem confettiParticleSystem;
 
 
+        private TweenCallback _hidingComplete;
+
+
+        private void OnEnable()
+        {
+            _hidingComplete += DeActiveBackground;
+        }
+
+        private void OnDisable()
+        {
+            _hidingComplete -= DeActiveBackground;
+        }
+
+
         public void AddClaimClickListener(UnityAction action) => claimButton.onClick.AddListener(action);
 
         public void RemoveClaimClickListener(UnityAction action) => claimButton.onClick.RemoveListener(action);
@@ -31,6 +47,17 @@ namespace UI
 
         public void RemoveAdvertiseRewardClickListener(UnityAction action) =>
             advertiseRewardButton.onClick.RemoveListener(action);
+
+
+        public void AddHidingCompleteListener(TweenCallback callback)
+        {
+            _hidingComplete += callback;
+        }
+
+        public void RemoveHidingCompleteListener(TweenCallback callback)
+        {
+            _hidingComplete -= callback;
+        }
 
 
         public void Show(
@@ -57,8 +84,12 @@ namespace UI
 
         public void Hide()
         {
-            background.localScale = Vector3.zero;
-            panel.SetActive(false);
+            background.transform.HidePopUp(_hidingComplete);
         }
+
+
+
+
+        private void DeActiveBackground() => panel.SetActive(false);
     }
 }
