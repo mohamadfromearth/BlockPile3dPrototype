@@ -11,6 +11,9 @@ namespace Objects.BlocksContainer
         public void Push(IBlock block);
 
 
+        public int FirstColorIndex { get; set; }
+
+
         public void MoveTo(Vector3 position, float duration, Ease ease = Ease.Linear);
 
 
@@ -31,6 +34,8 @@ namespace Objects.BlocksContainer
         public bool HasSingleColor { get; }
 
         public Stack<Color> Colors { get; }
+
+        public Color GetFirstColor();
 
 
         public bool IsPlaced { set; get; }

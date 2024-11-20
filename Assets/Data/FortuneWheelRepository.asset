@@ -88,4 +88,4 @@ MonoBehaviour:
     - count: 200
       sprite: {fileID: 21300000, guid: d2dde3a2657216f46918af8c12b60c2b, type: 3}
       type: 0
-  progressTargets: 020000000600000007000000
+  progressTargets: 010000000600000007000000

@@ -24,6 +24,7 @@ namespace Managers
         [SerializeField] private BoosterInfoUI boosterInfoUI;
         [SerializeField] private BoosterIntroductionUI boosterIntroductionUI;
         [SerializeField] private FortuneWheelUI fortuneWheelUI;
+        [SerializeField] private FortuneWheelRewardShowerUI fortuneWheelRewardShowerUI;
 
         [SerializeField] private LayerMask groundLayerMask;
 
@@ -33,6 +34,7 @@ namespace Managers
         [SerializeField] private Grid grid;
         [SerializeField] private TutorialManager tutorialManager;
         [SerializeField] private TutorialRepository tutorialRepository;
+        [SerializeField] private FortuneWheelCollectionStrategyHandler fortuneWheelCollectionStrategyHandler;
 
         [SerializeField] private float backToSelectionBarDuration = 0.3f;
 
@@ -59,6 +61,8 @@ namespace Managers
 
 
         private StateManager _stateManager;
+
+        private FortuneWheelItemData _fortuneWheelItemData;
 
 
         private void Awake()
@@ -113,7 +117,7 @@ namespace Managers
             gameUI.AddBuyAbilityClickListener(OnBuyAbility);
             gameUI.AddWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
             gameUI.AddAbilityCancelClickListener(OnAbilityCancel);
-            gameUI.AddBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
+            helpers.AddBlockToProgressAnimationCompleteListener(OnBlockToProgressAnimationFinished);
             gameUI.AddBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
             gameUI.AddTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
             gameUI.AddFirstCoinCollectionCompleteAnimationListener(OnFirstCoinCollectionAnimationCompleted);
@@ -121,6 +125,7 @@ namespace Managers
 
             fortuneWheelUI.AddSpinClickListener(OnSpinFortuneWheelClick);
             fortuneWheelUI.AddRotationCompletionListener(FortuneWheelSpinningCompleted);
+            fortuneWheelRewardShowerUI.AddClaimButtonClickListener(OnFortuneRewardClaim);
 
             winUI.AddHidingCompleteListener(OnWinUIHideCompleted);
 
@@ -154,12 +159,14 @@ namespace Managers
             gameUI.RemoveBuyAbilityClickListener(OnBuyAbility);
             gameUI.RemoveWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
             gameUI.RemoveAbilityCancelButtonListener(OnAbilityCancel);
-            gameUI.RemoveBlockToProgressAnimationFinishListener(OnBlockToProgressAnimationFinished);
+            helpers.RemoveBlockToProgressAnimationCompleteListener(OnBlockToProgressAnimationFinished);
             gameUI.RemoveBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
             gameUI.RemoveTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
 
             fortuneWheelUI.RemoveSpinClickListener(OnSpinFortuneWheelClick);
             fortuneWheelUI.RemoveRotationCompletionListener(FortuneWheelSpinningCompleted);
+            fortuneWheelRewardShowerUI.RemoveClaimButtonClickListener(OnFortuneRewardClaim);
+
 
             winUI.RemoveHidingCompleteListener(OnWinUIHideCompleted);
 
@@ -195,7 +202,10 @@ namespace Managers
         {
             var data = _channel.GetData<TargetBlockDestroyed>();
 
-            gameUI.ShowBlockToProgressAnimation(data.Position);
+            data.Position.y = 0.5f;
+            helpers.ShowBlockToProgressAnimation(data.Position, data.ColorIndex);
+
+            //gameUI.ShowBlockToProgressAnimation(data.Position);
 
             _previousScore = _currentScore;
             _currentScore += data.Count;
@@ -221,14 +231,6 @@ namespace Managers
 
         private void OnSecondCoinCollectionAnimationCompleted()
         {
-            if (_levelRepository.LevelIndex != 0)
-            {
-                var levelData = _levelRepository.GetLevelData();
-                gameUI.ShowTargetGoal(
-                    "Level: " + (_levelRepository.LevelIndex + 1),
-                    levelData.targetScore.ToString()
-                );
-            }
         }
 
 
@@ -251,6 +253,10 @@ namespace Managers
             else
             {
                 StartLevel();
+
+                helpers.ShowTargetScoreHint();
+
+
                 helpers.UpdateAbilityButtons(gameUI);
             }
         }
@@ -413,7 +419,12 @@ namespace Managers
         private void FortuneWheelSpinningCompleted()
         {
             var fortuneWheelItem = fortuneWheelRepository.GetFortuneWheelItemData(fortuneWheelUI.GetRotation());
+            fortuneWheelUI.Hide();
+            fortuneWheelRewardShowerUI.Show(fortuneWheelItem.sprite, fortuneWheelItem.count.ToString());
         }
+
+
+        private void OnFortuneRewardClaim() => fortuneWheelCollectionStrategyHandler.Claim(_fortuneWheelItemData);
 
         #endregion
 

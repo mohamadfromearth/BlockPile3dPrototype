@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Data;
 using DG.Tweening;
+using Objects.Block;
 using Objects.BlocksContainer;
 using UI;
 using UnityEngine;
@@ -10,198 +11,242 @@ using Utils;
 using Zenject;
 using Random = UnityEngine.Random;
 
-public class GameManagerHelpers : MonoBehaviour
+namespace Managers
 {
-    [Inject] private ILevelRepository _levelRepository;
-    [Inject] private MainRepository _mainRepository;
-    [Inject] private AbilityRepository _abilityRepository;
-    [Inject] private CurrencyRepository _currencyRepository;
-    [Inject] private Board _board;
-    [Inject] private BlockContainerSelectionBar _selectionBar;
-    [SerializeField] private BlocksMatcher blockMatcher;
-    [SerializeField] private Transform blockToProgressImage;
-    [SerializeField] private Transform progressImageTransform;
-    [SerializeField] private GameObject hammer;
-    [SerializeField] private Camera camera;
-    [SerializeField] private Vector3 abilityModeCameraRotation;
-
-    [SerializeField] private float cameraRotationDuration = 0.6f;
-
-    [SerializeField] private LayerMask layer;
-    [SerializeField] private Transform gridPivot;
-
-    [SerializeField] private Vector3 hammerInitialRotation;
-    [SerializeField] private Vector3 hammerHitRotation;
-
-    private Vector3 _progressImagePosition;
-
-    private Vector3 _cameraDefaultRotation;
-    private bool _isShuffling = false;
-
-    public bool IsShuffling => _isShuffling;
-
-    private Vector3Int[] _horizontalGridOffsets = new[]
+    public class GameManagerHelpers : MonoBehaviour
     {
-        new Vector3Int(1, 0, 0),
-        new Vector3Int(-1, 0, 0)
-    };
+        [Inject] private ILevelRepository _levelRepository;
+        [Inject] private MainRepository _mainRepository;
+        [Inject] private AbilityRepository _abilityRepository;
+        [Inject] private CurrencyRepository _currencyRepository;
+        [Inject] private Board _board;
+        [Inject] private BlockContainerSelectionBar _selectionBar;
+        [Inject] private IBlockFactory _blockFactory;
+        [SerializeField] private BlocksMatcher blockMatcher;
+        [SerializeField] private Transform blockToProgressImage;
+        [SerializeField] private Transform progressImageTransform;
+        [SerializeField] private RectTransform progressBlockImageTransform;
+        [SerializeField] private GameObject hammer;
+        [SerializeField] private Camera camera;
+        [SerializeField] private Vector3 abilityModeCameraRotation;
+        [SerializeField] private GameUI gameUI;
 
-    private Vector3Int[] _verticalGridOffsets = new[]
-    {
-        new Vector3Int(0, 0, 1),
-        new Vector3Int(0, 0, -1)
-    };
+        [SerializeField] private float cameraRotationDuration = 0.6f;
 
+        [SerializeField] private LayerMask layer;
+        [SerializeField] private Transform gridPivot;
 
-    private void Start()
-    {
-        _progressImagePosition =
-            PositionConverters.ScreenToWorldPosition(progressImageTransform.position, camera, layer).Value;
-
-        _cameraDefaultRotation = camera.transform.rotation.eulerAngles;
-    }
-
-    public string GetTargetScoreString(float currentScore)
-    {
-        var levelData = _levelRepository.GetLevelData();
-
-        return currentScore + "/" + levelData.targetScore;
-    }
+        [SerializeField] private Vector3 hammerInitialRotation;
+        [SerializeField] private Vector3 hammerHitRotation;
 
 
-    // Whenever we go to get anotherChance state we need to destroy 3 blocks this method returns 
-    // 3 adjacent blocks with a given coordinate;
-    public List<IBlockContainer> GetAnotherChanceBlocks(Board board, Vector3Int startingPoint)
-    {
-        var isHorizontal = Random.value > 0.5;
+        private Vector3 _cameraDefaultRotation;
+        private bool _isShuffling = false;
 
-        var horizontalList = new List<IBlockContainer>();
-        var verticalList = new List<IBlockContainer>();
-        Vector3Int pos;
+        private Vector3 _progressImagePosition;
 
-        foreach (var horizontalGridOffset in _horizontalGridOffsets)
+        public bool IsShuffling => _isShuffling;
+
+        private Vector3Int[] _horizontalGridOffsets = new[]
         {
-            pos = startingPoint + horizontalGridOffset;
+            new Vector3Int(1, 0, 0),
+            new Vector3Int(-1, 0, 0)
+        };
 
-            var cell = board.GetCell(pos);
+        private Vector3Int[] _verticalGridOffsets = new[]
+        {
+            new Vector3Int(0, 0, 1),
+            new Vector3Int(0, 0, -1)
+        };
 
-            if (cell != null && cell.BlockContainer != null)
+
+        private TweenCallback _blockProgressAnimationComplete;
+
+
+        private void Start()
+        {
+            _progressImagePosition =
+                PositionConverters.ScreenToWorldPosition(progressImageTransform.position, camera, layer).Value;
+
+            _cameraDefaultRotation = camera.transform.rotation.eulerAngles;
+        }
+
+        public string GetTargetScoreString(float currentScore)
+        {
+            var levelData = _levelRepository.GetLevelData();
+
+            return currentScore + "/" + levelData.targetScore;
+        }
+
+
+        // Whenever we go to get anotherChance state we need to destroy 3 blocks this method returns 
+        // 3 adjacent blocks with a given coordinate;
+        public List<IBlockContainer> GetAnotherChanceBlocks(Board board, Vector3Int startingPoint)
+        {
+            var isHorizontal = Random.value > 0.5;
+
+            var horizontalList = new List<IBlockContainer>();
+            var verticalList = new List<IBlockContainer>();
+            Vector3Int pos;
+
+            foreach (var horizontalGridOffset in _horizontalGridOffsets)
             {
-                horizontalList.Add(cell.BlockContainer);
+                pos = startingPoint + horizontalGridOffset;
+
+                var cell = board.GetCell(pos);
+
+                if (cell != null && cell.BlockContainer != null)
+                {
+                    horizontalList.Add(cell.BlockContainer);
+                }
             }
-        }
 
-        foreach (var verticalGridOffset in _verticalGridOffsets)
-        {
-            pos = startingPoint + verticalGridOffset;
-
-            var cell = board.GetCell(pos);
-
-            if (cell != null && cell.BlockContainer != null)
+            foreach (var verticalGridOffset in _verticalGridOffsets)
             {
-                verticalList.Add(cell.BlockContainer);
+                pos = startingPoint + verticalGridOffset;
+
+                var cell = board.GetCell(pos);
+
+                if (cell != null && cell.BlockContainer != null)
+                {
+                    verticalList.Add(cell.BlockContainer);
+                }
             }
+
+            var blockContainers =
+                isHorizontal && horizontalList.Count >= verticalList.Count ? horizontalList : verticalList;
+
+            return blockContainers;
         }
 
-        var blockContainers =
-            isHorizontal && horizontalList.Count >= verticalList.Count ? horizontalList : verticalList;
-
-        return blockContainers;
-    }
-
-    public void UpdateAbilityButtons(GameUI gameUI)
-    {
-        var level = _levelRepository.LevelIndex + 1;
-        gameUI.SetPunchIntractable(level >=
-                                   _abilityRepository.GetAbilityData(AbilityType.Punch).unLockLevel);
-        gameUI.SetSwapIntractable(level >=
-                                  _abilityRepository.GetAbilityData(AbilityType.Swap).unLockLevel);
-        gameUI.SetRefreshIntractable(level >=
-                                     _abilityRepository.GetAbilityData(AbilityType.Refresh).unLockLevel);
-
-        gameUI.SetCoinText(_currencyRepository.GetCoin().ToString());
-        gameUI.SetPunchCountText(_abilityRepository.GetAbilityData(AbilityType.Punch).count.ToString());
-        gameUI.SetSwapCountText(_abilityRepository.GetAbilityData(AbilityType.Swap).count.ToString());
-        gameUI.SetRefreshCountText(_abilityRepository.GetAbilityData(AbilityType.Refresh).count.ToString());
-
-        gameUI.SetPunchUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Punch).unLockLevel);
-        gameUI.SetSwapUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Swap).unLockLevel);
-        gameUI.SetRefreshUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Refresh).unLockLevel);
-    }
-
-    public Vector3 ModifyBlockContainerPositionForRotatedGrid(Vector3 position)
-    {
-        if (gridPivot.rotation.eulerAngles.y == 0)
+        public void UpdateAbilityButtons(GameUI gameUI)
         {
-            return position;
+            var level = _levelRepository.LevelIndex + 1;
+            gameUI.SetPunchIntractable(level >=
+                                       _abilityRepository.GetAbilityData(AbilityType.Punch).unLockLevel);
+            gameUI.SetSwapIntractable(level >=
+                                      _abilityRepository.GetAbilityData(AbilityType.Swap).unLockLevel);
+            gameUI.SetRefreshIntractable(level >=
+                                         _abilityRepository.GetAbilityData(AbilityType.Refresh).unLockLevel);
+
+            gameUI.SetCoinText(_currencyRepository.GetCoin().ToString());
+            gameUI.SetPunchCountText(_abilityRepository.GetAbilityData(AbilityType.Punch).count.ToString());
+            gameUI.SetSwapCountText(_abilityRepository.GetAbilityData(AbilityType.Swap).count.ToString());
+            gameUI.SetRefreshCountText(_abilityRepository.GetAbilityData(AbilityType.Refresh).count.ToString());
+
+            gameUI.SetPunchUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Punch).unLockLevel);
+            gameUI.SetSwapUnLockLevelText("Level " + _abilityRepository.GetAbilityData(AbilityType.Swap).unLockLevel);
+            gameUI.SetRefreshUnLockLevelText("Level " +
+                                             _abilityRepository.GetAbilityData(AbilityType.Refresh).unLockLevel);
         }
 
-        if (gridPivot.rotation.eulerAngles.y == 90)
+        public Vector3 ModifyBlockContainerPositionForRotatedGrid(Vector3 position)
         {
-            position.z -= 1;
-            return position;
-        }
-
-        if (gridPivot.rotation.eulerAngles.y == 180)
-        {
-            position.x -= 1;
-            position.z -= 1;
-            return position;
-        }
-
-        if (gridPivot.rotation.eulerAngles.y == 270)
-        {
-            position.x -= 1;
-            return position;
-        }
-
-        return position;
-    }
-
-
-    public void ShuffleBoard()
-    {
-        _isShuffling = true;
-        StartCoroutine(ShuffleBoardRoutine());
-    }
-
-    public void ChangeCameraToAbilitiesState()
-    {
-        camera.transform.DORotate(abilityModeCameraRotation, cameraRotationDuration);
-    }
-
-    public void ChangeCameraToDefaultState()
-    {
-        camera.transform.DORotate(_cameraDefaultRotation, cameraRotationDuration);
-    }
-
-
-    public void ShowHammerAnimation(IBlockContainer containerBlock, TweenCallback action)
-    {
-        hammer.SetActive(true);
-        var hammerPos = containerBlock.GetPosition();
-        hammerPos.y = containerBlock.Peek().GetPosition().y + 1.3f;
-        hammer.transform.position = hammerPos;
-        hammer.transform.rotation = Quaternion.Euler(hammerInitialRotation);
-        hammer.transform.DORotate(hammerHitRotation, 0.6f).SetEase(Ease.InBack).onComplete = action;
-    }
-
-    private IEnumerator ShuffleBoardRoutine()
-    {
-        yield return new WaitForSeconds(_board.Shuffle());
-
-        var cells = _board.Cells;
-        foreach (var keyValuePair in cells)
-        {
-            var cell = keyValuePair.Value;
-            if (cell.BlockContainer != null)
+            if (gridPivot.rotation.eulerAngles.y == 0)
             {
-                yield return blockMatcher.UpdateBoardRoutine(_board.WorldToCell(cell.GetPosition()), true);
+                return position;
             }
+
+            if (gridPivot.rotation.eulerAngles.y == 90)
+            {
+                position.z -= 1;
+                return position;
+            }
+
+            if (gridPivot.rotation.eulerAngles.y == 180)
+            {
+                position.x -= 1;
+                position.z -= 1;
+                return position;
+            }
+
+            if (gridPivot.rotation.eulerAngles.y == 270)
+            {
+                position.x -= 1;
+                return position;
+            }
+
+            return position;
         }
 
-        _isShuffling = false;
+
+        public void ShuffleBoard()
+        {
+            _isShuffling = true;
+            StartCoroutine(ShuffleBoardRoutine());
+        }
+
+        public void ChangeCameraToAbilitiesState()
+        {
+            camera.transform.DORotate(abilityModeCameraRotation, cameraRotationDuration);
+        }
+
+        public void ChangeCameraToDefaultState()
+        {
+            camera.transform.DORotate(_cameraDefaultRotation, cameraRotationDuration);
+        }
+
+
+        public void ShowBlockToProgressAnimation(Vector3 position, int colorIndex)
+        {
+            Debug.Log("Color index is " + colorIndex);
+            position.y = 0;
+            Debug.Log("Position is " + progressBlockImageTransform.position);
+            var block = _blockFactory.Create(colorIndex);
+            block.SetPosition(position);
+
+            var targetPos = progressBlockImageTransform.position;
+            targetPos.y += 0.2f;
+
+
+            var tween = block.GameObj.transform.DOMove(targetPos, 1f);
+            tween.onComplete += () => { Destroy(block.GameObj); };
+            tween.onComplete += _blockProgressAnimationComplete;
+            block.GameObj.transform.DOScale(new Vector3(0.2f, 0.2f, 0.2f), 0.99f);
+        }
+
+        public void AddBlockToProgressAnimationCompleteListener(TweenCallback callback) =>
+            _blockProgressAnimationComplete += callback;
+
+        public void RemoveBlockToProgressAnimationCompleteListener(TweenCallback callback) =>
+            _blockProgressAnimationComplete -= callback;
+
+
+        public void ShowHammerAnimation(IBlockContainer containerBlock, TweenCallback action)
+        {
+            hammer.SetActive(true);
+            var hammerPos = containerBlock.GetPosition();
+            hammerPos.y = containerBlock.Peek().GetPosition().y + 1.3f;
+            hammer.transform.position = hammerPos;
+            hammer.transform.rotation = Quaternion.Euler(hammerInitialRotation);
+            hammer.transform.DORotate(hammerHitRotation, 0.6f).SetEase(Ease.InBack).onComplete = action;
+        }
+
+
+        public void ShowTargetScoreHint()
+        {
+            var levelData = _levelRepository.GetLevelData();
+            gameUI.ShowTargetGoal(
+                "Level: " + (_levelRepository.LevelIndex + 1),
+                levelData.targetScore.ToString()
+            );
+        }
+
+        private IEnumerator ShuffleBoardRoutine()
+        {
+            yield return new WaitForSeconds(_board.Shuffle());
+
+            var cells = _board.Cells;
+            foreach (var keyValuePair in cells)
+            {
+                var cell = keyValuePair.Value;
+                if (cell.BlockContainer != null)
+                {
+                    yield return blockMatcher.UpdateBoardRoutine(_board.WorldToCell(cell.GetPosition()), true);
+                }
+            }
+
+            _isShuffling = false;
+        }
     }
-    
-    
 }

@@ -7,6 +7,8 @@ namespace Objects.Block
     {
         public Color Color { get; set; }
 
+        public int ColorIndex { get; set; }
+
         public void Destroy();
     }
 }

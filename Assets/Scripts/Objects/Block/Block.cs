@@ -31,6 +31,8 @@ namespace Objects.Block
             get { return color; }
         }
 
+        public int ColorIndex { get; set; }
+
         public void Destroy()
         {
             _scaleTween = transform.DOScale(Vector3.zero, 0.5f);

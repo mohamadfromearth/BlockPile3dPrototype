@@ -6,11 +6,13 @@ namespace Event
     {
         public Vector3 Position;
         public int Count;
+        public int ColorIndex;
 
-        public TargetBlockDestroyed(Vector3 position, int count)
+        public TargetBlockDestroyed(Vector3 position, int count, int colorIndex)
         {
             Position = position;
             Count = count;
+            ColorIndex = colorIndex;
         }
     }
 }

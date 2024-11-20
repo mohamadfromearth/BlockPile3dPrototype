@@ -157,9 +157,11 @@ namespace Objects.BlocksContainer
                     var targetPosition = targetContainer.GetPosition();
                     var targetCount = targetContainer.Count;
                     targetContainer.SetCountText("", 0);
+                    var colorIndex = targetContainer.FirstColorIndex;
                     yield return new WaitForSeconds(targetContainer.Destroy());
 
-                    _channel.Rise<TargetBlockDestroyed>(new TargetBlockDestroyed(targetPosition, targetCount));
+                    _channel.Rise<TargetBlockDestroyed>(new TargetBlockDestroyed(targetPosition, targetCount, colorIndex
+                    ));
 
                     if (targetContainer.Colors.Count == 0)
                     {

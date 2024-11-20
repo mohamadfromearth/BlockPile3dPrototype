@@ -13,16 +13,20 @@ namespace Objects.BlocksContainer
 {
     public class BlockContainer : MonoBehaviour, IBlockContainer, IPointerDownHandler, IPointerUpHandler
     {
-        private Stack<IBlock> blocks = new();
+        private readonly Stack<IBlock> blocks = new();
 
         private int _countIndex = -1;
 
-        private List<int> _countList = new List<int>();
+        private readonly List<int> _countList = new List<int>();
+
+        private Color _firstColor;
 
         [SerializeField] private TextMeshPro countText;
 
 
         public Stack<Color> Colors { get; set; }
+
+        public Color GetFirstColor() => _firstColor;
 
         public bool IsPlaced { get; set; }
 
@@ -258,6 +262,8 @@ namespace Objects.BlocksContainer
                 midPoint = block.GetPosition() + (blockPosition - block.GetPosition()) / 2;
                 block.SetPosition(blockPosition);
                 Colors.Push(block.Color);
+                _firstColor = block.Color;
+                FirstColorIndex = block.ColorIndex;
                 block.GameObj.transform.SetParent(transform);
                 blocks.Push(block);
 
@@ -291,6 +297,8 @@ namespace Objects.BlocksContainer
             block.SetPosition(blockPosition);
             block.GameObj.transform.SetParent(transform);
         }
+
+        public int FirstColorIndex { get; set; }
 
 
         public void Push(IBlock block, float duration)

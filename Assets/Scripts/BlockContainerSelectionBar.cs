@@ -131,7 +131,9 @@ public class BlockContainerSelectionBar
 
                 for (int blockIndex = 0; blockIndex < blockCount; blockIndex++)
                 {
-                    var block = _blockFactory.Create(colors[colorIndex].ToColorIndex());
+                    var colorI = colors[colorIndex].ToColorIndex();
+                    var block = _blockFactory.Create(colorI);
+                    block.ColorIndex = colorI;
 
 
                     block.Color = _colorRepository.GetColor(colors[colorIndex]);
