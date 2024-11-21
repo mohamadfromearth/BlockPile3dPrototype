@@ -11,12 +11,12 @@ using Zenject;
 
 public class Board
 {
+    public int Height { get; private set; }
     private readonly Grid _grid;
     private readonly Transform _pivot;
     private readonly float[] _snapAngles = { 0, 90f, 180f, 270f, 360f };
 
     public int Width { get; private set; }
-    public int Height { get; private set; }
 
     public Transform Center => _pivot;
 

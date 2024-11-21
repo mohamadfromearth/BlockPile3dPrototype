@@ -1,5 +1,6 @@
 ﻿using Data;
 using DG.Tweening;
+using Event;
 using UI;
 using UnityEngine;
 
@@ -11,12 +12,14 @@ public class FortuneWheelCollectionStrategy : IFortuneWheelCollectionStrategy
     private readonly AbilityType _abilityType;
     private readonly float _duration;
     private readonly FortuneWheelRewardShowerUI _fortuneWheelRewardShowerUI;
+    private readonly EventChannel _channel;
 
     private readonly Vector3 _startPosition;
 
     public FortuneWheelCollectionStrategy(Transform claimedObject, Transform target,
         AbilityRepository abilityRepository, AbilityType abilityType, float duration,
-        FortuneWheelRewardShowerUI fortuneWheelRewardShowerUI
+        FortuneWheelRewardShowerUI fortuneWheelRewardShowerUI,
+        EventChannel channel
     )
     {
         _claimedObject = claimedObject;
@@ -26,6 +29,7 @@ public class FortuneWheelCollectionStrategy : IFortuneWheelCollectionStrategy
         _duration = duration;
         _startPosition = claimedObject.position;
         _fortuneWheelRewardShowerUI = fortuneWheelRewardShowerUI;
+        _channel = channel;
     }
 
     public void Claim(int count)
@@ -41,5 +45,6 @@ public class FortuneWheelCollectionStrategy : IFortuneWheelCollectionStrategy
     private void OnMovingCompleted()
     {
         _claimedObject.gameObject.SetActive(false);
+        _channel.Rise<FortuneWheelRewardCollect>(new FortuneWheelRewardCollect());
     }
 }

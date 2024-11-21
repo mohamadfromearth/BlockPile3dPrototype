@@ -89,7 +89,7 @@ namespace Data
         {
             int index = Mathf.RoundToInt(rotation.eulerAngles.z) / 45;
             Debug.Log("Index is " + index);
-            return itemsData[_progressIndex].fortuneWheelItemsDataList[index];
+            return itemsData[_index].fortuneWheelItemsDataList[index];
         }
     }
 }

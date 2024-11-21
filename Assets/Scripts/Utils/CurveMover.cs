@@ -21,10 +21,16 @@ namespace Utils
         private Vector3[] _wayPoints;
 
 
-        public void AddFirstMovingCompleteAnimationListener(TweenCallback callback) => _firstMovingComplete = callback;
+        public void AddFirstMovingCompleteAnimationListener(TweenCallback callback) => _firstMovingComplete += callback;
+
+        public void RemoveFirstMovingCompleteAnimationListener(TweenCallback callback) =>
+            _firstMovingComplete -= callback;
 
 
-        public void AddLastMovingCompleteAnimationListener(TweenCallback callback) => _lastMovingComplete = callback;
+        public void AddLastMovingCompleteAnimationListener(TweenCallback callback) => _lastMovingComplete += callback;
+
+        public void RemoveLastMovingCompleteAnimationListener(TweenCallback callback) =>
+            _lastMovingComplete -= callback;
 
 
         public void CalculateWayPoints()

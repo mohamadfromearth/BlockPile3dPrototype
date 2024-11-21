@@ -98,7 +98,6 @@ namespace UI
 
         private IEnumerator Start()
         {
-
             yield return new WaitForSeconds(1f);
             bool isLandScape = Screen.width > Screen.height;
 
@@ -248,8 +247,17 @@ namespace UI
             coinsCollectionCurveMover.AddFirstMovingCompleteAnimationListener(callback);
 
 
-        public void AddSecondCoinCollectionCompleteAnimationListener(TweenCallback callback) =>
+        public void RemoveFirstCoinCollectionCompleteAnimationListener(TweenCallback callback) =>
+            coinsCollectionCurveMover.RemoveFirstMovingCompleteAnimationListener(callback);
+
+
+        public void AddCoinCollectionAnimationCompleteListener(TweenCallback callback) =>
             coinsCollectionCurveMover.AddLastMovingCompleteAnimationListener(callback);
+
+
+        public void RemoveCoinCollectionAnimationCompleteListener(TweenCallback callback) =>
+            coinsCollectionCurveMover.RemoveLastMovingCompleteAnimationListener(callback);
+
 
         public void ShowCoinCollection()
         {

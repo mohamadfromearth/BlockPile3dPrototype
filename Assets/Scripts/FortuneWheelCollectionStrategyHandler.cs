@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using Data;
+using Event;
 using UI;
 using UnityEngine;
+using Zenject;
 
 public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
 {
@@ -22,6 +24,8 @@ public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
     [SerializeField] private Transform refreshTarget;
     [SerializeField] private FortuneWheelRewardShowerUI fortuneWheelRewardShowerUI;
 
+    [Inject] private EventChannel _channel;
+
     [SerializeField] private float claimMovingDuration = 0.7f;
 
 
@@ -31,17 +35,18 @@ public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
     private void Start()
     {
         _coinCollectionStrategy =
-            new FortuneWheelCoinCollectionStrategy(gameUI, currencyRepository, fortuneWheelRewardShowerUI);
+            new FortuneWheelCoinCollectionStrategy(gameUI, currencyRepository, fortuneWheelRewardShowerUI, _channel);
         _hammerCollectionStrategy =
             new FortuneWheelCollectionStrategy(hammer, hammerTarget, abilityRepository, AbilityType.Punch,
-                claimMovingDuration, fortuneWheelRewardShowerUI);
+                claimMovingDuration, fortuneWheelRewardShowerUI, _channel);
         _swapCollectionStrategy =
             new FortuneWheelCollectionStrategy(swapImage, swapTarget, abilityRepository, AbilityType.Swap,
-                claimMovingDuration, fortuneWheelRewardShowerUI);
+                claimMovingDuration, fortuneWheelRewardShowerUI, _channel);
         _refreshCollectionStrategy = new FortuneWheelCollectionStrategy(
             refresh, refreshTarget, abilityRepository, AbilityType.Refresh,
             claimMovingDuration,
-            fortuneWheelRewardShowerUI
+            fortuneWheelRewardShowerUI,
+            _channel
         );
 
 

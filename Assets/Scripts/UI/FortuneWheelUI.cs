@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Data;
 using DG.Tweening;
 using TMPro;
@@ -17,6 +16,8 @@ namespace UI
         [SerializeField] private GameObject parent;
         [SerializeField] private GameObject panel;
         [SerializeField] private Button spinButton;
+        [SerializeField] private Button closeButton;
+        [SerializeField] private Image advertiseImage;
         [SerializeField] private Image[] itemsImages;
         [SerializeField] private TextMeshProUGUI[] itemsTexts;
 
@@ -32,8 +33,9 @@ namespace UI
         private Action _rotationCompleted;
 
 
-        public void SetData(FortuneWheelItemData[] fortuneWheelItemDataList)
+        public void SetData(FortuneWheelItemData[] fortuneWheelItemDataList, bool isAdvertise)
         {
+            advertiseImage.gameObject.SetActive(isAdvertise);
             for (int i = 0; i < fortuneWheelItemDataList.Length; i++)
             {
                 var sprite = fortuneWheelItemDataList[i].sprite;
@@ -82,6 +84,11 @@ namespace UI
 
         public void AddSpinClickListener(UnityAction action) => spinButton.onClick.AddListener(action);
         public void RemoveSpinClickListener(UnityAction action) => spinButton.onClick.RemoveListener(action);
+
+
+        public void AddCloseClickListener(UnityAction action) => closeButton.onClick.AddListener(action);
+
+        public void RemoveCloseClickListener(UnityAction action) => closeButton.onClick.RemoveListener(action);
 
         public void AddRotationCompletionListener(Action action) => _rotationCompleted += action;
 
