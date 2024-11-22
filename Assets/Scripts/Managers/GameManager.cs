@@ -94,7 +94,7 @@ namespace Managers
         {
             _channel.Subscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
             _channel.Subscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
-            _channel.Subscribe<BlockDestroy>(OnBlocksDestroyed);
+            _channel.Subscribe<BlockContainerDestroy>(OnBlocksDestroyed);
             _channel.Subscribe<UpdateBoardCompleted>(OnUpdateBoardCompleted);
             _channel.Subscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
             _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
@@ -133,7 +133,7 @@ namespace Managers
         {
             _channel.UnSubscribe<CellContainerPointerDown>(OnCellContainerPointerDown);
             _channel.UnSubscribe<CellContainerPointerUp>(OnCellContainerPointerUp);
-            _channel.UnSubscribe<BlockDestroy>(OnBlocksDestroyed);
+            _channel.UnSubscribe<BlockContainerDestroy>(OnBlocksDestroyed);
             _channel.UnSubscribe<UpdateBoardCompleted>(OnUpdateBoardCompleted);
             _channel.UnSubscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
             _channel.UnSubscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
@@ -189,7 +189,7 @@ namespace Managers
 
         private void OnBlocksDestroyed()
         {
-            var data = _channel.GetData<BlockDestroy>();
+            var data = _channel.GetData<BlockContainerDestroy>();
         }
 
         private void OnTargetBlockDestroyed()
@@ -414,6 +414,7 @@ namespace Managers
 
             if (_currentScore >= levelData.targetScore)
             {
+                helpers.StopRoutines();
                 _selectedBlockContainer = null;
                 _cellToDrop = null;
                 blocksMatcher.Stop();

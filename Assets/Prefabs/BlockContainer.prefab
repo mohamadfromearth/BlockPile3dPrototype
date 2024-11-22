@@ -69,7 +69,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   countText: {fileID: 4951231240329038368}
   height: 0.1
-  destroyRate: 0.02
+  destroyRate: 0.05
 --- !u!1 &6589509568932263126
 GameObject:
   m_ObjectHideFlags: 0

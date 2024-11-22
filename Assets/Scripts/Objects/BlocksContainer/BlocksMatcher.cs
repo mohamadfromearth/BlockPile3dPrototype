@@ -28,7 +28,7 @@ namespace Objects.BlocksContainer
 
 
         private const float BlockPlacementDuration = 0.35f;
-        private const float BlockPlacementRate = 0.06f;
+        private const float BlockPlacementRate = 0.13f;
         private const float BlockPlacementDelay = 0.175f;
 
 
@@ -99,6 +99,8 @@ namespace Objects.BlocksContainer
 
                             if (block == null)
                             {
+                                _channel.Rise<BlockPushComplete>(new BlockPushComplete());
+
                                 container.SetCountText(container.Count.ToString(), BlockPlacementDuration);
                                 _board.AddBlockContainer(null, matchedContainer.GetPosition());
                                 matchedContainer.SetCountText("", 0);
@@ -110,6 +112,8 @@ namespace Objects.BlocksContainer
 
                             if (block.Color != color)
                             {
+                                _channel.Rise<BlockPushComplete>(new BlockPushComplete());
+
                                 container.SetCountText(container.Count.ToString(), BlockPlacementDuration);
                                 matchedContainer.SetCountText(matchedContainer.Count.ToString(),
                                     0);

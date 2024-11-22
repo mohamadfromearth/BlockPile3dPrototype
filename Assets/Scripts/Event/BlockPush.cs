@@ -1,6 +1,6 @@
 ﻿namespace Event
 {
-    public struct BlockDestroy:IEventData
+    public struct BlockPush : IEventData
     {
         
     }

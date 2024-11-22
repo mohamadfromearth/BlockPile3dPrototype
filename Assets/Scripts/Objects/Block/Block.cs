@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Event;
 using UnityEngine;
 
 namespace Objects.Block
@@ -9,6 +10,9 @@ namespace Objects.Block
 
 
         private bool _hasBeenDestroyed = false;
+
+
+        public EventChannel Channel { get; set; }
 
         public void SetPosition(Vector3 position)
         {
@@ -35,6 +39,7 @@ namespace Objects.Block
 
         public void Destroy()
         {
+            Channel.Rise<BlockDestroy>(new BlockDestroy());
             _scaleTween = transform.DOScale(Vector3.zero, 0.5f);
             _scaleTween.onComplete = () => { Destroy(gameObject); };
         }
