@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Core;
 using Data;
 using Event;
+using Managers;
 using Objects.AdvertiseBlock;
 using Objects.Block;
 using Objects.BlocksContainer;
@@ -41,6 +43,7 @@ namespace Di
         [SerializeField] private AbilityRepository abilityRepository;
         [SerializeField] private CurrencyRepository currencyRepository;
         [SerializeField] private ProgressRewardsRepository progressRewardsRepository;
+        [SerializeField] private AudioRepository audioRepository;
 
         [SerializeField] private Grid grid;
         [SerializeField] private Transform gridPivot;
@@ -55,6 +58,8 @@ namespace Di
         [SerializeField] private SettingsController settingsController;
 
         [SerializeField] private Transform shuffleButtonTransform;
+
+        [SerializeField] private AudioPlayerData[] audioPlayerDataList;
 
 
         #region Tutorial
@@ -74,6 +79,8 @@ namespace Di
             #region Core
 
             Container.Bind<EventChannel>().AsSingle().NonLazy();
+
+            Container.Bind<AudioPlayer>().AsSingle().WithArguments(audioPlayerDataList).NonLazy();
 
             #endregion
 
@@ -118,6 +125,8 @@ namespace Di
 
             Container.Bind<IProgressRewardsRepository>().FromInstance(progressRewardsRepository).AsSingle();
 
+            Container.Bind<AudioRepository>().FromInstance(audioRepository).AsSingle();
+
             #endregion
 
             var levelData = levelRepository.GetLevelData();
@@ -141,7 +150,10 @@ namespace Di
 
             Container.Bind<ShuffleController>().AsSingle().WithArguments(shuffleButtonTransform).NonLazy();
 
+
             #endregion
+
+            Container.Bind<AudioController>().AsSingle().NonLazy();
         }
     }
 }

@@ -137,7 +137,7 @@ namespace Objects.BlocksContainer
                 SetCountText(Count.ToString(), 0);
             }
 
-            Channel.Rise<BlockDestroy>(new BlockDestroy(count, pos));
+            Channel.Rise<BlockContainerDestroy>(new BlockContainerDestroy(count, pos));
         }
 
         private bool _hasBeenDestroyed = false;
@@ -304,6 +304,8 @@ namespace Objects.BlocksContainer
         public void Push(IBlock block, float duration)
         {
             if (_hasBeenDestroyed) return;
+
+            Channel.Rise<BlockPush>(new BlockPush());
 
             Vector3 targetBlockPosition = GetPosition();
             var currentBlockPosition = block.GetPosition();

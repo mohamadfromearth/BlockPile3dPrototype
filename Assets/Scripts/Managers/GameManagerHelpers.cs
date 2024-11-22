@@ -62,6 +62,8 @@ namespace Managers
 
         private TweenCallback _blockProgressAnimationComplete;
 
+        private Coroutine _shuffleCoroutine;
+
 
         private void Start()
         {
@@ -173,7 +175,7 @@ namespace Managers
         public void ShuffleBoard()
         {
             _isShuffling = true;
-            StartCoroutine(ShuffleBoardRoutine());
+            _shuffleCoroutine = StartCoroutine(ShuffleBoardRoutine());
         }
 
         public void ChangeCameraToAbilitiesState()
@@ -230,6 +232,13 @@ namespace Managers
                 "Level: " + (_levelRepository.LevelIndex + 1),
                 levelData.targetScore.ToString()
             );
+        }
+
+
+        public void StopRoutines()
+        {
+            if (_shuffleCoroutine == null) return;
+            StopCoroutine(_shuffleCoroutine);
         }
 
         private IEnumerator ShuffleBoardRoutine()
