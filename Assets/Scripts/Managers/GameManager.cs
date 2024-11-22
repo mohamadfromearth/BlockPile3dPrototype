@@ -857,6 +857,7 @@ namespace Managers
 
                 _gameManager.helpers.ShowHammerAnimation(containerBlock, () =>
                 {
+                    containerBlock.SetCountText("", 0);
                     _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
 
                     _gameManager.StartCoroutine(
@@ -864,6 +865,7 @@ namespace Managers
 
                     foreach (var blockContainer in blockContainers)
                     {
+                        blockContainer.SetCountText("", 0);
                         _gameManager._board.AddBlockContainer(null, blockContainer.GetPosition());
                         blockContainer.DestroyAll();
                     }
