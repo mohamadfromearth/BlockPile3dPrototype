@@ -212,7 +212,6 @@ namespace Objects.BlocksContainer
             if (blocks.Count != 0)
             {
                 var pos = blocks.Peek().GetPosition();
-                Debug.Log("Pos is :" + pos + "And text is : " + text);
                 pos.y += 0.15f;
                 countText.transform.position = pos;
             }

@@ -17,7 +17,6 @@ public class SettingsController
         settingsUI.AddCancelClickListener(OnSettingsCancelClick);
         settingsUI.AddMusicClickListener(OnMusicClick);
         settingsUI.AddSoundClickListener(OnSoundClick);
-        settingsUI.AddSettingsClickListener(OnSettingsClick);
     }
 
 
