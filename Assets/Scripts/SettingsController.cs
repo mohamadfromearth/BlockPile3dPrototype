@@ -1,7 +1,10 @@
 ﻿using System;
 using Data;
+using Event;
 using UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Zenject;
 
 [Serializable]
 public class SettingsController
@@ -9,14 +12,18 @@ public class SettingsController
     [SerializeField] private SettingsRepository settingsRepository;
     [SerializeField] private SettingsUI settingsUI;
 
+    private EventChannel _channel;
 
-    public void Init()
+
+    public void Init(EventChannel channel)
     {
-        
-        Debug.Log("Settings Ui initialized");
-        settingsUI.AddCancelClickListener(OnSettingsCancelClick);
+        _channel = channel;
         settingsUI.AddMusicClickListener(OnMusicClick);
         settingsUI.AddSoundClickListener(OnSoundClick);
+        settingsUI.AddRetryClickListener(OnRetry);
+        settingsUI.AddBackToMenuClickListener(OnBackToMenu);
+        settingsUI.AddExitClickListener(OnExit);
+        settingsUI.AddCancelDialogClickListener(OnExitDialogueCancel);
     }
 
 
@@ -32,9 +39,23 @@ public class SettingsController
         settingsUI.SetSoundSprite(settingsRepository.GetSoundSprite());
     }
 
-    private void OnSettingsCancelClick() => settingsUI.Hide();
+    private void OnRetry()
+    {
+        settingsUI.HideExitDialog();
+        _channel.Rise<Retry>(new Retry());
+    }
+
+    private void OnCancelExitDialogue() => settingsUI.HideExitDialog();
 
 
-    private void OnSettingsClick() =>
-        settingsUI.Show(settingsRepository.GetMusicSprite(), settingsRepository.GetSoundSprite());
+    private void OnExit() => settingsUI.ShowExitDialog();
+
+
+    private void OnBackToMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
+
+    private void OnExitDialogueCancel() => settingsUI.HideExitDialog();
 }

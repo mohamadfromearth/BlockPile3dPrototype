@@ -57,6 +57,14 @@ namespace UI
 
                 _isDropped = true;
             }
+
+            mainButtonImage.transform.DORotate(GetRotation().eulerAngles, duration);
+        }
+
+
+        private Quaternion GetRotation()
+        {
+            return _isDropped ? Quaternion.Euler(0, 0, 180) : Quaternion.identity;
         }
     }
 }

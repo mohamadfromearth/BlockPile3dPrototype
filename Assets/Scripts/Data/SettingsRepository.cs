@@ -18,6 +18,10 @@ namespace Data
         private const string MusicKey = "MUSIC_KEY";
 
 
+        public bool IsSoundOn => _isSoundOn;
+        public bool IsMusicOn => _isMusicOn;
+
+
         private void OnEnable()
         {
             _isSoundOn = PlayerPrefs.GetInt(SoundKey, 1) == 1;

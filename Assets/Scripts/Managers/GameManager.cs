@@ -99,6 +99,7 @@ namespace Managers
             _channel.Subscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
             _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
             _channel.Subscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
+            _channel.Subscribe<Retry>(OnRetry);
 
             winUI.AddClaimClickListener(OnLevelClaim);
             winUI.AddAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
@@ -138,6 +139,7 @@ namespace Managers
             _channel.UnSubscribe<AdvertiseBlockPointerDown>(OnAdvertiseBlockPointerDown);
             _channel.UnSubscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
             _channel.UnSubscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
+            _channel.UnSubscribe<Retry>(OnRetry);
 
 
             winUI.RemoveClaimClickListener(OnLevelClaim);
@@ -326,6 +328,8 @@ namespace Managers
         {
             _board.Clear();
             _selectionBar.Clear();
+            _currentScore = 0;
+            _previousScore = 0;
             StartLevel();
             loseUI.Hide();
         }

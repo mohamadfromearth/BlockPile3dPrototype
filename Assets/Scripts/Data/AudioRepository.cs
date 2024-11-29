@@ -7,6 +7,7 @@ namespace Data
     {
         public AudioClip bubble;
         public AudioClip blockPickUp;
+        public AudioClip coinCollect;
         public AudioClip soundTrack;
 
 

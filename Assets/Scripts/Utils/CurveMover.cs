@@ -16,6 +16,7 @@ namespace Utils
 
         private TweenCallback _firstMovingComplete;
         private TweenCallback _lastMovingComplete;
+        private TweenCallback _movingComplete;
 
 
         private Vector3[] _wayPoints;
@@ -31,6 +32,10 @@ namespace Utils
 
         public void RemoveLastMovingCompleteAnimationListener(TweenCallback callback) =>
             _lastMovingComplete -= callback;
+
+
+        public void AddMovingCompleteListener(TweenCallback callback) => _movingComplete += callback;
+        public void RemoveMovingCompleteListener(TweenCallback callback) => _movingComplete -= callback;
 
 
         public void CalculateWayPoints()
@@ -52,6 +57,8 @@ namespace Utils
                 if (i == 0) tween.onComplete += _firstMovingComplete;
 
                 if (i == objects.Length - 1) tween.onComplete += _lastMovingComplete;
+
+                tween.onComplete += _movingComplete;
 
                 var currentObject = movingObject;
 

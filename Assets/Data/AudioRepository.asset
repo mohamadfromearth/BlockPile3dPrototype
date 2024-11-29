@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bubble: {fileID: 8300000, guid: f22afea7a30cbd24db26ba1a2cf806b8, type: 3}
   blockPickUp: {fileID: 0}
+  coinCollect: {fileID: 8300000, guid: 6531120ebc5dade449995124f354ad7f, type: 3}
   soundTrack: {fileID: 0}
   blockPushingInitialPitch: 1
   blockPushingPitchInterval: 0.2

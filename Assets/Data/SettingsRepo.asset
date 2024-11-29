@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16c46189ee234e28a962e63c96a7f47a, type: 3}
   m_Name: SettingsRepo
   m_EditorClassIdentifier: 
-  soundOnSprite: {fileID: 21300000, guid: 50e54db1ad979844c832f8e4c4fc8e21, type: 3}
-  soundOffSprite: {fileID: 21300000, guid: 1972df2ed0b7d4b449ed45f5d55106ff, type: 3}
-  musicOnSprite: {fileID: 21300000, guid: 2da088cfb6bb35c41a065ae25caae6aa, type: 3}
-  musicOffSprite: {fileID: 21300000, guid: 4af446a13d98d6c42b46dda8d019a53e, type: 3}
+  soundOnSprite: {fileID: 21300000, guid: 6c37edaacbac26c42a534e751b242b39, type: 3}
+  soundOffSprite: {fileID: 21300000, guid: 34765e909102eb5418b7be5b0d1be3c4, type: 3}
+  musicOnSprite: {fileID: 21300000, guid: f35b310ec4dcb1941ad42c232f6cb0f1, type: 3}
+  musicOffSprite: {fileID: 21300000, guid: 3e7fd9e08b898904ca994307385dee7b, type: 3}

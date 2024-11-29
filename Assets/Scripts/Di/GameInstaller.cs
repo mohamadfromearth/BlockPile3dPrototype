@@ -44,6 +44,7 @@ namespace Di
         [SerializeField] private CurrencyRepository currencyRepository;
         [SerializeField] private ProgressRewardsRepository progressRewardsRepository;
         [SerializeField] private AudioRepository audioRepository;
+        [SerializeField] private SettingsRepository settingsRepository;
 
         [SerializeField] private Grid grid;
         [SerializeField] private Transform gridPivot;
@@ -54,6 +55,7 @@ namespace Di
 
         [SerializeField] private Camera camera;
         [SerializeField] private CameraSizeSetterData cameraSizeSetterData;
+
 
         [SerializeField] private SettingsController settingsController;
 
@@ -74,8 +76,6 @@ namespace Di
 
         public override void InstallBindings()
         {
-            settingsController.Init();
-
             #region Core
 
             Container.Bind<EventChannel>().AsSingle().NonLazy();
@@ -150,10 +150,11 @@ namespace Di
 
             Container.Bind<ShuffleController>().AsSingle().WithArguments(shuffleButtonTransform).NonLazy();
 
-
             #endregion
 
-            Container.Bind<AudioController>().AsSingle().NonLazy();
+
+
+            settingsController.Init(Container.Resolve<EventChannel>());
         }
     }
 }
