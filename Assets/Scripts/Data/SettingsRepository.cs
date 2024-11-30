@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Data
 {
@@ -11,6 +12,9 @@ namespace Data
         [SerializeField] private Sprite musicOffSprite;
 
 
+        private Action _musicToggle;
+
+
         private bool _isSoundOn = true;
         private bool _isMusicOn = true;
 
@@ -20,6 +24,11 @@ namespace Data
 
         public bool IsSoundOn => _isSoundOn;
         public bool IsMusicOn => _isMusicOn;
+
+
+        public void AddMusicToggleListener(Action action) => _musicToggle += action;
+
+        public void RemoveMusicToggleListener(Action action) => _musicToggle -= action;
 
 
         private void OnEnable()
@@ -38,6 +47,7 @@ namespace Data
         {
             _isMusicOn = !_isMusicOn;
             PlayerPrefs.SetInt(MusicKey, _isMusicOn ? 1 : 0);
+            _musicToggle?.Invoke();
         }
 
 

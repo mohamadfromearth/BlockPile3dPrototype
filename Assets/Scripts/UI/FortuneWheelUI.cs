@@ -16,6 +16,8 @@ namespace UI
         [SerializeField] private GameObject parent;
         [SerializeField] private GameObject panel;
         [SerializeField] private Button spinButton;
+        [SerializeField] private GameObject spinText;
+        [SerializeField] private GameObject advertiseSpinText;
         [SerializeField] private Button closeButton;
         [SerializeField] private Image advertiseImage;
         [SerializeField] private Image[] itemsImages;
@@ -36,6 +38,10 @@ namespace UI
         public void SetData(FortuneWheelItemData[] fortuneWheelItemDataList, bool isAdvertise)
         {
             advertiseImage.gameObject.SetActive(isAdvertise);
+            advertiseSpinText.SetActive(isAdvertise);
+            spinText.SetActive(!isAdvertise);
+
+
             for (int i = 0; i < fortuneWheelItemDataList.Length; i++)
             {
                 var sprite = fortuneWheelItemDataList[i].sprite;
@@ -51,11 +57,14 @@ namespace UI
         {
             parent.SetActive(true);
             panel.transform.ShowPopUp();
+            spinButton.transform.ShowPopUp();
         }
 
         public void Hide()
         {
             parent.SetActive(false);
+            panel.transform.localScale = Vector3.zero;
+            spinButton.transform.localScale = Vector3.zero;
             panel.transform.rotation = Quaternion.identity;
         }
 

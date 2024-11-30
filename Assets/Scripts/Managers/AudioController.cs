@@ -1,8 +1,6 @@
-﻿using System;
-using Core;
+﻿using Core;
 using Data;
 using Event;
-using UI;
 using UnityEngine;
 using Zenject;
 
@@ -10,84 +8,34 @@ namespace Managers
 {
     public class AudioController : MonoBehaviour
     {
-        private AudioPlayer _player;
-        private EventChannel _channel;
-        private AudioRepository _repo;
-        [SerializeField] private SettingsRepository settingsRepository;
-        [SerializeField] private GameUI gameUI;
-
-        private float _blockPushingPitch;
-        private float _blockDestroyingPitch;
+        protected AudioPlayer Player;
+        protected EventChannel Channel;
+        protected AudioRepository Repo;
+        [SerializeField] protected SettingsRepository settingsRepository;
 
 
         [Inject]
-        public void Construct(AudioPlayer player, EventChannel channel, AudioRepository repo)
+        public virtual void Construct(AudioPlayer player, EventChannel channel, AudioRepository repo)
         {
-            _player = player;
-            _channel = channel;
-            _repo = repo;
-            _blockPushingPitch = _repo.blockPushingInitialPitch;
-            _blockDestroyingPitch = _repo.blockDestroyingInitialPitch;
-
-            SubscribeToEvents();
-        }
-
-        private void OnDisable()
-        {
-            gameUI.RemoveCoinCollectionAnimationCompleteListener(OnCoinCollecting);
+            Player = player;
+            Channel = channel;
+            Repo = repo;
+            settingsRepository.AddMusicToggleListener(OnMusicToggle);
         }
 
 
-        private void SubscribeToEvents()
+        private void OnMusicToggle()
         {
-            _channel.Subscribe<BlockPush>(OnBlockPushed);
-            _channel.Subscribe<BlockPushComplete>(ResetPitch);
-            _channel.Subscribe<BlockDestroyComplete>(ResetPitch);
-            _channel.Subscribe<BlockDestroy>(OnBlockDestroy);
+            var source = MusicAudioSource.GetInstance();
 
-            gameUI.AddCoinCollectionAnimationCompleteListener(OnCoinCollecting);
-        }
-
-
-        private void OnBlockPushed()
-        {
-            if (settingsRepository.IsSoundOn)
+            if (settingsRepository.IsMusicOn)
             {
-                _player.SetPitch(AudioSourceType.Main, _blockPushingPitch);
-                _player.SetAudioClip(AudioSourceType.Main, _repo.bubble);
-                _player.Play(AudioSourceType.Main);
+                source.Play();
             }
-
-            _blockPushingPitch += _repo.blockPushingPitchInterval;
-        }
-
-        private void OnBlockDestroy()
-        {
-            _player.SetPitch(AudioSourceType.Main, _blockDestroyingPitch);
-            _blockDestroyingPitch -= _repo.blockDestroyingPitchInterval;
-
-            if (settingsRepository.IsSoundOn)
+            else
             {
-                _player.SetAudioClip(AudioSourceType.Main, _repo.bubble);
-                _player.Play(AudioSourceType.Main);
+                source.Pause();
             }
-        }
-
-
-        private void OnCoinCollecting()
-        {
-            if (settingsRepository.IsSoundOn)
-            {
-                _player.SetAudioClip(AudioSourceType.Main, _repo.coinCollect);
-                _player.Play(AudioSourceType.Main);
-            }
-        }
-
-
-        private void ResetPitch()
-        {
-            _blockPushingPitch = _repo.blockPushingInitialPitch;
-            _blockDestroyingPitch = _repo.blockDestroyingInitialPitch;
         }
     }
 }

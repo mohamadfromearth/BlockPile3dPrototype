@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: AudioRepository
   m_EditorClassIdentifier: 
   bubble: {fileID: 8300000, guid: f22afea7a30cbd24db26ba1a2cf806b8, type: 3}
-  blockPickUp: {fileID: 0}
-  coinCollect: {fileID: 8300000, guid: 6531120ebc5dade449995124f354ad7f, type: 3}
-  soundTrack: {fileID: 0}
+  blockPickUp: {fileID: 8300000, guid: a0a451042c68de145939a4b6a177caba, type: 3}
+  coinCollect: {fileID: 8300000, guid: c27fb440d62e68846975f34ac7121777, type: 3}
+  soundTrack: {fileID: 8300000, guid: c27fb440d62e68846975f34ac7121777, type: 3}
   blockPushingInitialPitch: 1
   blockPushingPitchInterval: 0.2
   blockDestroyingInitialPitch: 5
-  blockDestroyingPitchInterval: 0.2
+  blockDestroyingPitchInterval: 0.05

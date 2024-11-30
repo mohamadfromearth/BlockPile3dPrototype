@@ -34,7 +34,7 @@ namespace Objects.BlocksContainer
                 {
                     var block = _blockFactory.Create(color.ToColorIndex());
                     block.Color = _colorRepository.GetColor(color);
-                    block.ColorIndex = block.Color.ToColorIndex();
+                    block.ColorIndex = color.ToColorIndex();
 
                     container.Push(block);
                 }

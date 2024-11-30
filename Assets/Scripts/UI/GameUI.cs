@@ -252,7 +252,7 @@ namespace UI
 
 
         public void AddCoinCollectionAnimationCompleteListener(TweenCallback callback) =>
-            coinsCollectionCurveMover.AddLastMovingCompleteAnimationListener(callback);
+            coinsCollectionCurveMover.AddMovingCompleteListener(callback);
 
 
         public void RemoveCoinCollectionAnimationCompleteListener(TweenCallback callback) =>

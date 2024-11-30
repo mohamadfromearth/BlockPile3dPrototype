@@ -5,7 +5,8 @@ namespace Core
 {
     public enum AudioSourceType
     {
-        Main
+        Main,
+        Second
     }
 
     [System.Serializable]

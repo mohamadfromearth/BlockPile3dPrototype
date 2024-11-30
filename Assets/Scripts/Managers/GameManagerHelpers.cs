@@ -191,7 +191,7 @@ namespace Managers
 
         public void ShowBlockToProgressAnimation(Vector3 position, int colorIndex)
         {
-            Debug.Log("Color index is " + colorIndex);
+            Debug.LogError("Color index is " + colorIndex);
             position.y = 0;
             Debug.Log("Position is " + progressBlockImageTransform.position);
             var block = _blockFactory.Create(colorIndex);
