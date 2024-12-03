@@ -18,6 +18,7 @@ namespace Objects.LockBlock
             {
                 _channel = value;
                 _channel.Subscribe<ScoreChanged>(OnScoreChanged);
+                _channel.Subscribe<GridRotate>(OnGridRotate);
             }
         }
 
@@ -25,6 +26,7 @@ namespace Objects.LockBlock
         private void OnDisable()
         {
             _channel.UnSubscribe<ScoreChanged>(OnScoreChanged);
+            _channel.UnSubscribe<GridRotate>(OnGridRotate);
         }
 
 
@@ -53,6 +55,14 @@ namespace Objects.LockBlock
             {
                 Channel.Rise<ScoreHitLockBLock>(new ScoreHitLockBLock(this));
             }
+        }
+
+
+        private void OnGridRotate()
+        {
+            //if (_hasBeenDestroyed) return;
+            var rotation = Quaternion.Inverse(Channel.GetData<GridRotate>().Rotation);
+            transform.rotation = Quaternion.Euler(90f, rotation.y + 45, 0);
         }
 
 

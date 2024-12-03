@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using System;
+using Core;
 using Data;
 using Event;
 using UnityEngine;
@@ -10,16 +11,15 @@ namespace Managers
     {
         protected AudioPlayer Player;
         protected EventChannel Channel;
-        protected AudioRepository Repo;
+        [SerializeField] protected AudioRepository Repo;
         [SerializeField] protected SettingsRepository settingsRepository;
 
 
         [Inject]
-        public virtual void Construct(AudioPlayer player, EventChannel channel, AudioRepository repo)
+        public virtual void Construct(AudioPlayer player, EventChannel channel)
         {
             Player = player;
             Channel = channel;
-            Repo = repo;
             settingsRepository.AddMusicToggleListener(OnMusicToggle);
         }
 

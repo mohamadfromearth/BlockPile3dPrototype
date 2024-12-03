@@ -60,14 +60,17 @@ namespace UI
         [SerializeField] private HorizontalLayoutGroup abilitiesHl;
         [SerializeField] private VerticalLayoutGroup abilitiesVl;
 
-        [SerializeField] private Transform verticalY;
-        [SerializeField] private Transform horizontalY;
-        [SerializeField] private Transform cameraVerticalY;
-        [SerializeField] private Transform cameraHorizontalY;
+        [SerializeField] private RectTransform verticalY;
+        [SerializeField] private RectTransform horizontalY;
+        [SerializeField] private RectTransform cameraVerticalY;
+        [SerializeField] private RectTransform cameraHorizontalY;
 
         [SerializeField] private Button settingButton;
+        [SerializeField] private Button soundButton;
+        [SerializeField] private Button musicButton;
+        [SerializeField] private Button exitButton;
         [SerializeField] private Transform coinTransform;
-        [SerializeField] private Transform progressTransform;
+        [SerializeField] private RectTransform progressTransform;
         [SerializeField] private Transform blocksImageTransform;
 
         [SerializeField] private TargetGoalUI targetGoal;
@@ -96,18 +99,21 @@ namespace UI
 
         private Action blockToProgressAnimationFinished;
 
-        private IEnumerator Start()
+        private void Start()
         {
-            yield return new WaitForSeconds(1f);
             bool isLandScape = Screen.width > Screen.height;
 
             float y = isLandScape ? horizontalY.position.y : verticalY.position.y;
-            float cameraY = isLandScape ? cameraHorizontalY.position.y : cameraVerticalY.position.y;
+            float cameraY = isLandScape ? cameraHorizontalY.anchoredPosition.y : cameraVerticalY.anchoredPosition.y;
 
-            //progressTransform.position = new Vector3(progressTransform.position.x, cameraY, 0);
+            progressTransform.anchoredPosition = new Vector3(progressTransform.anchoredPosition.x, cameraY, 0);
             coinTransform.position = new Vector3(coinTransform.position.x, y, coinTransform.position.z);
-            settingButton.transform.position =
-                new Vector3(settingButton.transform.position.x, y, settingButton.transform.position.z);
+
+            var settingPos = new Vector3(settingButton.transform.position.x, y, settingButton.transform.position.z);
+            settingButton.transform.position = settingPos;
+            soundButton.transform.position = settingPos;
+            musicButton.transform.position = settingPos;
+            exitButton.transform.position = settingPos;
 
 
             var abilityButtonsParent = isLandScape ? abilitiesVl.transform : abilitiesHl.transform;

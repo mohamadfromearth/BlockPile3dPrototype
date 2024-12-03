@@ -55,6 +55,13 @@ public class TutorialManager : MonoBehaviour
         TutorialCommand1Factory command1Factory
     )
     {
+        if (levelRepository.LevelIndex != 0)
+        {
+            tutorialRepository.TutorialIndex = (int)TutorialCommandType.Command4;
+            return;
+        }
+
+
         _channel = channel;
         _board = board;
         _selectionBar = selectionBar;
@@ -110,6 +117,7 @@ public class TutorialManager : MonoBehaviour
 
     public void OnBlockContainerPointerDown(int index)
     {
+        if (levelRepository.LevelIndex != 0) return;
         Debug.Log("Container index is : " + index);
         _latestSelectionBarIndex = index;
         indicator.SetActive(false);
@@ -119,6 +127,8 @@ public class TutorialManager : MonoBehaviour
 
     public void OnBlockContainerPointerUp()
     {
+        if (levelRepository.LevelIndex != 0) return;
+
         if (tutorialRepository.TutorialIndex < (int)TutorialCommandType.Command3)
         {
             indicator.SetActive(true);
@@ -129,6 +139,8 @@ public class TutorialManager : MonoBehaviour
 
     public void OnPlacedBlockContainer()
     {
+        if (levelRepository.LevelIndex != 0) return;
+
         if (tutorialRepository.TutorialIndex == (int)TutorialCommandType.Command4)
         {
             tutorialRepository.IsTutorialAvailable = false;

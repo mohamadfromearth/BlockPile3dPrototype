@@ -17,9 +17,9 @@ namespace Managers
 
 
         [Inject]
-        public override void Construct(AudioPlayer player, EventChannel channel, AudioRepository repo)
+        public override void Construct(AudioPlayer player, EventChannel channel)
         {
-            base.Construct(player, channel, repo);
+            base.Construct(player, channel);
             SubscribeToEvents();
         }
 

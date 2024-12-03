@@ -238,6 +238,7 @@ namespace Managers
         public void StopRoutines()
         {
             if (_shuffleCoroutine == null) return;
+            _isShuffling = false;
             StopCoroutine(_shuffleCoroutine);
         }
 

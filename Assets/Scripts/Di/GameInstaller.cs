@@ -43,7 +43,6 @@ namespace Di
         [SerializeField] private AbilityRepository abilityRepository;
         [SerializeField] private CurrencyRepository currencyRepository;
         [SerializeField] private ProgressRewardsRepository progressRewardsRepository;
-        [SerializeField] private AudioRepository audioRepository;
         [SerializeField] private SettingsRepository settingsRepository;
 
         [SerializeField] private Grid grid;
@@ -125,7 +124,6 @@ namespace Di
 
             Container.Bind<IProgressRewardsRepository>().FromInstance(progressRewardsRepository).AsSingle();
 
-            Container.Bind<AudioRepository>().FromInstance(audioRepository).AsSingle();
 
             #endregion
 

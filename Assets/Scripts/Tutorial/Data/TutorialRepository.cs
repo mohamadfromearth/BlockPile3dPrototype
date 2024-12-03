@@ -32,7 +32,11 @@ namespace Tutorial.Data
         }
 
 
-        public int TutorialIndex => _tutorialIndex;
+        public int TutorialIndex
+        {
+            get => _tutorialIndex;
+            set => _tutorialIndex = value;
+        }
 
         public Vector3Int FirstAvailablePos => firstAvailablePos;
         public Vector3Int SecondAvailablePos => secondAvailablePos;

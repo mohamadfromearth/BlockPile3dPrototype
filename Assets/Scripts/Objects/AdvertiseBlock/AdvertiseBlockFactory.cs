@@ -18,6 +18,7 @@ namespace Objects.AdvertiseBlock
         {
             var advertiseBlock = Object.Instantiate(_advertiseBlockPrefab);
             advertiseBlock.Channel = _channel;
+            advertiseBlock.Init();
             return advertiseBlock;
         }
     }

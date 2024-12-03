@@ -10,7 +10,9 @@ public class FortuneWheelController : MonoBehaviour
     [SerializeField] private FortuneWheelRepository fortuneWheelRepository;
     [SerializeField] private FortuneWheelRewardShowerUI fortuneWheelRewardShowerUI;
     [SerializeField] private FortuneWheelCollectionStrategyHandler rewardCollectionStrategyHandler;
+
     [SerializeField] private FortuneWheelUI fortuneWheelUI;
+
     // It is not a good idea to access gameUI here but fuck it dont wanna make game manager hell!!
     [SerializeField] private GameUI gameUI;
 
@@ -37,9 +39,9 @@ public class FortuneWheelController : MonoBehaviour
     public void RemoveFortuneWheelFlowCompleteListener(Action action) => _fortuneWheelFlowCompleted -= action;
 
 
-    public void OnWinUIHide()
+    public void CheckFortuneWheel()
     {
-        if (fortuneWheelRepository.CanClaimWheel())
+        if (fortuneWheelRepository.CanClaimWheel)
         {
             fortuneWheelUI.SetData(fortuneWheelRepository.GetData(), _isAdvertise);
             fortuneWheelUI.Show();
@@ -106,6 +108,7 @@ public class FortuneWheelController : MonoBehaviour
         {
             fortuneWheelUI.SetData(fortuneWheelRepository.GetData(), _isAdvertise);
             fortuneWheelUI.Show();
+            fortuneWheelRepository.CanClaimWheel = false;
         }
         else
         {
@@ -118,6 +121,7 @@ public class FortuneWheelController : MonoBehaviour
     {
         _fortuneWheelFlowCompleted();
         fortuneWheelUI.Hide();
+        fortuneWheelRepository.CanClaimWheel = false;
     }
 
     #endregion

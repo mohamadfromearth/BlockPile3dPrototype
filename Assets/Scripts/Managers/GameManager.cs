@@ -74,6 +74,7 @@ namespace Managers
 
         private void Start()
         {
+            fortuneWheelController.CheckFortuneWheel();
             StartLevel();
             helpers.UpdateAbilityButtons(gameUI);
         }
@@ -239,11 +240,11 @@ namespace Managers
 
         private void OnWinUIHideCompleted()
         {
-            fortuneWheelController.OnWinUIHide();
+            fortuneWheelController.CheckFortuneWheel();
             StartLevel();
             gameUI.Show();
 
-            if (fortuneWheelRepository.CanClaimWheel() == false)
+            if (fortuneWheelRepository.CanClaimWheel == false)
             {
                 helpers.ShowTargetScoreHint();
                 helpers.UpdateAbilityButtons(gameUI);
@@ -434,6 +435,14 @@ namespace Managers
                     fortuneWheelRepository.GetProgress(),
                     fortuneWheelRepository.GetProgressIndex() + "/" + fortuneWheelRepository.GetProgressTarget()
                 );
+
+
+                if (fortuneWheelRepository.IsReached())
+                {
+                    fortuneWheelRepository.IncreaseIndex();
+                    fortuneWheelRepository.CanClaimWheel = true;
+                }
+
 
                 gameUI.Hide();
 

@@ -10,22 +10,41 @@ namespace Data
         [SerializeField] private List<LevelDataSo> levelDataList;
 
 
+        private const string LevelIndexPrefKey = "LevelIndexPrefKey";
+
+
         private int _levelIndex;
 
         private void OnEnable()
         {
-            _levelIndex = 0;
+            _levelIndex = PlayerPrefs.GetInt(LevelIndexPrefKey, 0);
         }
 
         public int LevelIndex => _levelIndex;
 
 
-        public LevelDataSo GetLevelData() => levelDataList[_levelIndex];
+        public LevelDataSo GetLevelData()
+        {
+            if (_levelIndex > levelDataList.Count - 1)
+            {
+                return levelDataList[0];
+            }
+
+            return levelDataList[_levelIndex];
+        }
 
         public void NextLevel()
         {
-            if (_levelIndex < levelDataList.Count - 1) _levelIndex++;
-            else _levelIndex = 0;
+            if (_levelIndex < levelDataList.Count - 1)
+            {
+                _levelIndex++;
+            }
+            else
+            {
+                _levelIndex = 0;
+            }
+
+            PlayerPrefs.SetInt(LevelIndexPrefKey, _levelIndex);
         }
     }
 }

@@ -24,6 +24,9 @@ public class SettingsController
         settingsUI.AddBackToMenuClickListener(OnBackToMenu);
         settingsUI.AddExitClickListener(OnExit);
         settingsUI.AddCancelDialogClickListener(OnExitDialogueCancel);
+
+        settingsUI.SetMusicSprite(settingsRepository.GetMusicSprite());
+        settingsUI.SetSoundSprite(settingsRepository.GetSoundSprite());
     }
 
 
