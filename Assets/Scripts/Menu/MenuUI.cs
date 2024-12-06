@@ -16,6 +16,9 @@ namespace Menu
 
         [SerializeField] private TextMeshProUGUI levelText;
 
+        [SerializeField] private Image fortuneWheelProgress;
+        [SerializeField] private TextMeshProUGUI fortuneWheelProgressText;
+
 
         public void SetBackground(Sprite backgroundSprite) => backgroundImage.sprite = backgroundSprite;
 
@@ -37,5 +40,9 @@ namespace Menu
 
         public void StartLoadingAnimation() =>
             loadingBlocksImage.DOScale(new Vector3(1.3f, 1.3f, 1.3f), 0.5f).SetLoops(-1, LoopType.Yoyo);
+
+        public void SetFortuneWheelProgress(float progress) => fortuneWheelProgress.fillAmount = progress;
+
+        public void SetFortuneWheelProgressText(string text) => fortuneWheelProgressText.text = text;
     }
 }

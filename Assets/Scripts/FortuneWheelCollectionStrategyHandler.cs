@@ -3,6 +3,7 @@ using Data;
 using Event;
 using UI;
 using UnityEngine;
+using Utils;
 using Zenject;
 
 public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
@@ -13,8 +14,12 @@ public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
     private IFortuneWheelCollectionStrategy _refreshCollectionStrategy;
 
     [SerializeField] private CurrencyRepository currencyRepository;
+
     [SerializeField] private AbilityRepository abilityRepository;
-    [SerializeField] private GameUI gameUI;
+
+    //[SerializeField] private GameUI gameUI;
+    [SerializeField] private CurveMover coinsCollectionCurveMover;
+
 
     [SerializeField] private Transform hammerTarget;
     [SerializeField] private Transform hammer;
@@ -35,7 +40,8 @@ public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
     private void Start()
     {
         _coinCollectionStrategy =
-            new FortuneWheelCoinCollectionStrategy(gameUI, currencyRepository, fortuneWheelRewardShowerUI, _channel);
+            new FortuneWheelCoinCollectionStrategy(currencyRepository, fortuneWheelRewardShowerUI, _channel,
+                coinsCollectionCurveMover);
         _hammerCollectionStrategy =
             new FortuneWheelCollectionStrategy(hammer, hammerTarget, abilityRepository, AbilityType.Punch,
                 claimMovingDuration, fortuneWheelRewardShowerUI, _channel);

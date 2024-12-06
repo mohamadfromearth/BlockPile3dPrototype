@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using DG.Tweening;
+using ModestTree;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,9 @@ namespace Utils
 
 
         private Vector3[] _wayPoints;
+
+
+        public bool IsEmpty => wayPointsTransforms.IsEmpty();
 
 
         public void AddFirstMovingCompleteAnimationListener(TweenCallback callback) => _firstMovingComplete += callback;

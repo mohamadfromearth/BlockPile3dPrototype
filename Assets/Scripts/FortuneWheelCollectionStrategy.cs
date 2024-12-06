@@ -27,17 +27,23 @@ public class FortuneWheelCollectionStrategy : IFortuneWheelCollectionStrategy
         _abilityRepository = abilityRepository;
         _abilityType = abilityType;
         _duration = duration;
-        _startPosition = claimedObject.position;
+        if (_claimedObject != null) _startPosition = claimedObject.position;
         _fortuneWheelRewardShowerUI = fortuneWheelRewardShowerUI;
         _channel = channel;
     }
 
     public void Claim(int count)
     {
+        if (_claimedObject == null)
+        {
+            _channel.Rise<FortuneWheelRewardCollect>(new FortuneWheelRewardCollect());
+            _abilityRepository.AddAbility(_abilityType, count);
+            return;
+        }
+
         _claimedObject.position = _startPosition;
         _claimedObject.gameObject.SetActive(true);
         _abilityRepository.AddAbility(_abilityType, count);
-        _abilityRepository.AddAbility(AbilityType.Punch, count);
         _claimedObject.DOMove(_target.position, _duration).onComplete = OnMovingCompleted;
     }
 

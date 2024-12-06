@@ -12,7 +12,9 @@ namespace UI
         [SerializeField] private Button[] buttons;
         [SerializeField] private float duration = 0.5f;
         [SerializeField] private float padding = 2f;
+        [SerializeField] private bool isCameraCanvas;
 
+        private Quaternion _initialRotation;
         private bool _isDropped = false;
 
         private float _size;
@@ -20,7 +22,15 @@ namespace UI
 
         private void Start()
         {
-            _size = mainButtonImage.rectTransform.rect.height;
+            if (isCameraCanvas)
+            {
+                _initialRotation = mainButton.transform.rotation;
+                _size = Screen.width > Screen.height ? 5 : 3;
+            }
+            else
+            {
+                _size = mainButtonImage.rectTransform.rect.height;
+            }
         }
 
 
@@ -64,6 +74,12 @@ namespace UI
 
         private Quaternion GetRotation()
         {
+            if (isCameraCanvas)
+            {
+                var rot = _isDropped ? Quaternion.Euler(0, 0, 180) : Quaternion.identity;
+                return _initialRotation * rot;
+            }
+
             return _isDropped ? Quaternion.Euler(0, 0, 180) : Quaternion.identity;
         }
     }

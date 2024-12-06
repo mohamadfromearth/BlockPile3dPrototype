@@ -1,6 +1,7 @@
 ﻿using System;
 using Data;
 using Event;
+using Event.FortuneWheel;
 using UI;
 using UnityEngine;
 using Zenject;
@@ -13,13 +14,14 @@ public class FortuneWheelController : MonoBehaviour
 
     [SerializeField] private FortuneWheelUI fortuneWheelUI;
 
-    // It is not a good idea to access gameUI here but fuck it dont wanna make game manager hell!!
-    [SerializeField] private GameUI gameUI;
+    [SerializeField] private bool endClaimingOnClose = true;
+
+    // It is not a good idea to access the gameUI here but fuck it dont wanna make the game manager hell!!
+    //[SerializeField] private GameUI gameUI;
 
     [Inject] private EventChannel _channel;
 
 
-    private bool _isAdvertise = false;
     private FortuneWheelItemData _fortuneWheelItemData;
 
     private Action _fortuneWheelFlowCompleted;
@@ -43,9 +45,15 @@ public class FortuneWheelController : MonoBehaviour
     {
         if (fortuneWheelRepository.CanClaimWheel)
         {
-            fortuneWheelUI.SetData(fortuneWheelRepository.GetData(), _isAdvertise);
+            fortuneWheelUI.SetData(fortuneWheelRepository.GetData(), fortuneWheelRepository.IsAdvertise);
             fortuneWheelUI.Show();
         }
+    }
+
+    public void Show()
+    {
+        fortuneWheelUI.SetData(fortuneWheelRepository.GetData(), fortuneWheelRepository.IsAdvertise);
+        fortuneWheelUI.Show();
     }
 
 
@@ -53,7 +61,6 @@ public class FortuneWheelController : MonoBehaviour
     {
         fortuneWheelUI.AddSpinClickListener(OnSpinFortuneWheelClick);
         fortuneWheelUI.AddRotationCompletionListener(FortuneWheelSpinningCompleted);
-        fortuneWheelRewardShowerUI.AddClaimButtonClickListener(OnFortuneRewardClaim);
         fortuneWheelRewardShowerUI.AddClaimButtonClickListener(OnClaim);
         fortuneWheelUI.AddCloseClickListener(OnClose);
 
@@ -74,58 +81,76 @@ public class FortuneWheelController : MonoBehaviour
 
     #region Subscribers
 
-    private void OnSpinFortuneWheelClick() => fortuneWheelUI.Rotate();
+    private void OnSpinFortuneWheelClick()
+    {
+        if (fortuneWheelRepository.CanClaimWheel)
+        {
+            fortuneWheelUI.Rotate();
+        }
+    }
 
     private void FortuneWheelSpinningCompleted()
     {
         _fortuneWheelItemData = fortuneWheelRepository.GetFortuneWheelItemData(fortuneWheelUI.GetRotation());
         fortuneWheelUI.Hide();
         fortuneWheelRewardShowerUI.Show(_fortuneWheelItemData.sprite, _fortuneWheelItemData.count.ToString());
-        gameUI.Hide();
+        _channel.Rise<FortuneWheelSpinningComplete>(new FortuneWheelSpinningComplete());
+        //gameUI.Hide();
     }
 
 
     private void OnClaim()
     {
-        gameUI.Show();
+        _channel.Rise<FortuneWheelClaim>(new FortuneWheelClaim());
+        //gameUI.Show();
         fortuneWheelRewardShowerUI.Hide();
-        rewardCollectionStrategyHandler.Claim(_fortuneWheelItemData);
 
-        if (_isAdvertise == false)
+        if (fortuneWheelRepository.IsAdvertise == false)
         {
-            _isAdvertise = true;
+            Debug.Log("OnClaim::IsAdvertise:false");
+            fortuneWheelRepository.IsAdvertise = true;
         }
         else
         {
-            _isAdvertise = false;
+            Debug.Log("OnClaim::IsAdvertise:true");
+            fortuneWheelRepository.IsAdvertise = false;
         }
+
+        rewardCollectionStrategyHandler.Claim(_fortuneWheelItemData);
     }
 
 
     private void OnClaimComplete()
     {
-        if (_isAdvertise)
+        if (fortuneWheelRepository.IsAdvertise)
         {
-            fortuneWheelUI.SetData(fortuneWheelRepository.GetData(), _isAdvertise);
+            Debug.Log("OnClaimCompleted::IsAdvertise:true");
+
+            fortuneWheelUI.SetData(fortuneWheelRepository.GetData(), fortuneWheelRepository.IsAdvertise);
             fortuneWheelUI.Show();
-            fortuneWheelRepository.CanClaimWheel = false;
         }
         else
         {
-            _fortuneWheelFlowCompleted();
+            Debug.Log("OnClaimCompleted::IsAdvertise:false");
+
+            fortuneWheelRepository.CanClaimWheel = false;
+            fortuneWheelRepository.IncreaseIndex();
+            _fortuneWheelFlowCompleted?.Invoke();
         }
     }
 
 
     private void OnClose()
     {
-        _fortuneWheelFlowCompleted();
+        _fortuneWheelFlowCompleted?.Invoke();
         fortuneWheelUI.Hide();
-        fortuneWheelRepository.CanClaimWheel = false;
+        if (endClaimingOnClose)
+        {
+            fortuneWheelRepository.IncreaseIndex();
+            fortuneWheelRepository.IsAdvertise = false;
+            fortuneWheelRepository.CanClaimWheel = false;
+        }
     }
 
     #endregion
-
-
-    private void OnFortuneRewardClaim() => rewardCollectionStrategyHandler.Claim(_fortuneWheelItemData);
 }

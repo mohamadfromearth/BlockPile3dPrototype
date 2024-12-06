@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Data;
 using Event;
+using Event.FortuneWheel;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Scrips.Event;
@@ -101,6 +102,8 @@ namespace Managers
             _channel.Subscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
             _channel.Subscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
             _channel.Subscribe<Retry>(OnRetry);
+            _channel.Subscribe<FortuneWheelClaim>(gameUI.Show);
+            _channel.Subscribe<FortuneWheelSpinningComplete>(gameUI.Hide);
 
             winUI.AddClaimClickListener(OnLevelClaim);
             winUI.AddAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
@@ -141,6 +144,8 @@ namespace Managers
             _channel.UnSubscribe<ScoreHitLockBLock>(OnScoreHitLockBlock);
             _channel.UnSubscribe<TargetBlockDestroyed>(OnTargetBlockDestroyed);
             _channel.UnSubscribe<Retry>(OnRetry);
+            _channel.UnSubscribe<FortuneWheelClaim>(gameUI.Show);
+            _channel.UnSubscribe<FortuneWheelSpinningComplete>(gameUI.Hide);
 
 
             winUI.RemoveClaimClickListener(OnLevelClaim);
@@ -439,7 +444,7 @@ namespace Managers
 
                 if (fortuneWheelRepository.IsReached())
                 {
-                    fortuneWheelRepository.IncreaseIndex();
+                    //fortuneWheelRepository.IncreaseIndex();
                     fortuneWheelRepository.CanClaimWheel = true;
                 }
 

@@ -34,14 +34,18 @@ namespace Data
         private const string IndexPrefKey = "INDEX_PREF_KEY";
         private const string ProgressIndexPrefKey = "PROGRESS_INDEX_PREF_KEY";
         private const string CanClaimWheelPrefKey = "CAN_CLAIM_WHEEL_PREF_KEY";
+        private const string IsAdvertisePrefKey = "IS_ADVERTISE_PREF_KEY";
 
         private const int CanClaimWheelValue = 1;
         private const int CanNotClaimWheelValue = 0;
+        private const int IsAdvertiseValue = 1;
+        private const int IsNotAdvertiseValue = 0;
 
 
         private int _index;
         private int _progressIndex;
         private bool _canClaimWheel;
+        private bool _isAdvertise;
 
 
         [SerializeField] private FortuneWheelItemsData[] itemsData;
@@ -57,14 +61,23 @@ namespace Data
             }
         }
 
+        public bool IsAdvertise
+        {
+            get => _isAdvertise;
+            set
+            {
+                _isAdvertise = value;
+                PlayerPrefs.SetInt(IsAdvertisePrefKey, _isAdvertise ? IsAdvertiseValue : IsNotAdvertiseValue);
+            }
+        }
+
 
         private void OnEnable()
         {
             _index = PlayerPrefs.GetInt(IndexPrefKey, 0);
             _progressIndex = PlayerPrefs.GetInt(ProgressIndexPrefKey, 0);
-            _canClaimWheel = PlayerPrefs.GetInt(CanClaimWheelPrefKey, CanNotClaimWheelValue) == CanClaimWheelValue
-                ? true
-                : false;
+            _canClaimWheel = PlayerPrefs.GetInt(CanClaimWheelPrefKey, CanNotClaimWheelValue) == CanClaimWheelValue;
+            _isAdvertise = PlayerPrefs.GetInt(IsAdvertisePrefKey, IsNotAdvertiseValue) == IsAdvertiseValue;
         }
 
 
@@ -85,6 +98,7 @@ namespace Data
         public void IncreaseProgressIndex()
         {
             _progressIndex += 1;
+            PlayerPrefs.SetInt(ProgressIndexPrefKey, _progressIndex);
         }
 
 

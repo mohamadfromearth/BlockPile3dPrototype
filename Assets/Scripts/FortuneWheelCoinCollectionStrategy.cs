@@ -1,24 +1,27 @@
 ﻿using Data;
 using Event;
 using UI;
+using Utils;
 
 public class FortuneWheelCoinCollectionStrategy : IFortuneWheelCollectionStrategy
 {
-    private readonly GameUI _gameUI;
+    //private readonly GameUI _gameUI;
+    private readonly CurveMover _coinCollectionCurveMover;
     private readonly CurrencyRepository _currencyRepository;
     private readonly FortuneWheelRewardShowerUI _fortuneWheelRewardShowerUI;
     private readonly EventChannel _channel;
 
     private bool _isClaiming = false;
 
-    public FortuneWheelCoinCollectionStrategy(GameUI gameUI, CurrencyRepository currencyRepository,
-        FortuneWheelRewardShowerUI fortuneWheelRewardShowerUI, EventChannel channel
+    public FortuneWheelCoinCollectionStrategy(CurrencyRepository currencyRepository,
+        FortuneWheelRewardShowerUI fortuneWheelRewardShowerUI, EventChannel channel,
+        CurveMover coinCollectionCurveMover
     )
     {
-        _gameUI = gameUI;
         _currencyRepository = currencyRepository;
         _fortuneWheelRewardShowerUI = fortuneWheelRewardShowerUI;
-        _gameUI.AddCoinCollectionAnimationCompleteListener(OnCoinCollectionAnimationCompleted);
+        //_gameUI.AddCoinCollectionAnimationCompleteListener(OnCoinCollectionAnimationCompleted);
+        _coinCollectionCurveMover = coinCollectionCurveMover;
         _channel = channel;
     }
 
@@ -27,7 +30,7 @@ public class FortuneWheelCoinCollectionStrategy : IFortuneWheelCollectionStrateg
     {
         if (_isClaiming)
         {
-            _channel.Rise<FortuneWheelRewardCollect>( new FortuneWheelRewardCollect());
+            _channel.Rise<FortuneWheelRewardCollect>(new FortuneWheelRewardCollect());
             _isClaiming = false;
         }
     }
@@ -35,7 +38,15 @@ public class FortuneWheelCoinCollectionStrategy : IFortuneWheelCollectionStrateg
 
     public void Claim(int count)
     {
+        if (_coinCollectionCurveMover.IsEmpty)
+        {
+            _channel.Rise<FortuneWheelRewardCollect>(new FortuneWheelRewardCollect());
+            return;
+        }
+
         _isClaiming = true;
-        _gameUI.ShowCoinCollection();
+        _coinCollectionCurveMover.CalculateWayPoints();
+        _coinCollectionCurveMover.Move();
+        //_gameUI.ShowCoinCollection();
     }
 }

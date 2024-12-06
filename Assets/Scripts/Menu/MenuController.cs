@@ -10,10 +10,11 @@ namespace Menu
 {
     public class MenuController : MonoBehaviour
     {
-        [SerializeField] private FortuneWheelUI fortuneWheelUI;
         [SerializeField] private MenuUI menuUI;
 
+
         [SerializeField] private SettingsRepository settingRepository;
+        [SerializeField] private FortuneWheelRepository fortuneWheelRepository;
 
         [SerializeField] private Sprite landscapeBack;
         [SerializeField] private Sprite portraitBack;
@@ -70,6 +71,14 @@ namespace Menu
         {
             settingRepository.ToggleMusic();
             menuUI.SetMusicImage(settingRepository.GetMusicSprite());
+        }
+
+
+        public void FortuneWheelClick()
+        {
+            menuUI.SetFortuneWheelProgressText(
+                $"{fortuneWheelRepository.GetProgressIndex()}/{fortuneWheelRepository.GetProgressTarget()}");
+            menuUI.SetFortuneWheelProgress(fortuneWheelRepository.GetProgress());
         }
     }
 }
