@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Data
 {
@@ -9,6 +10,8 @@ namespace Data
         public AudioClip blockPickUp;
         public AudioClip coinCollect;
         public AudioClip soundTrack;
+        public AudioClip lose;
+        public AudioClip win;
 
 
         public float blockPushingInitialPitch;

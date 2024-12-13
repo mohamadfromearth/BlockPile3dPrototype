@@ -586,6 +586,7 @@ MonoBehaviour:
   fortuneWheelRepository: {fileID: 11400000, guid: f3761f0a302fb1349bbd96bf8fe56e81, type: 2}
   landscapeBack: {fileID: 21300000, guid: 47f58dac4c71a254281cc25a4654cac2, type: 3}
   portraitBack: {fileID: 21300000, guid: 6f79000d1c3a75e4f9a91ae7e5d7e7bc, type: 3}
+  colorRepository: {fileID: 11400000, guid: d4be1912187f8c14da21e56ab232041a, type: 2}
   loadingDuration: 2
 --- !u!114 &255976811
 MonoBehaviour:
@@ -2751,6 +2752,7 @@ MonoBehaviour:
   levelText: {fileID: 1204342903}
   fortuneWheelProgress: {fileID: 105494342}
   fortuneWheelProgressText: {fileID: 1396620252}
+  playText: {fileID: 191704778}
 --- !u!1 &1703001346
 GameObject:
   m_ObjectHideFlags: 0

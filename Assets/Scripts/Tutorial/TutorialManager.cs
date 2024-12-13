@@ -55,7 +55,7 @@ public class TutorialManager : MonoBehaviour
         TutorialCommand1Factory command1Factory
     )
     {
-        if (levelRepository.LevelIndex != 0)
+        if (levelRepository.LevelIndex != 0 || tutorialRepository.IsTutorialAvailable == false)
         {
             tutorialRepository.TutorialIndex = (int)TutorialCommandType.Command4;
             return;
@@ -106,7 +106,9 @@ public class TutorialManager : MonoBehaviour
     {
         var levelIndex = levelRepository.LevelIndex;
 
-        if (levelIndex == 0)
+        
+        
+        if (levelIndex == 0 && tutorialRepository.IsTutorialAvailable)
         {
             gameUI.Hide();
             var indicatorStartPos = camera.WorldToScreenPoint(_selectionBar.ContainerPositionsList[2].position);
@@ -117,7 +119,7 @@ public class TutorialManager : MonoBehaviour
 
     public void OnBlockContainerPointerDown(int index)
     {
-        if (levelRepository.LevelIndex != 0) return;
+        if (levelRepository.LevelIndex != 0 || tutorialRepository.IsTutorialAvailable == false) return;
         Debug.Log("Container index is : " + index);
         _latestSelectionBarIndex = index;
         indicator.SetActive(false);
@@ -127,7 +129,7 @@ public class TutorialManager : MonoBehaviour
 
     public void OnBlockContainerPointerUp()
     {
-        if (levelRepository.LevelIndex != 0) return;
+        if (levelRepository.LevelIndex != 0 || tutorialRepository.IsTutorialAvailable == false) return;
 
         if (tutorialRepository.TutorialIndex < (int)TutorialCommandType.Command3)
         {
@@ -139,7 +141,7 @@ public class TutorialManager : MonoBehaviour
 
     public void OnPlacedBlockContainer()
     {
-        if (levelRepository.LevelIndex != 0) return;
+        if (levelRepository.LevelIndex != 0 || tutorialRepository.IsTutorialAvailable == false) return;
 
         if (tutorialRepository.TutorialIndex == (int)TutorialCommandType.Command4)
         {

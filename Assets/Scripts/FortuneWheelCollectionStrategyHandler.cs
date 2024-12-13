@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Data;
 using Event;
+using Event.Coin;
 using UI;
 using UnityEngine;
 using Utils;
@@ -37,6 +39,19 @@ public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
     private Dictionary<FortuneWheelItemType, IFortuneWheelCollectionStrategy> _fortuneWheelCollectionStrategies;
 
 
+    private void OnEnable()
+    {
+        coinsCollectionCurveMover.AddFirstMovingCompleteAnimationListener(OnFirstCoinBeCollected);
+        coinsCollectionCurveMover.AddMovingCompleteListener(OnCoinCollectionAnimationCompleted);
+    }
+
+    private void OnDisable()
+    {
+        coinsCollectionCurveMover.RemoveFirstMovingCompleteAnimationListener(OnFirstCoinBeCollected);
+        coinsCollectionCurveMover.RemoveLastMovingCompleteAnimationListener(OnCoinCollectionAnimationCompleted);
+    }
+
+
     private void Start()
     {
         _coinCollectionStrategy =
@@ -65,6 +80,12 @@ public class FortuneWheelCollectionStrategyHandler : MonoBehaviour
         };
     }
 
+
+    private void OnFirstCoinBeCollected() =>
+        _channel.Rise<FirstCoinCollectionCompleted>(new FirstCoinCollectionCompleted());
+
+    private void OnCoinCollectionAnimationCompleted() =>
+        _channel.Rise<CoinCollectionAnimationCompleted>(new CoinCollectionAnimationCompleted());
 
     public void Claim(FortuneWheelItemData data) => _fortuneWheelCollectionStrategies[data.type].Claim(data.count);
 }

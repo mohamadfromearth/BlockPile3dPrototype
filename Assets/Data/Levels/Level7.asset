@@ -40,7 +40,7 @@ MonoBehaviour:
   advertiseBlocks: []
   lockBlocks:
   - position: {x: 3, y: 0, z: 5}
-    count: 70
+    count: 20
   - position: {x: 5, y: 0, z: 3}
     count: 120
   targetScore: 360

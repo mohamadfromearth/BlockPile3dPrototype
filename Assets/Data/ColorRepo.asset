@@ -29,3 +29,5 @@ MonoBehaviour:
     color: {r: 0, g: 0, b: 0, a: 1}
   - name: Orange
     color: {r: 1, g: 0.64705884, b: 0, a: 1}
+  - name: LightPurple
+    color: {r: 0.40899318, g: 0.25380713, b: 0.51572317, a: 1}

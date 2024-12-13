@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Data;
 using Event;
+using Event.Coin;
 using Event.FortuneWheel;
 using Objects.BlocksContainer;
 using Objects.Cell;
@@ -10,6 +11,7 @@ using Scrips.Event;
 using Tutorial.Data;
 using UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utils;
 using Zenject;
 
@@ -24,6 +26,8 @@ namespace Managers
         [SerializeField] private LoseUI loseUI;
         [SerializeField] private BoosterInfoUI boosterInfoUI;
         [SerializeField] private BoosterIntroductionUI boosterIntroductionUI;
+        [SerializeField] private TwoButtonsDialog exitDialogUI;
+        [SerializeField] private EndingUI endingUI;
 
         [SerializeField] private LayerMask groundLayerMask;
 
@@ -104,12 +108,18 @@ namespace Managers
             _channel.Subscribe<Retry>(OnRetry);
             _channel.Subscribe<FortuneWheelClaim>(gameUI.Show);
             _channel.Subscribe<FortuneWheelSpinningComplete>(gameUI.Hide);
+            _channel.Subscribe<FirstCoinCollectionCompleted>(OnFirstCoinCollectionAnimationCompleted);
+            _channel.Subscribe<CoinCollectionAnimationCompleted>(OnCoinCollectionAnimationComplete);
 
             winUI.AddClaimClickListener(OnLevelClaim);
             winUI.AddAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
-            loseUI.AddRetryClickListener(OnRetry);
             loseUI.AddCoinReviveClickListener(OnLosingCoinRevive);
             loseUI.AddAdvertiseReviveClickListener(OnLosingAdvertiseRevive);
+            loseUI.AddCancelClickListener(OnLosingCancel);
+
+
+            exitDialogUI.AddLeftButtonClickListener(OnBackToMenu);
+            exitDialogUI.AddRightButtonClickListener(OnRetry);
 
             gameUI.AddPunchClickListener(OnPunch);
             gameUI.AddSwapButtonClickListener(OnSwap);
@@ -122,6 +132,7 @@ namespace Managers
             gameUI.AddTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
             gameUI.AddFirstCoinCollectionCompleteAnimationListener(OnFirstCoinCollectionAnimationCompleted);
             gameUI.AddCoinCollectionAnimationCompleteListener(OnCoinCollectionAnimationComplete);
+            gameUI.AddLastCoinCollectionAnimationCompleteListener(OnLastCoinCollectionAnimationCompleted);
 
 
             winUI.AddHidingCompleteListener(OnWinUIHideCompleted);
@@ -146,13 +157,18 @@ namespace Managers
             _channel.UnSubscribe<Retry>(OnRetry);
             _channel.UnSubscribe<FortuneWheelClaim>(gameUI.Show);
             _channel.UnSubscribe<FortuneWheelSpinningComplete>(gameUI.Hide);
+            _channel.UnSubscribe<FirstCoinCollectionCompleted>(OnFirstCoinCollectionAnimationCompleted);
+            _channel.UnSubscribe<CoinCollectionAnimationCompleted>(OnCoinCollectionAnimationComplete);
 
 
             winUI.RemoveClaimClickListener(OnLevelClaim);
             winUI.RemoveAdvertiseRewardClickListener(OnWinRewardAdvertiseClick);
-            loseUI.RemoveRetryClickListener(OnRetry);
             loseUI.RemoveCoinReviveClickListener(OnLosingCoinRevive);
             loseUI.RemoveCoinReviveClickListener(OnLosingAdvertiseRevive);
+            loseUI.RemoveCancelClickListener(OnLosingCancel);
+
+            exitDialogUI.RemoveLeftButtonClickListener(OnBackToMenu);
+            exitDialogUI.RemoveRightButtonClickListener(OnRetry);
 
 
             gameUI.RemovePunchClickListener(OnPunch);
@@ -161,6 +177,8 @@ namespace Managers
             gameUI.RemoveBuyAbilityClickListener(OnBuyAbility);
             gameUI.RemoveWatchAdForAbilityClickListener(OnWatchAdToGetAbility);
             gameUI.RemoveAbilityCancelButtonListener(OnAbilityCancel);
+            gameUI.RemoveLastCoinCollectionAnimationCompleteListener(OnLastCoinCollectionAnimationCompleted);
+
             helpers.RemoveBlockToProgressAnimationCompleteListener(OnBlockToProgressAnimationFinished);
             gameUI.RemoveBuyingAbilityCancelClickListener(OnAbilityBuyingCancel);
             gameUI.RemoveTargetGoalAnimationCompleted(OnTargetGoalUIAnimationCompleted);
@@ -238,21 +256,44 @@ namespace Managers
 
         private void OnLevelClaim()
         {
-            winUI.Hide();
-            gameUI.ShowCoinCollection();
+            if (_levelRepository.IsLastLevel())
+            {
+                _levelRepository.Clear();
+                endingUI.Show();
+                StartCoroutine(EndingGameRoutine());
+            }
+            else
+            {
+                winUI.Hide();
+                StartLevel();
+                gameUI.ShowCoinCollection();
+            }
+        }
+
+        private IEnumerator EndingGameRoutine()
+        {
+            yield return new WaitForSeconds(endingUI.ShowingDuration);
+            SceneManager.LoadScene("Menu");
         }
 
 
         private void OnWinUIHideCompleted()
         {
-            fortuneWheelController.CheckFortuneWheel();
-            StartLevel();
             gameUI.Show();
 
             if (fortuneWheelRepository.CanClaimWheel == false)
             {
-                helpers.ShowTargetScoreHint();
                 helpers.UpdateAbilityButtons(gameUI);
+            }
+        }
+
+
+        private void OnLastCoinCollectionAnimationCompleted()
+        {
+            fortuneWheelController.CheckFortuneWheel();
+            if (fortuneWheelRepository.CanClaimWheel == false)
+            {
+                helpers.ShowTargetScoreHint();
             }
         }
 
@@ -337,7 +378,7 @@ namespace Managers
             _currentScore = 0;
             _previousScore = 0;
             StartLevel();
-            loseUI.Hide();
+            exitDialogUI.Hide();
         }
 
         private void OnLosingCoinRevive()
@@ -351,6 +392,14 @@ namespace Managers
             loseUI.Hide();
             _stateManager.ChangeState(GameStateType.GetAnotherChance);
         }
+
+        private void OnLosingCancel()
+        {
+            loseUI.Hide();
+            exitDialogUI.Show();
+        }
+
+        private void OnBackToMenu() => SceneManager.LoadScene("Menu");
 
 
         private void OnAbilityCancel() => _stateManager.ChangeState(GameStateType.Default);
@@ -444,7 +493,6 @@ namespace Managers
 
                 if (fortuneWheelRepository.IsReached())
                 {
-                    //fortuneWheelRepository.IncreaseIndex();
                     fortuneWheelRepository.CanClaimWheel = true;
                 }
 
@@ -458,7 +506,6 @@ namespace Managers
 
 
                 _currencyRepository.AddCoin(levelData.coinReward);
-                gameUI.SetCoinText("Coin:" + _currencyRepository.GetCoin());
 
                 return true;
             }
@@ -537,19 +584,22 @@ namespace Managers
             {
                 var containerBlock = _gameManager._channel.GetData<CellContainerPointerUp>().BlockContainer;
 
-                _gameManager.helpers.ShowHammerAnimation(containerBlock, () =>
+                if (containerBlock.IsPlaced)
                 {
-                    _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+                    _gameManager.helpers.ShowHammerAnimation(containerBlock, () =>
+                    {
+                        _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
 
-                    _gameManager.StartCoroutine(
-                        _gameManager.hammer.DeActiveObjectWithDelay(containerBlock.DestroyAll()));
+                        _gameManager.StartCoroutine(
+                            _gameManager.hammer.DeActiveObjectWithDelay(containerBlock.DestroyAll()));
 
-                    _gameManager._abilityRepository.RemoveAbility(AbilityType.Punch, 1);
+                        _gameManager._abilityRepository.RemoveAbility(AbilityType.Punch, 1);
 
-                    _gameManager._stateManager.ChangeState(GameStateType.Default);
+                        _gameManager._stateManager.ChangeState(GameStateType.Default);
 
-                    _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
-                });
+                        _gameManager.helpers.UpdateAbilityButtons(_gameManager.gameUI);
+                    });
+                }
             }
 
 
@@ -868,32 +918,35 @@ namespace Managers
             {
                 var containerBlock = _gameManager._channel.GetData<CellContainerPointerUp>().BlockContainer;
 
-                var gridPos = _gameManager._board.WorldToCell(containerBlock.GetPosition());
-
-                var blockContainers = _gameManager.helpers.GetAnotherChanceBlocks(_gameManager._board, gridPos);
-
-
-                _gameManager.helpers.ShowHammerAnimation(containerBlock, () =>
+                if (containerBlock.IsPlaced == true)
                 {
-                    containerBlock.SetCountText("", 0);
-                    _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+                    var gridPos = _gameManager._board.WorldToCell(containerBlock.GetPosition());
 
-                    _gameManager.StartCoroutine(
-                        _gameManager.hammer.DeActiveObjectWithDelay(containerBlock.DestroyAll()));
+                    var blockContainers = _gameManager.helpers.GetAnotherChanceBlocks(_gameManager._board, gridPos);
 
-                    foreach (var blockContainer in blockContainers)
+
+                    _gameManager.helpers.ShowHammerAnimation(containerBlock, () =>
                     {
-                        blockContainer.SetCountText("", 0);
-                        _gameManager._board.AddBlockContainer(null, blockContainer.GetPosition());
-                        blockContainer.DestroyAll();
-                    }
+                        containerBlock.SetCountText("", 0);
+                        _gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
 
-                    //_gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+                        _gameManager.StartCoroutine(
+                            _gameManager.hammer.DeActiveObjectWithDelay(containerBlock.DestroyAll()));
+
+                        foreach (var blockContainer in blockContainers)
+                        {
+                            blockContainer.SetCountText("", 0);
+                            _gameManager._board.AddBlockContainer(null, blockContainer.GetPosition());
+                            blockContainer.DestroyAll();
+                        }
+
+                        //_gameManager._board.AddBlockContainer(null, containerBlock.GetPosition());
+
+                        _gameManager._stateManager.ChangeState(GameStateType.Default);
+                    });
 
                     _gameManager._stateManager.ChangeState(GameStateType.Default);
-                });
-
-                _gameManager._stateManager.ChangeState(GameStateType.Default);
+                }
             }
 
 

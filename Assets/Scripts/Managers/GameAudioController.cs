@@ -38,6 +38,8 @@ namespace Managers
             Channel.Subscribe<BlockDestroy>(OnBlockDestroy);
             Channel.Subscribe<CellContainerPointerDown>(OnBlockContainerPointerDown);
             Channel.Subscribe<UpdateBoardCompleted>(ResetPitch);
+            Channel.Subscribe<Lose>(OnLose);
+            Channel.Subscribe<Won>(OnWon);
 
             gameUI.AddCoinCollectionAnimationCompleteListener(OnCoinCollecting);
         }
@@ -68,22 +70,31 @@ namespace Managers
         }
 
 
-        private void OnCoinCollecting()
-        {
-            if (settingsRepository.IsSoundOn)
-            {
-                Player.SetAudioClip(AudioSourceType.Main, Repo.coinCollect);
-                Player.Play(AudioSourceType.Main);
-            }
-        }
-
-
         private void OnBlockContainerPointerDown()
         {
             var data = Channel.GetData<CellContainerPointerDown>();
             if (settingsRepository.IsSoundOn && data.BlockContainer.IsPlaced == false)
             {
                 Player.SetAudioClip(AudioSourceType.Second, Repo.blockPickUp);
+                Player.Play(AudioSourceType.Second);
+            }
+        }
+
+        private void OnLose()
+        {
+            if (settingsRepository.IsSoundOn)
+            {
+                Player.SetAudioClip(AudioSourceType.Second, Repo.lose);
+                Player.Play(AudioSourceType.Second);
+            }
+        }
+
+
+        private void OnWon()
+        {
+            if (settingsRepository.IsSoundOn)
+            {
+                Player.SetAudioClip(AudioSourceType.Second, Repo.win);
                 Player.Play(AudioSourceType.Second);
             }
         }

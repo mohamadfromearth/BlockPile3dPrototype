@@ -19,6 +19,11 @@ namespace Menu
         [SerializeField] private Image fortuneWheelProgress;
         [SerializeField] private TextMeshProUGUI fortuneWheelProgressText;
 
+        [SerializeField] private TextMeshProUGUI playText;
+
+
+        public void SetPlayText(string text) => playText.text = text;
+
 
         public void SetBackground(Sprite backgroundSprite) => backgroundImage.sprite = backgroundSprite;
 

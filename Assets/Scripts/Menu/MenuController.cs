@@ -4,6 +4,7 @@ using Managers;
 using UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Utils;
 using Zenject;
 
 namespace Menu
@@ -20,6 +21,7 @@ namespace Menu
         [SerializeField] private Sprite portraitBack;
 
         [Inject] private ILevelRepository _levelRepository;
+        [SerializeField] private ColorRepository colorRepository;
 
 
         [SerializeField] private float loadingDuration = 0.7f;
@@ -36,6 +38,7 @@ namespace Menu
             menuUI.StartLoadingAnimation();
             menuUI.SetLevelText("Level " + (_levelRepository.LevelIndex + 1));
             StartCoroutine(HideLoadingRoutine());
+            ColorMapper.SetColorStringToIndexDic(colorRepository.colorDataList);
         }
 
 

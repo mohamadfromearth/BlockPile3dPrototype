@@ -1,4 +1,6 @@
-﻿using Event;
+﻿using System.Collections;
+using Data;
+using Event;
 using TMPro;
 using UnityEngine;
 
@@ -7,6 +9,14 @@ namespace Objects.LockBlock
     public class LockBlock : MonoBehaviour, ILockBlock
     {
         [SerializeField] private TextMeshPro text;
+
+        [SerializeField] private MeshRenderer renderer;
+
+        [SerializeField] private ParticleSystem explosionParticle;
+
+        [SerializeField] private SettingsRepository settingRepo;
+
+        [SerializeField] private AudioSource explosionAudioSource;
 
 
         private EventChannel _channel;
@@ -45,7 +55,18 @@ namespace Objects.LockBlock
             }
         }
 
-        public void Destroy() => Destroy(gameObject);
+        public void Destroy() => StartCoroutine(DestroyRoutine());
+
+
+        private IEnumerator DestroyRoutine()
+        {
+            explosionParticle.Play();
+            renderer.enabled = false;
+            text.enabled = false;
+            if (settingRepo.IsSoundOn) explosionAudioSource.Play();
+            yield return new WaitForSeconds(0.5f);
+            Destroy(gameObject);
+        }
 
         private void OnScoreChanged()
         {
@@ -62,7 +83,7 @@ namespace Objects.LockBlock
         {
             //if (_hasBeenDestroyed) return;
             var rotation = Quaternion.Inverse(Channel.GetData<GridRotate>().Rotation);
-            transform.rotation = Quaternion.Euler(90f, rotation.y + 45, 0);
+            transform.rotation = Quaternion.Euler(0, rotation.y, 0);
         }
 
 

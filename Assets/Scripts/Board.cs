@@ -280,7 +280,7 @@ public class Board
     }
 
 
-    public void SpawnCells(List<Vector3Int> emptyHolders, int width, int height)
+    public Dictionary<Vector3Int, ICell> SpawnCells(List<Vector3Int> emptyHolders, int width, int height)
     {
         Width = width;
         Height = height;
@@ -309,6 +309,8 @@ public class Board
         _grid.transform.SetParent(null);
         _pivot.transform.position = GetBoardCenter();
         _grid.transform.SetParent(_pivot);
+
+        return _cellsDic;
     }
 
 

@@ -13,10 +13,11 @@ namespace Designer.DI
     public class DesignerInstaller : MonoInstaller
     {
         // prefabs
-        [Header("Prefabs")] [SerializeField] private Block blockPrefab;
         [SerializeField] private BlockContainer blockContainerPrefab;
         [SerializeField] private AdvertiseBlock advertiseBlockPrefab;
         [SerializeField] private LockBlock lockBlockPrefab;
+        [SerializeField] private Block[] blockPrefabs;
+
 
         [FormerlySerializedAs("cellPrefab")] [FormerlySerializedAs("blockContainerHolderPrefab")] [SerializeField]
         private DefaultCell defaultCellPrefab;
@@ -30,12 +31,12 @@ namespace Designer.DI
             Container.Bind<EventChannel>().AsSingle();
 
 
-            Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefab);
+            Container.Bind<IBlockFactory>().To<BlockFactory>().AsSingle().WithArguments(blockPrefabs);
 
             Container.Bind<ICellFactory>().To<CellFactory>().AsSingle()
-                .WithArguments(defaultCellPrefab).NonLazy();
+                .WithArguments(defaultCellPrefab, grid.transform).NonLazy();
 
-            Container.Bind<Board>().AsSingle().WithArguments(width, height, grid);
+            Container.Bind<Board>().AsSingle().WithArguments(width, height, grid, grid.transform);
 
             Container.Bind<IBlockContainerFactory>().To<BlockContainerFactory>().AsSingle()
                 .WithArguments(blockContainerPrefab);

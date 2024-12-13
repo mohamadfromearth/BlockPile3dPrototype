@@ -7,6 +7,9 @@ namespace Editor
     public class PlayerPrefManager : EditorWindow
     {
         private string keyToDelete = "";
+        private string keyToSave = "";
+
+        private int intToSave = 0;
 
 
         [MenuItem("MenuItem/PlayerPrefManager")]
@@ -39,6 +42,17 @@ namespace Editor
             if (GUILayout.Button("Delete All pref"))
             {
                 PlayerPrefs.DeleteAll();
+            }
+
+
+            keyToSave = EditorGUILayout.TextField("key to save", keyToSave);
+
+            intToSave = EditorGUILayout.IntField("Int to save", intToSave);
+
+
+            if (GUILayout.Button("Save Key"))
+            {
+                PlayerPrefs.SetInt(keyToSave, intToSave);
             }
         }
     }

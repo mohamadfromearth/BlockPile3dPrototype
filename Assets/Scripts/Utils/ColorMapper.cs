@@ -1,22 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Data;
 using UnityEngine;
 
 namespace Utils
 {
     public static class ColorMapper
     {
-        private static Dictionary<string, int> colorStringToIndexDic = new()
+        private static Dictionary<string, int> colorStringToIndexDic = new();
+
+
+        public static void SetColorStringToIndexDic(List<ColorData> colorDataList)
         {
-            { "Blue", 0 },
-            { "Red", 1 },
-            { "Yellow", 2 },
-            { "Light Blue", 3 },
-            { "Green", 4 },
-            { "Light pink", 5 },
-            { "Black", 6 },
-            { "Orange", 7 },
-        };
+            for (int i = 0; i < colorDataList.Count; i++)
+            {
+                var colorData = colorDataList[i];
+                colorStringToIndexDic[colorData.name] = i;
+            }
+        }
 
 
         public static int ToColorIndex(this string colorName)
@@ -27,9 +28,8 @@ namespace Utils
 
         public static int ToColorIndex(this Color color)
         {
-            
             Debug.Log("Color is " + color);
-            
+
             Color blue = Color.white;
             blue.r = 49;
             blue.g = 57;
@@ -77,9 +77,6 @@ namespace Utils
             if (color == orange) return 7;
 
             return -1;
-
-
-
         }
     }
 }

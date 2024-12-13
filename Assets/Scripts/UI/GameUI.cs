@@ -69,7 +69,7 @@ namespace UI
         [SerializeField] private Button soundButton;
         [SerializeField] private Button musicButton;
         [SerializeField] private Button exitButton;
-        [SerializeField] private Transform coinTransform;
+        [SerializeField] private RectTransform coinTransform;
         [SerializeField] private RectTransform progressTransform;
         [SerializeField] private Transform blocksImageTransform;
 
@@ -85,6 +85,8 @@ namespace UI
         [SerializeField] private Image abilityHintImage;
         [SerializeField] private GameObject abilityHint;
         [SerializeField] private CurveMover coinsCollectionCurveMover;
+        [SerializeField] private Transform coinCollectionAnimationTarget;
+        [SerializeField] private Transform coinImage;
         private AbilityData _abilityData;
 
         [SerializeField] private GameUIHelpers helpers;
@@ -106,8 +108,10 @@ namespace UI
             float y = isLandScape ? horizontalY.position.y : verticalY.position.y;
             float cameraY = isLandScape ? cameraHorizontalY.anchoredPosition.y : cameraVerticalY.anchoredPosition.y;
 
-            progressTransform.anchoredPosition = new Vector3(progressTransform.anchoredPosition.x, cameraY, 0);
-            coinTransform.position = new Vector3(coinTransform.position.x, y, coinTransform.position.z);
+            progressTransform.anchoredPosition = new Vector3(progressTransform.anchoredPosition.x, cameraY);
+            coinTransform.anchoredPosition = new Vector3(coinTransform.anchoredPosition.x, cameraY);
+            coinCollectionAnimationTarget.position =
+                new Vector3(coinImage.position.x, coinImage.position.y, coinImage.position.z);
 
             var settingPos = new Vector3(settingButton.transform.position.x, y, settingButton.transform.position.z);
             settingButton.transform.position = settingPos;
@@ -260,6 +264,12 @@ namespace UI
         public void AddCoinCollectionAnimationCompleteListener(TweenCallback callback) =>
             coinsCollectionCurveMover.AddMovingCompleteListener(callback);
 
+        public void AddLastCoinCollectionAnimationCompleteListener(TweenCallback callback) =>
+            coinsCollectionCurveMover.AddLastMovingCompleteAnimationListener(callback);
+
+        public void RemoveLastCoinCollectionAnimationCompleteListener(TweenCallback callback) =>
+            coinsCollectionCurveMover.RemoveLastMovingCompleteAnimationListener(callback);
+
 
         public void RemoveCoinCollectionAnimationCompleteListener(TweenCallback callback) =>
             coinsCollectionCurveMover.RemoveLastMovingCompleteAnimationListener(callback);
@@ -267,6 +277,12 @@ namespace UI
 
         public void ShowCoinCollection()
         {
+            StartCoroutine(ShowCoinCollectionRoutine());
+        }
+
+        private IEnumerator ShowCoinCollectionRoutine()
+        {
+            yield return new WaitForEndOfFrame();
             coinsCollectionCurveMover.CalculateWayPoints();
             coinsCollectionCurveMover.Move();
         }
@@ -279,6 +295,7 @@ namespace UI
             progressText.gameObject.SetActive(true);
             progressBackgroundImage.gameObject.SetActive(true);
             blocksImageTransform.gameObject.SetActive(true);
+            coinTransform.gameObject.SetActive(true);
         }
 
         public void Hide()
@@ -286,6 +303,7 @@ namespace UI
             panel.SetActive(false);
             progressImage.gameObject.SetActive(false);
             progressText.gameObject.SetActive(false);
+            coinTransform.gameObject.SetActive(false);
             progressBackgroundImage.gameObject.SetActive(false);
             blocksImageTransform.gameObject.SetActive(false);
         }

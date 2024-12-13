@@ -13,7 +13,10 @@ namespace Data
         private const string LevelIndexPrefKey = "LevelIndexPrefKey";
 
 
+
         private int _levelIndex;
+
+       
 
         private void OnEnable()
         {
@@ -33,18 +36,22 @@ namespace Data
             return levelDataList[_levelIndex];
         }
 
-        public void NextLevel()
+        public void Clear()
         {
-            if (_levelIndex < levelDataList.Count - 1)
-            {
-                _levelIndex++;
-            }
-            else
-            {
-                _levelIndex = 0;
-            }
-
+            _levelIndex = 0;
             PlayerPrefs.SetInt(LevelIndexPrefKey, _levelIndex);
         }
+
+        public void NextLevel()
+        {
+            _levelIndex++;
+
+            if (_levelIndex < levelDataList.Count)
+            {
+                PlayerPrefs.SetInt(LevelIndexPrefKey, _levelIndex);
+            }
+        }
+
+        public bool IsLastLevel() => _levelIndex > levelDataList.Count - 1;
     }
 }

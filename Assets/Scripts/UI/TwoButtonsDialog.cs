@@ -14,6 +14,8 @@ namespace UI
         [SerializeField] private Transform backGround;
         [SerializeField] private GameObject panel;
 
+        [SerializeField] private bool isCancelButtonActive;
+
 
         public void AddRightButtonClickListener(UnityAction action) => rightButton.onClick.AddListener(action);
 
@@ -30,6 +32,7 @@ namespace UI
 
         public void Show()
         {
+            cancelButton.gameObject.SetActive(isCancelButtonActive);
             panel.SetActive(true);
             backGround.ShowPopUp();
         }

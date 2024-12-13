@@ -27,8 +27,14 @@ namespace Data
     {
         public int LevelIndex { get; }
 
+
         public LevelDataSo GetLevelData();
 
         public void NextLevel();
+
+
+        public void Clear();
+
+        public bool IsLastLevel();
     }
 }

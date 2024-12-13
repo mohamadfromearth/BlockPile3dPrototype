@@ -21,14 +21,14 @@ namespace Tutorial.Data
         [SerializeField] private List<string> blocksColors;
         [SerializeField] private List<int> blocksCount;
 
-        private bool _isTutorialAvailable = true;
+        private bool _isTutorialAvailable;
 
 
         private void OnEnable()
         {
-            _tutorialIndex = PlayerPrefs.GetInt(TutorialIndexKey, 0);
-            // _isTutorialAvailable =
-            //     PlayerPrefs.GetInt(IsTutorialAvailableKey, TutorialAvailableValue) == TutorialAvailableValue;
+            _tutorialIndex = 0;
+            _isTutorialAvailable = PlayerPrefs.GetInt(IsTutorialAvailableKey, TutorialAvailableValue) ==
+                                   TutorialAvailableValue;
         }
 
 

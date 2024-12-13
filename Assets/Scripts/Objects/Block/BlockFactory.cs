@@ -18,6 +18,7 @@ namespace Objects.Block
 
         public IBlock Create(int index)
         {
+            Debug.Log("Color index is " + index);
             var block = Object.Instantiate(_blockPrefabs[index]);
             block.Channel = _channel;
             return block;

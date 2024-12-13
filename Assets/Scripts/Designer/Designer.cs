@@ -1,5 +1,3 @@
-/*
-#if UNITY_EDITOR
 using System.Collections.Generic;
 using Data;
 using Event;
@@ -8,8 +6,10 @@ using Objects.Block;
 using Objects.BlocksContainer;
 using Objects.Cell;
 using Objects.LockBlock;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using Utils;
 using Zenject;
 using LockBlock = Objects.LockBlock.LockBlock;
 
@@ -148,6 +148,7 @@ namespace Designer
 
         private void Start()
         {
+            Debug.Log("Level index is: " + PlayerPrefs.GetInt("LEVEL_INDEX_KEY", 1));
             _levelData = ScriptableObject.CreateInstance<LevelDataSo>();
             colorAdderUI.SetColors(colorRepository.GetColorsNames());
             cellColorAdderUI.SetColors(colorRepository.GetColorsNames());
@@ -308,7 +309,7 @@ namespace Designer
 
             for (int i = 0; i < count; i++)
             {
-                var block = _blockFactory.Create();
+                var block = _blockFactory.Create(cellColorAdderUI.GetColorIndex());
                 block.Color = color;
                 _selectedCell.BlockContainer.Push(block);
             }
@@ -419,7 +420,3 @@ namespace Designer
         #endregion
     }
 }
-#endif
-*/
-
-

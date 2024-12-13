@@ -2,6 +2,7 @@
 using Core;
 using Data;
 using Event;
+using Event.Coin;
 using UnityEngine;
 using Zenject;
 
@@ -21,6 +22,7 @@ namespace Managers
             Player = player;
             Channel = channel;
             settingsRepository.AddMusicToggleListener(OnMusicToggle);
+            channel.Subscribe<CoinCollectionAnimationCompleted>(OnCoinCollecting);
         }
 
 
@@ -35,6 +37,15 @@ namespace Managers
             else
             {
                 source.Pause();
+            }
+        }
+
+        protected void OnCoinCollecting()
+        {
+            if (settingsRepository.IsSoundOn)
+            {
+                Player.SetAudioClip(AudioSourceType.Main, Repo.coinCollect);
+                Player.Play(AudioSourceType.Main);
             }
         }
     }

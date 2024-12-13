@@ -2696,10 +2696,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83a50c9e71a44facb515b2680ff5d957, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockPrefab: {fileID: 3869021828577780324, guid: ab5441bb0e5db7f4b91fb3cc70b09e4d, type: 3}
-  blockContainerPrefab: {fileID: 7031501898914153013, guid: 4484d8ccb9d44ad44ba3729d86055d82, type: 3}
+  blockContainerPrefab: {fileID: 6330068114331806170, guid: 4484d8ccb9d44ad44ba3729d86055d82, type: 3}
   advertiseBlockPrefab: {fileID: 1664345079107195230, guid: 8e60abcbe704a524682e05e9fcd3afc7, type: 3}
   lockBlockPrefab: {fileID: 4833048417843813151, guid: c092c448d1ac25040bdbf1337f6702bb, type: 3}
+  blockPrefabs:
+  - {fileID: 1516367837362834279, guid: 8e95a20fe80f3304f9efefeb0e16e896, type: 3}
+  - {fileID: 5876079780068329927, guid: 399c9f0e000df644ab33f843d916e3e1, type: 3}
+  - {fileID: 2649606372340438999, guid: 71d0205b60d72e44d8b624bd59f008c5, type: 3}
+  - {fileID: 5909242990236815993, guid: 87c1b21072bf9274aad07bfe4064c8a0, type: 3}
+  - {fileID: 8890303694570937639, guid: 4f3e575f4e8593540b4267b3807eea2b, type: 3}
+  - {fileID: 2861846005787181164, guid: 6a89aa7d359268d4abbffd44a54a457f, type: 3}
+  - {fileID: 1633688284018747786, guid: 66158791b003b7943911a5ea6281f2c8, type: 3}
+  - {fileID: 8049263949921012205, guid: 6be6b8fae85b25b45bdf01d2e19c9eb8, type: 3}
+  - {fileID: 6239914422245134076, guid: dd277d4814727274b88917c6c9814fd5, type: 3}
+  - {fileID: 3113855439487344326, guid: 3bca03555ccba264b81ef331a4239576, type: 3}
+  - {fileID: 8192634000189098835, guid: c236e5fcc1c51d64d8d45f25a36d3893, type: 3}
+  - {fileID: 7382204278330924345, guid: 950137b5359dd3643a7620fb9fc69dd6, type: 3}
+  - {fileID: 7307833846041254475, guid: edb82b207eb4e544385720b4e3daba40, type: 3}
+  - {fileID: 6308618592584718538, guid: 75d026e7a1af67b44b06710d77e33b3e, type: 3}
+  - {fileID: 4381120437192232408, guid: 7959da120b01a5344b42a2029ecdbd81, type: 3}
+  - {fileID: 4803256460400165517, guid: d9cf735c41c98ca4faa8437a2eb340f3, type: 3}
   defaultCellPrefab: {fileID: 7998414728364303778, guid: f7716b26ad3a7f94f87c9053f1311564, type: 3}
   grid: {fileID: 1654743540}
   width: 5
@@ -5709,6 +5725,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  PointerUpEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &870798978
 Transform:
   m_ObjectHideFlags: 0

@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bubble: {fileID: 8300000, guid: f22afea7a30cbd24db26ba1a2cf806b8, type: 3}
   blockPickUp: {fileID: 8300000, guid: a0a451042c68de145939a4b6a177caba, type: 3}
-  coinCollect: {fileID: 8300000, guid: c27fb440d62e68846975f34ac7121777, type: 3}
+  coinCollect: {fileID: 8300000, guid: ece316d453317784bad2146e24cc3971, type: 3}
   soundTrack: {fileID: 8300000, guid: c27fb440d62e68846975f34ac7121777, type: 3}
+  lose: {fileID: 8300000, guid: e0187417650b89241895f2fc7863c0d8, type: 3}
+  win: {fileID: 8300000, guid: c172a8301354836458d34b74525f2874, type: 3}
   blockPushingInitialPitch: 1
   blockPushingPitchInterval: 0.2
   blockDestroyingInitialPitch: 5

@@ -8,7 +8,6 @@ namespace UI
 {
     public class LoseUI : MonoBehaviour
     {
-        [SerializeField] private Button retryButton;
         [SerializeField] private Button advertiseReviveButton;
         [SerializeField] private Button coinReviveButton;
         [SerializeField] private Button cancelButton;
@@ -19,8 +18,6 @@ namespace UI
         [SerializeField] private TextMeshProUGUI needToCollectText;
 
 
-        public void AddRetryClickListener(UnityAction action) => retryButton.onClick.AddListener(action);
-        public void RemoveRetryClickListener(UnityAction action) => retryButton.onClick.RemoveListener(action);
 
         public void AddCoinReviveClickListener(UnityAction action) =>
             coinReviveButton.onClick.AddListener(action);

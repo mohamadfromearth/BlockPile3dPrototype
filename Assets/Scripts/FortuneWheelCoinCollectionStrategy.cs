@@ -22,6 +22,7 @@ public class FortuneWheelCoinCollectionStrategy : IFortuneWheelCollectionStrateg
         _fortuneWheelRewardShowerUI = fortuneWheelRewardShowerUI;
         //_gameUI.AddCoinCollectionAnimationCompleteListener(OnCoinCollectionAnimationCompleted);
         _coinCollectionCurveMover = coinCollectionCurveMover;
+        _coinCollectionCurveMover?.AddLastMovingCompleteAnimationListener(OnCoinCollectionAnimationCompleted);
         _channel = channel;
     }
 
@@ -38,6 +39,8 @@ public class FortuneWheelCoinCollectionStrategy : IFortuneWheelCollectionStrateg
 
     public void Claim(int count)
     {
+        _currencyRepository.AddCoin(count);
+
         if (_coinCollectionCurveMover.IsEmpty)
         {
             _channel.Rise<FortuneWheelRewardCollect>(new FortuneWheelRewardCollect());
