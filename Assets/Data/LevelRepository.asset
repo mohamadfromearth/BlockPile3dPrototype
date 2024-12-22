@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: LevelRepository
   m_EditorClassIdentifier: 
   levelDataList:
-  - {fileID: 11400000, guid: 3b4d6d4c75fe68b4e98cb6bf399ab1f1, type: 2}
-  - {fileID: 11400000, guid: f99837089f530eb4b99329424cf66c12, type: 2}
+  - {fileID: 11400000, guid: 0b27ba7bf743cc047b86af5e3a05f856, type: 2}
+  - {fileID: 11400000, guid: 84cddc670f4c75540b4a94a9b1e3b464, type: 2}

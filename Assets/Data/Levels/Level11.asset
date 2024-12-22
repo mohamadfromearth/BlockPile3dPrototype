@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1519aaaf220e408b8b86c54250975670, type: 3}
+  m_Name: Level11
+  m_EditorClassIdentifier: 
+  size: 6
+  colors:
+  - Red
+  - Green
+  - Black
+  - Yellow
+  blockContainerDataList:
+  - position: {x: 5, y: 0, z: 3}
+    color:
+    - Black
+    - Black
+    - Yellow
+    - Yellow
+  - position: {x: 1, y: 0, z: 0}
+    color:
+    - Green
+    - Green
+    - Green
+    - Green
+  - position: {x: 0, y: 0, z: 1}
+    color:
+    - Red
+    - Red
+    - Red
+    - Red
+    - Green
+    - Green
+    - Green
+    - Green
+  - position: {x: 2, y: 0, z: 3}
+    color:
+    - Red
+    - Red
+    - Red
+    - Red
+    - Red
+  - position: {x: 3, y: 0, z: 5}
+    color:
+    - Blue
+    - Blue
+    - Blue
+    - Black
+    - Black
+  emptyHoldersPosList:
+  - {x: 5, y: 0, z: 5}
+  - {x: 1, y: 0, z: 5}
+  - {x: 0, y: 0, z: 5}
+  - {x: 0, y: 0, z: 4}
+  - {x: 5, y: 0, z: 1}
+  - {x: 5, y: 0, z: 0}
+  - {x: 4, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  advertiseBlocks:
+  - {x: 2, y: 0, z: 2}
+  lockBlocks:
+  - position: {x: 4, y: 0, z: 3}
+    count: 200
+  - position: {x: 3, y: 0, z: 4}
+    count: 120
+  - position: {x: 1, y: 0, z: 1}
+    count: 250
+  targetScore: 450
+  leftEdgePosition: {x: 0, y: 0, z: 0}
+  rightEdgePosition: {x: 0, y: 0, z: 0}
+  buildingItemReward: 3
+  coinReward: 30
