@@ -17,7 +17,7 @@ namespace Menu
         [SerializeField] private SettingsRepository settingRepository;
         [SerializeField] private FortuneWheelRepository fortuneWheelRepository;
 
-        [SerializeField] private Sprite landscapeBack;
+        //[SerializeField] private Sprite landscapeBack;
         [SerializeField] private Sprite portraitBack;
 
         [Inject] private ILevelRepository _levelRepository;
@@ -33,8 +33,8 @@ namespace Menu
             if (settingRepository.IsMusicOn) musicSource.Play();
             menuUI.SetMusicImage(settingRepository.GetMusicSprite());
             menuUI.SetSoundImage(settingRepository.GetSoundSprite());
-            var background = Screen.width > Screen.height ? landscapeBack : portraitBack;
-            menuUI.SetBackground(background);
+           // var background = Screen.width > Screen.height ? landscapeBack : portraitBack;
+            //menuUI.SetBackground(background);
             menuUI.StartLoadingAnimation();
             menuUI.SetLevelText("Level " + (_levelRepository.LevelIndex + 1));
             StartCoroutine(HideLoadingRoutine());
